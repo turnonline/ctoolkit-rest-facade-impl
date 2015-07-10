@@ -42,18 +42,6 @@
         <module>appengine</module>
     </modules>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <!-- Include site generation and deployment into release -->
-                    <goals>deploy site site-deploy</goals>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
