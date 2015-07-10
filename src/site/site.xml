@@ -1,0 +1,27 @@
+<project name="REST Client Facade API implementation">
+    <bannerLeft>
+        <name>Uniform client facade API implementation to perform common operations on top of REST.</name>
+        <src>http://maven.apache.org/images/apache-maven-project-2.png</src>
+        <href>https://github.com/turnonline/rest-client-facade-impl</href>
+    </bannerLeft>
+    <body>
+        <menu name="REST Client Facade API Implementation Project">
+            <item name="Overview" href="index.html"/>
+        </menu>
+        <menu ref="reports"/>
+    </body>
+
+    <custom>
+        <fluidoSkin>
+            <topBarEnabled>true</topBarEnabled>
+            <sideBarEnabled>true</sideBarEnabled>
+            <navBarStyle>navbar-inverse</navBarStyle>
+        </fluidoSkin>
+    </custom>
+
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.4</version>
+    </skin>
+</project>
