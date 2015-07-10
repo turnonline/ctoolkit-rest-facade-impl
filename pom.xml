@@ -42,6 +42,19 @@
         <module>appengine</module>
     </modules>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.17</version>
+                <configuration>
+                    <argLine>-Xmx128m ${jmockit.setting}</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -78,7 +91,7 @@
             <dependency>
                 <groupId>org.jmockit</groupId>
                 <artifactId>jmockit</artifactId>
-                <version>1.18</version>
+                <version>${jmockit.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -89,4 +102,11 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <properties>
+        <jmockit.version>1.18</jmockit.version>
+        <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
+        <jmockit.setting>-javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar
+        </jmockit.setting>
+    </properties>
 </project>
