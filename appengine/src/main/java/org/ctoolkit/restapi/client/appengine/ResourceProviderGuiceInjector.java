@@ -17,7 +17,7 @@ import java.lang.reflect.ParameterizedType;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class ResourceProviderGuiceInjector
+class ResourceProviderGuiceInjector
         implements ResourceProviderInjector
 {
     private final Injector injector;

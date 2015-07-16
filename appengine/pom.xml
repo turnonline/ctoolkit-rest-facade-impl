@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.ctoolkit.restapi</groupId>
@@ -15,7 +16,7 @@
     <name>Uniform REST Client Facade API AppEngine Implementation</name>
     <description>
         Uniform client facade API implementation to perform common operations on top of REST.
-        Implemented for Google AppEngine runtime.
+        Implemented for Google AppEngine runtime with Guice.
     </description>
 
     <dependencies>
@@ -39,6 +40,10 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client-appengine</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
