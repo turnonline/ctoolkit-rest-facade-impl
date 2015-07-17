@@ -1,6 +1,5 @@
 /*
- * Comvai Uniform client facade API
- * Copyright (C) 2015 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2015 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
