@@ -17,8 +17,7 @@
   ~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
   -->
 
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.ctoolkit.maven</groupId>
@@ -29,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ctoolkit.restapi</groupId>
     <artifactId>rest-client-facade-impl</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.7</version>
     <packaging>pom</packaging>
     <name>Parent Project</name>
     <description>Uniform client facade API implementation to perform common operations on top of REST.</description>
@@ -39,7 +38,7 @@
         <connection>scm:git:[fetch=]git@github.com:turnonline/rest-client-facade-impl.git</connection>
         <developerConnection>scm:git:[push=]git@github.com:turnonline/rest-client-facade-impl.git</developerConnection>
         <url>https://github.com/turnonline/rest-client-facade-impl</url>
-        <tag>HEAD</tag>
+        <tag>rest-client-facade-impl-0.7</tag>
     </scm>
 
     <issueManagement>
