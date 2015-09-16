@@ -18,6 +18,7 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import com.google.common.collect.Lists;
 import ma.glasnost.orika.MapperFacade;
 import org.ctoolkit.restapi.client.LocalResourceProvider;
 import org.ctoolkit.restapi.client.Patch;
@@ -261,10 +262,17 @@ public class ResourceFacadeAdapter
                 logger.warn( "Resource " + resource.getName(), e );
                 throw new RuntimeException( e );
             }
-            response = mapper.mapAsList( remoteList, resource );
+            if ( remoteList == null )
+            {
+                response = Lists.newArrayList();
+            }
+            else
+            {
+                response = mapper.mapAsList( remoteList, resource );
+            }
         }
 
-        if ( requestForPersist && response != null )
+        if ( requestForPersist && response != null && !response.isEmpty() )
         {
             // provide remote list of resource to be either persisted or cached
             provider.persistList( response, criteria, locale );
