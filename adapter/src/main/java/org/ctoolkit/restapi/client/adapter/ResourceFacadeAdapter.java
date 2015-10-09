@@ -18,6 +18,8 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import com.google.api.client.http.HttpResponseException;
+import com.google.api.client.http.HttpStatusCodes;
 import com.google.common.collect.Lists;
 import ma.glasnost.orika.MapperFacade;
 import org.ctoolkit.restapi.client.LocalResourceProvider;
@@ -195,6 +197,15 @@ public class ResourceFacadeAdapter
             }
             catch ( IOException e )
             {
+                if ( e instanceof HttpResponseException )
+                {
+                    int statusCode = ( ( HttpResponseException ) e ).getStatusCode();
+                    if ( HttpStatusCodes.STATUS_CODE_NOT_FOUND == statusCode )
+                    {
+                        return null;
+                    }
+                }
+
                 logger.warn( "Resource " + resource.getName() + ", identifier: " + identifier, e );
                 throw new RuntimeException( e );
             }
