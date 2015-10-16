@@ -26,6 +26,12 @@ import org.ctoolkit.restapi.client.LocalResourceProvider;
 import org.ctoolkit.restapi.client.Patch;
 import org.ctoolkit.restapi.client.ResourceFacade;
 import org.ctoolkit.restapi.client.RestExecutorAdaptee;
+import org.ctoolkit.restapi.client.error.BadRequestException;
+import org.ctoolkit.restapi.client.error.ConflictException;
+import org.ctoolkit.restapi.client.error.ForbiddenException;
+import org.ctoolkit.restapi.client.error.InternalServerErrorException;
+import org.ctoolkit.restapi.client.error.ServiceUnavailableException;
+import org.ctoolkit.restapi.client.error.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,8 +118,16 @@ public class ResourceFacadeAdapter
         }
         catch ( IOException e )
         {
-            logger.warn( "Resource " + resource.getName(), e );
-            throw new RuntimeException( e );
+            RuntimeException exception = prepareException( e, resource, null );
+            if ( exception == null )
+            {
+                //TODO ??
+                return null;
+            }
+            else
+            {
+                throw exception;
+            }
         }
 
         // null means no specific call processed to create default instance
@@ -197,17 +211,15 @@ public class ResourceFacadeAdapter
             }
             catch ( IOException e )
             {
-                if ( e instanceof HttpResponseException )
+                RuntimeException exception = prepareException( e, resource, identifier );
+                if ( exception == null )
                 {
-                    int statusCode = ( ( HttpResponseException ) e ).getStatusCode();
-                    if ( HttpStatusCodes.STATUS_CODE_NOT_FOUND == statusCode )
-                    {
-                        return null;
-                    }
+                    return null;
                 }
-
-                logger.warn( "Resource " + resource.getName() + ", identifier: " + identifier, e );
-                throw new RuntimeException( e );
+                else
+                {
+                    throw exception;
+                }
             }
             response = mapper.map( remoteObject, resource );
         }
@@ -270,8 +282,16 @@ public class ResourceFacadeAdapter
             }
             catch ( IOException e )
             {
-                logger.warn( "Resource " + resource.getName(), e );
-                throw new RuntimeException( e );
+                RuntimeException exception = prepareException( e, resource, null );
+                if ( exception == null )
+                {
+                    //TODO ?? return null;
+                    remoteList = null;
+                }
+                else
+                {
+                    throw exception;
+                }
             }
             if ( remoteList == null )
             {
@@ -310,8 +330,16 @@ public class ResourceFacadeAdapter
         }
         catch ( IOException e )
         {
-            logger.warn( "Resource " + resource.getClass().getName() + ", parent key: " + parentKey, e );
-            throw new RuntimeException( e );
+            RuntimeException exception = prepareException( e, resource.getClass(), parentKey );
+            if ( exception == null )
+            {
+                // TODO ??
+                return null;
+            }
+            else
+            {
+                throw exception;
+            }
         }
 
         return ( T ) mapper.map( source, resource.getClass() );
@@ -331,8 +359,16 @@ public class ResourceFacadeAdapter
         }
         catch ( IOException e )
         {
-            logger.warn( "Resource " + resource.getClass().getName() + ", identifier: " + identifier, e );
-            throw new RuntimeException( e );
+            RuntimeException exception = prepareException( e, resource.getClass(), identifier );
+            if ( exception == null )
+            {
+                // TODO ??
+                return null;
+            }
+            else
+            {
+                throw exception;
+            }
         }
 
         return ( T ) mapper.map( source, resource.getClass() );
@@ -352,8 +388,16 @@ public class ResourceFacadeAdapter
         }
         catch ( IOException e )
         {
-            logger.warn( "Resource " + resource.getClass().getName() + ", identifier: " + identifier, e );
-            throw new RuntimeException( e );
+            RuntimeException exception = prepareException( e, resource.getClass(), identifier );
+            if ( exception == null )
+            {
+                // TODO ??
+                return null;
+            }
+            else
+            {
+                throw exception;
+            }
         }
 
         return mapper.map( source, resource.type() );
@@ -371,9 +415,68 @@ public class ResourceFacadeAdapter
         }
         catch ( IOException e )
         {
-            logger.warn( "Resource " + resource.getName() + ", identifier: " + identifier, e );
-            throw new RuntimeException( e );
+            RuntimeException exception = prepareException( e, resource, identifier );
+            if ( exception == null )
+            {
+                // TODO ??
+                return;
+            }
+            else
+            {
+                throw exception;
+            }
         }
+    }
+
+    private RuntimeException prepareException( IOException e, Class<?> resource, @Nullable Object identifier )
+    {
+        int statusCode = -1;
+        String statusMessage = null;
+
+        RuntimeException toBeThrown;
+
+        if ( e instanceof HttpResponseException )
+        {
+            statusCode = ( ( HttpResponseException ) e ).getStatusCode();
+            statusMessage = ( ( HttpResponseException ) e ).getStatusMessage();
+        }
+
+        logger.warn( "Resource " + resource.getName() + ", identifier: " + identifier, e );
+
+        if ( 400 == statusCode )
+        {
+            toBeThrown = new BadRequestException( statusMessage );
+        }
+        else if ( HttpStatusCodes.STATUS_CODE_UNAUTHORIZED == statusCode )
+        {
+            toBeThrown = new UnauthorizedException( statusMessage );
+        }
+        else if ( HttpStatusCodes.STATUS_CODE_FORBIDDEN == statusCode )
+        {
+            toBeThrown = new ForbiddenException( statusMessage );
+        }
+        else if ( HttpStatusCodes.STATUS_CODE_NOT_FOUND == statusCode )
+        {
+            return null;
+        }
+        else if ( 409 == statusCode )
+        {
+            toBeThrown = new ConflictException( statusMessage );
+        }
+        else if ( HttpStatusCodes.STATUS_CODE_SERVER_ERROR == statusCode )
+        {
+            toBeThrown = new InternalServerErrorException( statusMessage );
+        }
+        else if ( HttpStatusCodes.STATUS_CODE_SERVICE_UNAVAILABLE == statusCode )
+        {
+            toBeThrown = new ServiceUnavailableException( statusMessage );
+        }
+        else
+        {
+            toBeThrown = new RuntimeException( statusMessage );
+        }
+
+        return toBeThrown;
     }
 
     private Class<?> getSourceClassFor( Class<?> clazz )

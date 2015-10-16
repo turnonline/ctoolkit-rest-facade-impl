@@ -17,7 +17,8 @@
   ~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.ctoolkit.maven</groupId>
@@ -83,7 +84,7 @@
             <dependency>
                 <groupId>org.ctoolkit.restapi</groupId>
                 <artifactId>rest-client-facade-api</artifactId>
-                <version>0.6</version>
+                <version>0.7-20151016.161121-1</version>
             </dependency>
             <dependency>
                 <groupId>javax.inject</groupId>
@@ -167,7 +168,7 @@
     <properties>
         <google-api-client.version>1.20.0</google-api-client.version>
         <appengine.version>1.9.23</appengine.version>
-        <jmockit.version>1.18</jmockit.version>
+        <jmockit.version>1.19</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
         <jmockit.setting>-javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar
         </jmockit.setting>
