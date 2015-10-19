@@ -22,16 +22,15 @@ import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpStatusCodes;
 import com.google.common.collect.Lists;
 import ma.glasnost.orika.MapperFacade;
+import org.ctoolkit.restapi.client.ClientErrorException;
+import org.ctoolkit.restapi.client.HttpFailureException;
 import org.ctoolkit.restapi.client.LocalResourceProvider;
+import org.ctoolkit.restapi.client.NotFoundException;
 import org.ctoolkit.restapi.client.Patch;
+import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.ResourceFacade;
 import org.ctoolkit.restapi.client.RestExecutorAdaptee;
-import org.ctoolkit.restapi.client.error.BadRequestException;
-import org.ctoolkit.restapi.client.error.ConflictException;
-import org.ctoolkit.restapi.client.error.ForbiddenException;
-import org.ctoolkit.restapi.client.error.InternalServerErrorException;
-import org.ctoolkit.restapi.client.error.ServiceUnavailableException;
-import org.ctoolkit.restapi.client.error.UnauthorizedException;
+import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,16 +117,7 @@ public class ResourceFacadeAdapter
         }
         catch ( IOException e )
         {
-            RuntimeException exception = prepareException( e, resource, null );
-            if ( exception == null )
-            {
-                //TODO ??
-                return null;
-            }
-            else
-            {
-                throw exception;
-            }
+            throw prepareUpdateException( e, resource, null );
         }
 
         // null means no specific call processed to create default instance
@@ -211,7 +201,7 @@ public class ResourceFacadeAdapter
             }
             catch ( IOException e )
             {
-                RuntimeException exception = prepareException( e, resource, identifier );
+                RuntimeException exception = prepareRetrievalException( e, resource, identifier );
                 if ( exception == null )
                 {
                     return null;
@@ -282,10 +272,9 @@ public class ResourceFacadeAdapter
             }
             catch ( IOException e )
             {
-                RuntimeException exception = prepareException( e, resource, null );
+                RuntimeException exception = prepareRetrievalException( e, resource, null );
                 if ( exception == null )
                 {
-                    //TODO ?? return null;
                     remoteList = null;
                 }
                 else
@@ -330,16 +319,7 @@ public class ResourceFacadeAdapter
         }
         catch ( IOException e )
         {
-            RuntimeException exception = prepareException( e, resource.getClass(), parentKey );
-            if ( exception == null )
-            {
-                // TODO ??
-                return null;
-            }
-            else
-            {
-                throw exception;
-            }
+            throw prepareUpdateException( e, resource.getClass(), parentKey );
         }
 
         return ( T ) mapper.map( source, resource.getClass() );
@@ -359,16 +339,7 @@ public class ResourceFacadeAdapter
         }
         catch ( IOException e )
         {
-            RuntimeException exception = prepareException( e, resource.getClass(), identifier );
-            if ( exception == null )
-            {
-                // TODO ??
-                return null;
-            }
-            else
-            {
-                throw exception;
-            }
+            throw prepareUpdateException( e, resource.getClass(), identifier );
         }
 
         return ( T ) mapper.map( source, resource.getClass() );
@@ -388,16 +359,7 @@ public class ResourceFacadeAdapter
         }
         catch ( IOException e )
         {
-            RuntimeException exception = prepareException( e, resource.getClass(), identifier );
-            if ( exception == null )
-            {
-                // TODO ??
-                return null;
-            }
-            else
-            {
-                throw exception;
-            }
+            throw prepareUpdateException( e, resource.getClass(), identifier );
         }
 
         return mapper.map( source, resource.type() );
@@ -415,20 +377,24 @@ public class ResourceFacadeAdapter
         }
         catch ( IOException e )
         {
-            RuntimeException exception = prepareException( e, resource, identifier );
-            if ( exception == null )
-            {
-                // TODO ??
-                return;
-            }
-            else
-            {
-                throw exception;
-            }
+            throw prepareUpdateException( e, resource, identifier );
         }
     }
 
-    private RuntimeException prepareException( IOException e, Class<?> resource, @Nullable Object identifier )
+    private RuntimeException prepareRetrievalException( IOException e, Class<?> resource, @Nullable Object identifier )
+    {
+        return prepareException( e, resource, identifier, false );
+    }
+
+    private RuntimeException prepareUpdateException( IOException e, Class<?> resource, @Nullable Object identifier )
+    {
+        return prepareException( e, resource, identifier, true );
+    }
+
+    private RuntimeException prepareException( IOException e,
+                                               Class<?> resource,
+                                               @Nullable Object identifier,
+                                               boolean update )
     {
         int statusCode = -1;
         String statusMessage = null;
@@ -445,7 +411,7 @@ public class ResourceFacadeAdapter
 
         if ( 400 == statusCode )
         {
-            toBeThrown = new BadRequestException( statusMessage );
+            toBeThrown = new ClientErrorException( statusCode, statusMessage );
         }
         else if ( HttpStatusCodes.STATUS_CODE_UNAUTHORIZED == statusCode )
         {
@@ -453,23 +419,35 @@ public class ResourceFacadeAdapter
         }
         else if ( HttpStatusCodes.STATUS_CODE_FORBIDDEN == statusCode )
         {
-            toBeThrown = new ForbiddenException( statusMessage );
+            toBeThrown = new ClientErrorException( statusCode, statusMessage );
+        }
+        else if ( HttpStatusCodes.STATUS_CODE_NOT_FOUND == statusCode && update )
+        {
+            toBeThrown = new NotFoundException( statusMessage );
         }
         else if ( HttpStatusCodes.STATUS_CODE_NOT_FOUND == statusCode )
         {
-            return null;
+            toBeThrown = new NotFoundException( statusMessage );
         }
         else if ( 409 == statusCode )
         {
-            toBeThrown = new ConflictException( statusMessage );
+            toBeThrown = new ClientErrorException( statusCode, statusMessage );
+        }
+        else if ( 400 < statusCode && statusCode < 499 )
+        {
+            toBeThrown = new ClientErrorException( statusCode, statusMessage );
         }
         else if ( HttpStatusCodes.STATUS_CODE_SERVER_ERROR == statusCode )
         {
-            toBeThrown = new InternalServerErrorException( statusMessage );
+            toBeThrown = new RemoteServerErrorException( statusCode, statusMessage );
         }
         else if ( HttpStatusCodes.STATUS_CODE_SERVICE_UNAVAILABLE == statusCode )
         {
-            toBeThrown = new ServiceUnavailableException( statusMessage );
+            toBeThrown = new RemoteServerErrorException( statusCode, statusMessage );
+        }
+        else if ( statusCode > -1 )
+        {
+            toBeThrown = new HttpFailureException( statusCode, statusMessage );
         }
         else
         {

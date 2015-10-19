@@ -84,7 +84,7 @@
             <dependency>
                 <groupId>org.ctoolkit.restapi</groupId>
                 <artifactId>rest-client-facade-api</artifactId>
-                <version>0.7-20151016.161121-1</version>
+                <version>0.7-20151019.034701-2</version>
             </dependency>
             <dependency>
                 <groupId>javax.inject</groupId>
@@ -167,7 +167,7 @@
 
     <properties>
         <google-api-client.version>1.20.0</google-api-client.version>
-        <appengine.version>1.9.23</appengine.version>
+        <appengine.version>1.9.27</appengine.version>
         <jmockit.version>1.19</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
         <jmockit.setting>-javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar
