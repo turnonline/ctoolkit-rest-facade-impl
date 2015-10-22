@@ -84,7 +84,7 @@
             <dependency>
                 <groupId>org.ctoolkit.restapi</groupId>
                 <artifactId>rest-client-facade-api</artifactId>
-                <version>0.7-20151019.034701-2</version>
+                <version>0.7</version>
             </dependency>
             <dependency>
                 <groupId>javax.inject</groupId>
