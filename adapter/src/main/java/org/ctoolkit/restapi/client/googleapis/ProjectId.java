@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2016 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,13 +27,13 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 
 /**
- * The annotation to set the service account ID (typically an e-mail address) for Google API calls.
+ * The annotation to set the Google Cloud Project ID also known as applicationId (AppId).
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Qualifier
 @Target( {METHOD, PARAMETER, FIELD} )
 @Retention( java.lang.annotation.RetentionPolicy.RUNTIME )
-public @interface ServiceAccount
+public @interface ProjectId
 {
 }

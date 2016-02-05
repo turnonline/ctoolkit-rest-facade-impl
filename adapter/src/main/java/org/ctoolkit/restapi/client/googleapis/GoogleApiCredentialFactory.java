@@ -31,6 +31,7 @@ import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
@@ -46,7 +47,11 @@ import java.util.Collection;
  */
 public abstract class GoogleApiCredentialFactory
 {
-    protected final String serviceAccount;
+    protected final String projectId;
+
+    protected final String clientId;
+
+    protected final String serviceAccountEmail;
 
     protected final String applicationName;
 
@@ -72,7 +77,9 @@ public abstract class GoogleApiCredentialFactory
     protected GoogleApiCredentialFactory( @Nonnull Builder builder, @Nonnull EventBus eventBus )
     {
         this.eventBus = eventBus;
-        this.serviceAccount = builder.serviceAccount;
+        this.projectId = builder.projectId;
+        this.clientId = builder.clientId;
+        this.serviceAccountEmail = builder.serviceAccountEmail;
         this.applicationName = builder.applicationName;
         this.fileName = builder.fileName;
         this.apiKey = builder.apiKey;
@@ -105,9 +112,19 @@ public abstract class GoogleApiCredentialFactory
         return jsonFactory;
     }
 
-    public final String getServiceAccount()
+    public String getProjectId()
     {
-        return serviceAccount;
+        return projectId;
+    }
+
+    public String getClientId()
+    {
+        return clientId;
+    }
+
+    public final String getServiceAccountEmail()
+    {
+        return serviceAccountEmail;
     }
 
     public final String getApplicationName()
@@ -130,6 +147,11 @@ public abstract class GoogleApiCredentialFactory
         return endpointUrl;
     }
 
+    public int getNumberOfRetries()
+    {
+        return numberOfRetries;
+    }
+
     public final boolean isDevelopmentEnvironment()
     {
         return isDevelopmentEnvironment;
@@ -148,21 +170,39 @@ public abstract class GoogleApiCredentialFactory
     public HttpRequestInitializer authorize( Collection<String> scopes, String userAccount )
             throws GeneralSecurityException, IOException
     {
-        if ( serviceAccount == null || fileName == null )
+        if ( serviceAccountEmail == null )
         {
             throw new NullPointerException();
         }
 
         // p12 file load right before usage
-        URL resource = GoogleApiCredentialFactory.class.getResource( fileName );
+        URL resource = getServiceAccountPrivateKeyP12Resource();
 
         return new ConfiguredGoogleCredential().setTransport( getHttpTransport() )
                 .setJsonFactory( getJsonFactory() )
-                .setServiceAccountId( serviceAccount )
+                .setServiceAccountId( serviceAccountEmail )
                 .setServiceAccountScopes( scopes )
                 .setServiceAccountPrivateKeyFromP12File( new File( resource.getPath() ) )
                 .setServiceAccountUser( userAccount )
                 .build();
+    }
+
+    public URL getServiceAccountPrivateKeyP12Resource()
+    {
+        if ( fileName == null )
+        {
+            throw new NullPointerException();
+        }
+        return GoogleApiCredentialFactory.class.getResource( fileName );
+    }
+
+    public InputStream getServiceAccountPrivateKeyP12Stream()
+    {
+        if ( fileName == null )
+        {
+            throw new NullPointerException();
+        }
+        return GoogleApiCredentialFactory.class.getResourceAsStream( fileName );
     }
 
     /**
@@ -170,7 +210,11 @@ public abstract class GoogleApiCredentialFactory
      */
     public static class Builder
     {
-        private String serviceAccount;
+        private String projectId;
+
+        private String clientId;
+
+        private String serviceAccountEmail;
 
         private String applicationName;
 
@@ -185,11 +229,27 @@ public abstract class GoogleApiCredentialFactory
         private int numberOfRetries = 1;
 
         /**
+         * Sets the Google Cloud Project ID.
+         */
+        public void setProjectId( String projectId )
+        {
+            this.projectId = projectId;
+        }
+
+        /**
+         * Sets the Google API OAuth 2.0 Client ID Credential.
+         */
+        public void setClientId( String clientId )
+        {
+            this.clientId = clientId;
+        }
+
+        /**
          * Sets the service account ID (typically an e-mail address).
          */
-        public Builder setServiceAccount( String serviceAccount )
+        public Builder setServiceAccountEmail( String serviceAccountEmail )
         {
-            this.serviceAccount = serviceAccount;
+            this.serviceAccountEmail = serviceAccountEmail;
             return this;
         }
 

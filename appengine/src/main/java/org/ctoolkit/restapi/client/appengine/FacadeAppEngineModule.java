@@ -29,11 +29,13 @@ import org.ctoolkit.restapi.client.adapter.ResourceFacadeAdapter;
 import org.ctoolkit.restapi.client.adapter.ResourceProviderInjector;
 import org.ctoolkit.restapi.client.googleapis.ApiKey;
 import org.ctoolkit.restapi.client.googleapis.ApplicationName;
+import org.ctoolkit.restapi.client.googleapis.ClientId;
 import org.ctoolkit.restapi.client.googleapis.DevelopmentEnvironment;
 import org.ctoolkit.restapi.client.googleapis.EndpointUrl;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiCredentialFactory;
 import org.ctoolkit.restapi.client.googleapis.P12FileName;
-import org.ctoolkit.restapi.client.googleapis.ServiceAccount;
+import org.ctoolkit.restapi.client.googleapis.ProjectId;
+import org.ctoolkit.restapi.client.googleapis.ServiceAccountEmail;
 
 import javax.inject.Singleton;
 
@@ -69,9 +71,19 @@ public class FacadeAppEngineModule
             builder.setFileName( holder.fileName );
         }
 
-        if ( holder.serviceAccount != null )
+        if ( holder.projectId != null )
         {
-            builder.setServiceAccount( holder.serviceAccount );
+            builder.setProjectId( holder.projectId );
+        }
+
+        if ( holder.clientId != null )
+        {
+            builder.setClientId( holder.clientId );
+        }
+
+        if ( holder.serviceAccountEmail != null )
+        {
+            builder.setServiceAccountEmail( holder.serviceAccountEmail );
         }
 
         if ( holder.apiKey != null )
@@ -90,12 +102,20 @@ public class FacadeAppEngineModule
     static class GoogleApiInit
     {
         @Inject( optional = true )
+        @ProjectId
+        String projectId = null;
+
+        @Inject( optional = true )
+        @ClientId
+        String clientId = null;
+
+        @Inject( optional = true )
         @ApplicationName
         String appName = Constants.DEFAULT_APP_NAME;
 
         @Inject( optional = true )
-        @ServiceAccount
-        String serviceAccount = null;
+        @ServiceAccountEmail
+        String serviceAccountEmail = null;
 
         @Inject( optional = true )
         @P12FileName

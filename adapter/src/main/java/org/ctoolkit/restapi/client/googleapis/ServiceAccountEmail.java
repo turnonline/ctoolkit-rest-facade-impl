@@ -16,14 +16,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.restapi.client.adapter;
+package org.ctoolkit.restapi.client.googleapis;
+
+import javax.inject.Qualifier;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
 
 /**
- * Constants.
+ * The annotation to set the service account ID (typically an e-mail address) for Google API calls.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public interface Constants
+@Qualifier
+@Target( {METHOD, PARAMETER, FIELD} )
+@Retention( java.lang.annotation.RetentionPolicy.RUNTIME )
+public @interface ServiceAccountEmail
 {
-    String DEFAULT_APP_NAME = "ctoolkit:rest-client-facade-api";
 }
