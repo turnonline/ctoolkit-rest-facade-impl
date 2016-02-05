@@ -31,7 +31,7 @@
     <artifactId>rest-client-facade-impl</artifactId>
     <version>0.10-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Parent Project</name>
+    <name>Uniform REST Client Parent Project</name>
     <description>Uniform client facade API implementation to perform common operations on top of REST.</description>
     <url>https://github.com/turnonline/rest-client-facade-impl</url>
 
@@ -57,6 +57,7 @@
     <modules>
         <module>adapter</module>
         <module>appengine</module>
+        <module>analytics</module>
         <module>identity-toolkit</module>
     </modules>
 
@@ -85,7 +86,7 @@
             <dependency>
                 <groupId>org.ctoolkit.restapi</groupId>
                 <artifactId>rest-client-facade-api</artifactId>
-                <version>0.8-20160205.172121-1</version>
+                <version>${rest-client-facade-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.inject</groupId>
@@ -108,11 +109,38 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <!-- Google APIs dependencies -->
             <dependency>
                 <groupId>com.google.api-client</groupId>
                 <artifactId>google-api-client-appengine</artifactId>
                 <version>${google-api-client.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.oauth-client</groupId>
+                <artifactId>google-oauth-client</artifactId>
+                <version>${google-api-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.http-client</groupId>
+                <artifactId>google-http-client-jackson2</artifactId>
+                <version>${google-api-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.apis</groupId>
+                <artifactId>google-api-services-analytics</artifactId>
+                <version>${google-api-services-analytics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.apis</groupId>
+                <artifactId>google-api-services-identitytoolkit</artifactId>
+                <version>${google-api-services-identitytoolkit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.identitytoolkit</groupId>
+                <artifactId>gitkitclient</artifactId>
+                <version>${gitkitclient.version}</version>
+            </dependency>
+            <!-- Google APIs dependencies -->
             <dependency>
                 <groupId>com.google.appengine</groupId>
                 <artifactId>appengine-api-1.0-sdk</artifactId>
@@ -167,11 +195,16 @@
     </dependencyManagement>
 
     <properties>
+        <rest-client-facade-api.version>0.8-20160205.172121-1</rest-client-facade-api.version>
         <google-api-client.version>1.21.0</google-api-client.version>
-        <appengine.version>1.9.31</appengine.version>
+        <google-api-services-analytics.version>v3-rev123-1.21.0</google-api-services-analytics.version>
+        <google-api-services-identitytoolkit.version>v3-rev203-1.21.0</google-api-services-identitytoolkit.version>
+        <gitkitclient.version>1.2.5</gitkitclient.version>
+        <appengine.version>1.9.32</appengine.version>
         <jmockit.version>1.21</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
-        <jmockit.setting>-javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar
+        <jmockit.setting>
+            -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar
         </jmockit.setting>
     </properties>
 </project>

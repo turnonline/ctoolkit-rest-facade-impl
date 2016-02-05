@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2015 Comvai, s.r.o. All Rights Reserved.
+  ~ Copyright (c) 2016 Comvai, s.r.o. All Rights Reserved.
   ~
   ~ This library is free software; you can redistribute it and/or
   ~ modify it under the terms of the GNU Lesser General Public
@@ -28,16 +28,19 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>rest-client-facade-appengine</artifactId>
+    <artifactId>ctoolkit-client-analytics</artifactId>
     <version>0.10-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Uniform REST Client Facade API AppEngine Impl</name>
+    <name>Google API CtoolkiT Client - Google Analytics</name>
     <description>
-        Uniform client facade API implementation to perform common operations on top of REST.
-        Implemented for Google AppEngine runtime with Guice.
+        Google API CtoolkiT REST API Client Implementation of Google Analytics
     </description>
 
     <dependencies>
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-analytics</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.ctoolkit.restapi</groupId>
             <artifactId>rest-client-facade-api</artifactId>
@@ -58,22 +61,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.appengine</groupId>
-            <artifactId>appengine-api-1.0-sdk</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.appengine</groupId>
-            <artifactId>appengine-jsr107cache</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.api-client</groupId>
-            <artifactId>google-api-client-appengine</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jmockit</groupId>
