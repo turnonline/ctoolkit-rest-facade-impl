@@ -23,8 +23,8 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Types;
-import org.ctoolkit.restapi.client.LocalResourceProvider;
 import org.ctoolkit.restapi.client.adapter.ResourceProviderInjector;
+import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;

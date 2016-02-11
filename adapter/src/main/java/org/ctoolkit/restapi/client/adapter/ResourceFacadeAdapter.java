@@ -24,13 +24,15 @@ import com.google.common.collect.Lists;
 import ma.glasnost.orika.MapperFacade;
 import org.ctoolkit.restapi.client.ClientErrorException;
 import org.ctoolkit.restapi.client.HttpFailureException;
-import org.ctoolkit.restapi.client.LocalResourceProvider;
+import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.NotFoundException;
 import org.ctoolkit.restapi.client.Patch;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.ResourceFacade;
-import org.ctoolkit.restapi.client.RestExecutorAdaptee;
+import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.UnauthorizedException;
+import org.ctoolkit.restapi.client.adaptee.RestExecutorAdaptee;
+import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,103 +88,98 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    public <T> T newInstance( @Nonnull Class<T> resource )
+    public <T> SingleRequest<T> newInstance( @Nonnull Class<T> resource )
     {
         return newInstance( resource, null, null );
     }
 
     @Override
-    public <T> T newInstance( @Nonnull Class<T> resource, @Nullable Locale locale )
-    {
-        return newInstance( resource, null, locale );
-    }
-
-    @Override
-    public <T> T newInstance( @Nonnull Class<T> resource, @Nullable Map<String, Object> parameters )
-    {
-        return newInstance( resource, parameters, null );
-    }
-
-    @Override
-    public <T> T newInstance( @Nonnull Class<T> resource,
-                              @Nullable Map<String, Object> parameters,
-                              @Nullable Locale locale )
+    public <T> SingleRequest<T> newInstance( @Nonnull Class<T> resource,
+                                             @Nullable Map<String, Object> parameters,
+                                             @Nullable Locale locale )
     {
         checkNotNull( resource );
+
+        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resource );
+        Object remoteRequest;
+        try
+        {
+            remoteRequest = adaptee.prepareNew( resource.getSimpleName(), parameters, locale );
+        }
+        catch ( IOException e )
+        {
+            throw new ClientErrorException( 400, e.getMessage() );
+        }
+
+        return new NewInstanceRequest<>( resource, this, adaptee, remoteRequest );
+    }
+
+    <R> R callbackNewInstance( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+                               @Nonnull Object remoteRequest,
+                               @Nonnull Class<R> responseType,
+                               @Nullable Map<String, Object> parameters,
+                               @Nullable Locale locale )
+    {
+        checkNotNull( adaptee );
+        checkNotNull( remoteRequest );
+        checkNotNull( responseType );
+
+        if ( parameters == null )
+        {
+            parameters = new HashMap<>();
+        }
 
         Object remoteInstance;
         try
         {
-            remoteInstance = adaptee( resource ).executeNew( locale, resource.getSimpleName(), parameters );
+            remoteInstance = adaptee.executeNew( remoteRequest, parameters, locale );
         }
         catch ( IOException e )
         {
-            throw prepareUpdateException( e, resource, null );
+            throw prepareUpdateException( e, responseType, null );
         }
 
-        // null means no specific call processed to create default instance
-        if ( remoteInstance == null )
-        {
-            try
-            {
-                return resource.newInstance();
-            }
-            catch ( InstantiationException | IllegalAccessException e )
-            {
-                throw new IllegalArgumentException( e );
-            }
-        }
-
-        return mapper.map( remoteInstance, resource );
+        return mapper.map( remoteInstance, responseType );
     }
 
     @Override
-    public <T> T get( @Nonnull Class<T> resource, @Nonnull Object identifier )
-    {
-        checkNotNull( identifier );
-
-        return get( resource, identifier, new HashMap<String, Object>(), null );
-    }
-
-    @Override
-    public <T> T get( @Nonnull Class<T> resource, @Nonnull Object identifier, @Nullable Locale locale )
-    {
-        checkNotNull( identifier );
-
-        return get( resource, identifier, new HashMap<String, Object>(), locale );
-    }
-
-    @Override
-    public <T> T get( @Nonnull Class<T> resource, @Nonnull Map<String, Object> parameters )
-    {
-        return get( resource, null, parameters, null );
-    }
-
-    @Override
-    public <T> T get( @Nonnull Class<T> resource, @Nonnull Map<String, Object> parameters, @Nullable Locale locale )
-    {
-        return get( resource, null, parameters, locale );
-    }
-
-    @Override
-    public <T> T get( @Nonnull Class<T> resource, @Nonnull Object identifier, @Nonnull Map<String, Object> parameters )
-    {
-        checkNotNull( identifier );
-        return get( resource, identifier, parameters, null );
-    }
-
-    @Override
-    public <T> T get( @Nonnull Class<T> resource,
-                      @Nullable Object identifier,
-                      @Nullable Map<String, Object> parameters,
-                      @Nullable Locale locale )
+    public <T> SingleRequest<T> get( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
         checkNotNull( resource );
-        checkNotNull( parameters );
+        checkNotNull( identifier );
+
+        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resource );
+        Object remoteRequest;
+        try
+        {
+            //noinspection unchecked
+            remoteRequest = adaptee.prepareGet( identifier );
+        }
+        catch ( IOException e )
+        {
+            throw new ClientErrorException( 400, e.getMessage() );
+        }
+
+        return new GetRequest<>( resource, identifier, this, adaptee, remoteRequest );
+    }
+
+    <R> R callbackExecuteGet( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+                              @Nonnull Object remoteRequest,
+                              @Nonnull Class<R> responseType,
+                              @Nonnull Object identifier,
+                              @Nullable Map<String, Object> parameters,
+                              @Nullable Locale locale )
+    {
+        checkNotNull( responseType );
+
+        if ( parameters == null )
+        {
+            parameters = new HashMap<>();
+        }
 
         // looking for LocalResourceProvider optional implementation for given resource type
-        LocalResourceProvider<T> provider = injector.getExistingResourceProvider( resource );
-        T response = null;
+        LocalResourceProvider<R> provider = injector.getExistingResourceProvider( responseType );
+        R response = null;
 
         boolean requestForPersist = false;
         if ( provider != null )
@@ -197,11 +194,11 @@ public class ResourceFacadeAdapter
             Object remoteObject;
             try
             {
-                remoteObject = adaptee( resource ).executeGet( identifier, parameters, locale );
+                remoteObject = adaptee.executeGet( remoteRequest, parameters, locale );
             }
             catch ( IOException e )
             {
-                RuntimeException exception = prepareRetrievalException( e, resource, identifier );
+                RuntimeException exception = prepareRetrievalException( e, responseType, identifier );
                 if ( exception == null )
                 {
                     return null;
@@ -211,7 +208,7 @@ public class ResourceFacadeAdapter
                     throw exception;
                 }
             }
-            response = mapper.map( remoteObject, resource );
+            response = mapper.map( remoteObject, responseType );
         }
 
         if ( requestForPersist && response != null )
@@ -223,28 +220,38 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    public <T> List<T> list( @Nonnull Class<T> resource, @Nonnull Map<String, Object> criteria )
+    public <T> ListRequest<T> list( @Nonnull Class<T> resource )
     {
-        checkNotNull( criteria );
-
-        return internalExecuteList( resource, criteria, null );
+        return list( resource, null );
     }
 
     @Override
-    public <T> List<T> list( @Nonnull Class<T> resource,
-                             @Nonnull Map<String, Object> criteria,
-                             @Nullable Locale locale )
-    {
-        checkNotNull( criteria );
-
-        return internalExecuteList( resource, criteria, locale );
-    }
-
-    private <T> List<T> internalExecuteList( @Nonnull Class<T> resource,
-                                             @Nullable Map<String, Object> criteria,
-                                             @Nullable Locale locale )
+    public <T> ListRequest<T> list( @Nonnull Class<T> resource, @Nullable Identifier parent )
     {
         checkNotNull( resource );
+
+        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resource );
+        Object remoteRequest;
+        try
+        {
+            //noinspection unchecked
+            remoteRequest = adaptee.prepareList( parent );
+        }
+        catch ( IOException e )
+        {
+            throw new ClientErrorException( 400, e.getMessage() );
+        }
+
+        return new ListRequest<>( resource, this, adaptee, remoteRequest );
+    }
+
+    <R> List<R> callbackExecuteList( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+                                     @Nonnull Object remoteRequest,
+                                     @Nonnull Class<R> responseType,
+                                     @Nullable Map<String, Object> criteria,
+                                     @Nullable Locale locale )
+    {
+        checkNotNull( responseType );
 
         if ( criteria == null )
         {
@@ -252,8 +259,8 @@ public class ResourceFacadeAdapter
         }
 
         // looking for LocalResourceProvider optional implementation for given resource type
-        LocalResourceProvider<T> provider = injector.getExistingResourceProvider( resource );
-        List<T> response = null;
+        LocalResourceProvider<R> provider = injector.getExistingResourceProvider( responseType );
+        List<R> response = null;
 
         boolean requestForPersist = false;
         if ( provider != null )
@@ -268,11 +275,11 @@ public class ResourceFacadeAdapter
             List<?> remoteList;
             try
             {
-                remoteList = adaptee( resource ).executeList( criteria, locale );
+                remoteList = adaptee.executeList( remoteRequest, criteria, locale );
             }
             catch ( IOException e )
             {
-                RuntimeException exception = prepareRetrievalException( e, resource, null );
+                RuntimeException exception = prepareRetrievalException( e, responseType, null );
                 if ( exception == null )
                 {
                     remoteList = null;
@@ -288,7 +295,7 @@ public class ResourceFacadeAdapter
             }
             else
             {
-                response = mapper.mapAsList( remoteList, resource );
+                response = mapper.mapAsList( remoteList, responseType );
             }
         }
 
@@ -301,84 +308,192 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    public <T> T insert( @Nonnull T resource )
+    public <T> SingleRequest<T> insert( @Nonnull T resource )
     {
         return insert( resource, null );
     }
 
     @Override
     @SuppressWarnings( "unchecked" )
-    public <T> T insert( @Nonnull T resource, @Nullable Object parentKey )
+    public <T> SingleRequest<T> insert( @Nonnull T resource, @Nullable Identifier parentKey )
     {
         checkNotNull( resource );
 
         Object source = mapper.map( resource, getSourceClassFor( resource.getClass() ) );
+
+        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resource.getClass() );
+        Object remoteRequest;
         try
         {
-            source = adaptee( resource.getClass() ).executeInsert( source, parentKey );
+            remoteRequest = adaptee.prepareInsert( source, parentKey );
         }
         catch ( IOException e )
         {
-            throw prepareUpdateException( e, resource.getClass(), parentKey );
+            throw new ClientErrorException( 400, e.getMessage() );
         }
 
-        return ( T ) mapper.map( source, resource.getClass() );
+        return ( InsertRequest<T> ) new InsertRequest<>( resource.getClass(), parentKey, this, adaptee, remoteRequest );
+    }
+
+    <R> R callbackExecuteInsert( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+                                 @Nonnull Object remoteRequest,
+                                 @Nonnull Class<R> responseType,
+                                 @Nullable Object parentKey,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
+    {
+        checkNotNull( adaptee );
+        checkNotNull( remoteRequest );
+        checkNotNull( responseType );
+
+        Object source;
+        try
+        {
+            source = adaptee.executeInsert( remoteRequest, parameters, locale );
+        }
+        catch ( IOException e )
+        {
+            throw prepareUpdateException( e, responseType, parentKey );
+        }
+
+        return mapper.map( source, responseType );
     }
 
     @Override
     @SuppressWarnings( "unchecked" )
-    public <T> T update( @Nonnull T resource, @Nonnull Object identifier )
+    public <T> SingleRequest<T> update( @Nonnull T resource, @Nonnull Identifier identifier )
     {
         checkNotNull( resource );
         checkNotNull( identifier );
 
         Object source = mapper.map( resource, getSourceClassFor( resource.getClass() ) );
+
+        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resource.getClass() );
+        Object remoteRequest;
         try
         {
-            source = adaptee( resource.getClass() ).executeUpdate( source, identifier );
+            remoteRequest = adaptee.prepareUpdate( source, identifier );
         }
         catch ( IOException e )
         {
-            throw prepareUpdateException( e, resource.getClass(), identifier );
+            throw new ClientErrorException( 400, e.getMessage() );
         }
 
-        return ( T ) mapper.map( source, resource.getClass() );
+        return ( UpdateRequest<T> ) new UpdateRequest<>( resource.getClass(), identifier, this, adaptee, remoteRequest );
+    }
+
+    <R> R callbackExecuteUpdate( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+                                 @Nonnull Object remoteRequest,
+                                 @Nonnull Class<R> responseType,
+                                 @Nonnull Object identifier,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
+    {
+        checkNotNull( adaptee );
+        checkNotNull( remoteRequest );
+        checkNotNull( responseType );
+        checkNotNull( identifier );
+
+        Object source;
+        try
+        {
+            source = adaptee.executeUpdate( remoteRequest, parameters, locale );
+        }
+        catch ( IOException e )
+        {
+            throw prepareUpdateException( e, responseType, identifier );
+        }
+
+        return mapper.map( source, responseType );
     }
 
     @Override
-    public <T> T patch( @Nonnull Patch<T> resource, @Nonnull Object identifier )
+    public <T> SingleRequest<T> patch( @Nonnull Patch<T> resource, @Nonnull Identifier identifier )
     {
         checkNotNull( resource );
         checkNotNull( identifier );
 
-        Object source = mapper.map( resource, getSourceClassFor( resource.getClass() ) );
+        Class<? extends Patch> resourceClass = resource.getClass();
+        Object source = mapper.map( resource, getSourceClassFor( resourceClass ) );
+
+        String alias = resourceClass.getSimpleName();
+        Class<T> responseType = resource.type();
+        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resourceClass );
+        Object remoteRequest;
         try
         {
-            String alias = resource.getClass().getSimpleName();
-            source = adaptee( resource.getClass() ).executePatch( source, identifier, alias );
+            //noinspection unchecked
+            remoteRequest = adaptee.preparePatch( source, identifier, alias );
         }
         catch ( IOException e )
         {
-            throw prepareUpdateException( e, resource.getClass(), identifier );
+            throw new ClientErrorException( 400, e.getMessage() );
         }
 
-        return mapper.map( source, resource.type() );
+        return new PatchRequest<>( responseType, identifier, this, adaptee, remoteRequest );
+    }
+
+    <R> R callbackExecutePatch( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+                                @Nonnull Object remoteRequest,
+                                @Nonnull Class<R> responseType,
+                                @Nonnull Object identifier,
+                                @Nullable Map<String, Object> parameters,
+                                @Nullable Locale locale )
+    {
+        checkNotNull( responseType );
+        checkNotNull( identifier );
+
+        Object source;
+        try
+        {
+            source = adaptee.executePatch( remoteRequest, parameters, locale );
+        }
+        catch ( IOException e )
+        {
+            throw prepareUpdateException( e, responseType, identifier );
+        }
+
+        return mapper.map( source, responseType );
     }
 
     @Override
-    public <T> void delete( @Nonnull Class<T> resource, @Nonnull Object identifier )
+    @SuppressWarnings( "unchecked" )
+    public <T> SingleRequest<T> delete( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
         checkNotNull( resource );
         checkNotNull( identifier );
 
+        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resource );
+        Object remoteRequest;
         try
         {
-            adaptee( resource ).executeDelete( identifier );
+            remoteRequest = adaptee.prepareDelete( identifier );
+        }
+        catch ( IOException e )
+        {
+            throw new ClientErrorException( 400, e.getMessage() );
+        }
+
+        return ( SingleRequest<T> ) new DeleteRequest( resource, identifier, this, adaptee, remoteRequest );
+    }
+
+    Void callbackExecuteDelete( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+                                @Nonnull Object remoteRequest,
+                                @Nonnull Class resource,
+                                @Nonnull Object identifier,
+                                @Nullable Locale locale )
+    {
+        checkNotNull( identifier );
+
+        try
+        {
+            adaptee.executeDelete( remoteRequest, locale );
         }
         catch ( IOException e )
         {
             throw prepareUpdateException( e, resource, identifier );
         }
+        return null;
     }
 
     private RuntimeException prepareRetrievalException( IOException e, Class<?> resource, @Nullable Object identifier )
@@ -468,15 +583,14 @@ public class ResourceFacadeAdapter
         return destinationClass;
     }
 
-    @SuppressWarnings( "unchecked" )
-    private <T, I> RestExecutorAdaptee<T, I> adaptee( Class<?> clazz )
+    private RestExecutorAdaptee<Object, Object, Object> adaptee( Class<?> clazz )
     {
-        RestExecutorAdaptee adaptee = binder.adaptee( clazz );
+        RestExecutorAdaptee<Object, Object, Object> adaptee = binder.adaptee( clazz );
         if ( adaptee == null )
         {
             throw new IllegalArgumentException( "Missing mapped adaptee for " + clazz );
         }
 
-        return ( RestExecutorAdaptee<T, I> ) adaptee;
+        return adaptee;
     }
 }

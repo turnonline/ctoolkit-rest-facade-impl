@@ -19,7 +19,7 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import net.sf.jsr107cache.Cache;
-import org.ctoolkit.restapi.client.LocalResourceProvider;
+import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

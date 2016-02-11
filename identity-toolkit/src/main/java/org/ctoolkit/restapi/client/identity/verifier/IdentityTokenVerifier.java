@@ -22,6 +22,7 @@ import com.google.gson.JsonObject;
 import com.google.identitytoolkit.JsonTokenHelper;
 import net.oauth.jsontoken.JsonToken;
 import org.ctoolkit.restapi.client.TokenVerifier;
+import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.identity.Identity;
 import org.joda.time.Instant;
 
@@ -46,9 +47,17 @@ class IdentityTokenVerifier
 
     @Override
     public Identity verifyAndGet( String token )
-            throws SignatureException
+            throws UnauthorizedException
     {
-        JsonToken jsonToken = helper.verifyAndDeserialize( token );
+        JsonToken jsonToken;
+        try
+        {
+            jsonToken = helper.verifyAndDeserialize( token );
+        }
+        catch ( SignatureException e )
+        {
+            throw new UnauthorizedException( e );
+        }
 
         Instant issuedAt = jsonToken.getIssuedAt();
         Instant expiration = jsonToken.getExpiration();

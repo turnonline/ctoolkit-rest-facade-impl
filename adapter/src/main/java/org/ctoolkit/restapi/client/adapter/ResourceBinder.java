@@ -18,7 +18,7 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
-import org.ctoolkit.restapi.client.RestExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.RestExecutorAdaptee;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,9 +32,9 @@ public class ResourceBinder
 {
     private Map<Class<?>, Class<?>> modelMapper = new HashMap<>();
 
-    private Map<Class<?>, RestExecutorAdaptee> adaptees = new HashMap<>();
+    private Map<Class<?>, Object> adaptees = new HashMap<>();
 
-    private Map<RestExecutorAdaptee, Class<?>> inverseAdaptees = new HashMap<>();
+    private Map<Object, Class<?>> inverseAdaptees = new HashMap<>();
 
     public ResourceBinder()
     {
@@ -49,7 +49,7 @@ public class ResourceBinder
      */
     public <S, T> void bind( Class<T> target,
                              Class<S> source,
-                             RestExecutorAdaptee adaptee )
+                             Object adaptee )
     {
         modelMapper.put( target, source );
         adaptees.put( target, adaptee );
@@ -84,8 +84,9 @@ public class ResourceBinder
      * @param clazz the class type as a key
      * @return the class type specific adaptee implementation
      */
-    public RestExecutorAdaptee adaptee( Class<?> clazz )
+    @SuppressWarnings( "unchecked" )
+    public RestExecutorAdaptee<Object, Object, Object> adaptee( Class<?> clazz )
     {
-        return adaptees.get( clazz );
+        return ( RestExecutorAdaptee<Object, Object, Object> ) adaptees.get( clazz );
     }
 }

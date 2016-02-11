@@ -18,7 +18,7 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
-import org.ctoolkit.restapi.client.LocalResourceProvider;
+import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 
 import javax.annotation.Nonnull;
 
