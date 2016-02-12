@@ -19,7 +19,7 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import org.ctoolkit.restapi.client.RetrievalRequest;
-import org.ctoolkit.restapi.client.adaptee.RestExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -40,13 +40,13 @@ public class ListRequest<T>
 
     private final ResourceFacadeAdapter adapter;
 
-    private final RestExecutorAdaptee<Object, Object, Object> adaptee;
+    private final ListExecutorAdaptee adaptee;
 
     private final Object remoteRequest;
 
     ListRequest( @Nonnull Class<T> resource,
                  @Nonnull ResourceFacadeAdapter adapter,
-                 @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+                 @Nonnull ListExecutorAdaptee adaptee,
                  @Nonnull Object remoteRequest )
     {
         this.resource = checkNotNull( resource );

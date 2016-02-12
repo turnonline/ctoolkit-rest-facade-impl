@@ -46,7 +46,6 @@ class ResourceProviderGuiceInjector
         this.injector = injector;
     }
 
-    @SuppressWarnings( "unchecked" )
     @Override
     public <T> LocalResourceProvider<T> getExistingResourceProvider( @Nonnull Class<T> resource )
     {
@@ -57,9 +56,26 @@ class ResourceProviderGuiceInjector
 
         if ( binding != null )
         {
+            //noinspection unchecked
             provider = ( LocalResourceProvider<T> ) binding.getProvider().get();
         }
 
+        return provider;
+    }
+
+    @Override
+    public <A> A getExecutorAdaptee( @Nonnull Class<A> adapteeType, @Nonnull Class<?> resource )
+    {
+        A provider = null;
+
+        ParameterizedType pt = Types.newParameterizedType( adapteeType, resource );
+        Binding<?> binding = injector.getExistingBinding( Key.get( TypeLiteral.get( pt ) ) );
+
+        if ( binding != null )
+        {
+            //noinspection unchecked
+            provider = ( A ) binding.getProvider().get();
+        }
         return provider;
     }
 }

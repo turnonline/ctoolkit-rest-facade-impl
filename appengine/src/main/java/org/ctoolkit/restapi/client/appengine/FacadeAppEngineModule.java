@@ -24,7 +24,6 @@ import com.google.inject.Inject;
 import com.google.inject.Provides;
 import org.ctoolkit.restapi.client.ResourceFacade;
 import org.ctoolkit.restapi.client.adapter.Constants;
-import org.ctoolkit.restapi.client.adapter.ResourceBinder;
 import org.ctoolkit.restapi.client.adapter.ResourceFacadeAdapter;
 import org.ctoolkit.restapi.client.adapter.ResourceProviderInjector;
 import org.ctoolkit.restapi.client.googleapis.ApiKey;
@@ -52,7 +51,6 @@ public class FacadeAppEngineModule
     {
         bind( ResourceFacade.class ).to( ResourceFacadeAdapter.class ).in( Singleton.class );
         bind( ResourceProviderInjector.class ).to( ResourceProviderGuiceInjector.class );
-        bind( ResourceBinder.class ).asEagerSingleton();
         bind( EventBus.class ).in( Singleton.class );
         bind( GoogleApiCredentialFactory.class ).to( GoogleApiCredentialFactoryAppEngine.class ).in( Singleton.class );
     }

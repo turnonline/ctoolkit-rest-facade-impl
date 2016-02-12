@@ -19,7 +19,7 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import org.ctoolkit.restapi.client.SingleRequest;
-import org.ctoolkit.restapi.client.adaptee.RestExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
 
 import javax.annotation.Nonnull;
 import java.util.Locale;
@@ -41,14 +41,14 @@ public class PatchRequest<T>
 
     private final ResourceFacadeAdapter adapter;
 
-    private final RestExecutorAdaptee<Object, Object, Object> adaptee;
+    private final PatchExecutorAdaptee adaptee;
 
     private final Object remoteRequest;
 
     PatchRequest( @Nonnull Class<T> responseType,
                   @Nonnull Object identifier,
                   @Nonnull ResourceFacadeAdapter adapter,
-                  @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+                  @Nonnull PatchExecutorAdaptee adaptee,
                   @Nonnull Object remoteRequest )
     {
         this.responseType = checkNotNull( responseType );

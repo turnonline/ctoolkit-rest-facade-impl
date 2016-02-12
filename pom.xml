@@ -194,14 +194,20 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>6.9.10</version>
+                <version>${testng.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ctoolkit.test</groupId>
+                <artifactId>ctoolkit-test</artifactId>
+                <version>${ctoolkit-test.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
-        <rest-client-facade-api.version>0.8-SNAPSHOT</rest-client-facade-api.version>
+        <rest-client-facade-api.version>0.8-20160212.172845-2</rest-client-facade-api.version>
         <google-api-client.version>1.21.0</google-api-client.version>
         <google-api-services-analytics.version>v3-rev123-1.21.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v2-rev203-1.21.0</google-api-services-drive.version>
@@ -213,5 +219,7 @@
         <jmockit.setting>
             -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar
         </jmockit.setting>
+        <testng.version>6.9.10</testng.version>
+        <ctoolkit-test.version>1.0</ctoolkit-test.version>
     </properties>
 </project>

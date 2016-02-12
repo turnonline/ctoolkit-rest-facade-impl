@@ -20,24 +20,47 @@ package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest;
 import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.json.GenericJson;
-import org.ctoolkit.restapi.client.adaptee.RestExecutorAdaptee;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The Google Client API specific abstract implementation of the {@link RestExecutorAdaptee}.
+ * The base adaptee implementation.
  *
+ * @param <C> the concrete type of the client instance
+ * @param <M> the concrete type of request's model object to work with
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public abstract class AbstractGoogleClientExecutorAdaptee<M extends GenericJson, R extends AbstractGoogleJsonClientRequest, K>
-        implements RestExecutorAdaptee<M, R, K>
+public class AbstractAdaptee<C, M>
 {
+    private final C turnonline;
+
+    public AbstractAdaptee( C turnonline )
+    {
+        this.turnonline = turnonline;
+    }
+
+    protected C getTurnonline()
+    {
+        return turnonline;
+    }
+
+    protected AbstractGoogleJsonClientRequest get( Object request )
+    {
+        return ( AbstractGoogleJsonClientRequest ) request;
+    }
+
+    @SuppressWarnings( "unchecked" )
+    protected M execute( Object request ) throws IOException
+    {
+        return ( M ) get( request ).execute();
+    }
+
     /**
      * Accept optional language.
      *

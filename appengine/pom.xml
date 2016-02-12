@@ -83,5 +83,9 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.ctoolkit.test</groupId>
+            <artifactId>ctoolkit-test</artifactId>
+        </dependency>
     </dependencies>
 </project>

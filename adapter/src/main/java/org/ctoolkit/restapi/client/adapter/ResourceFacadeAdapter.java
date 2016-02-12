@@ -22,6 +22,9 @@ import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpStatusCodes;
 import com.google.common.collect.Lists;
 import ma.glasnost.orika.MapperFacade;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.metadata.Type;
+import ma.glasnost.orika.metadata.TypeFactory;
 import org.ctoolkit.restapi.client.ClientErrorException;
 import org.ctoolkit.restapi.client.HttpFailureException;
 import org.ctoolkit.restapi.client.Identifier;
@@ -31,7 +34,13 @@ import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.ResourceFacade;
 import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.UnauthorizedException;
-import org.ctoolkit.restapi.client.adaptee.RestExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,16 +50,20 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The resource facade implementation as adapter. Executes Java bean mapping
  * and then delegates the execution to one of the binded adaptee.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
- * @see ResourceBinder
+ * @see MapperFactory
  */
 public class ResourceFacadeAdapter
         implements ResourceFacade
@@ -59,32 +72,18 @@ public class ResourceFacadeAdapter
 
     private final MapperFacade mapper;
 
-    private final ResourceBinder binder;
+    private final MapperFactory factory;
 
     private final ResourceProviderInjector injector;
 
     @Inject
-    public ResourceFacadeAdapter( MapperFacade mapper, ResourceBinder binder, ResourceProviderInjector injector )
+    public ResourceFacadeAdapter( MapperFacade mapper,
+                                  MapperFactory factory,
+                                  ResourceProviderInjector injector )
     {
         this.mapper = mapper;
-        this.binder = binder;
+        this.factory = factory;
         this.injector = injector;
-    }
-
-    /**
-     * Ensures that an object reference passed as a parameter to the calling method is not null.
-     *
-     * @param reference an object reference
-     * @return the non-null reference that was validated
-     * @throws NullPointerException if {@code reference} is null
-     */
-    private static <T> T checkNotNull( T reference )
-    {
-        if ( reference == null )
-        {
-            throw new NullPointerException();
-        }
-        return reference;
     }
 
     @Override
@@ -100,7 +99,7 @@ public class ResourceFacadeAdapter
     {
         checkNotNull( resource );
 
-        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resource );
+        NewExecutorAdaptee adaptee = adaptee( NewExecutorAdaptee.class, resource );
         Object remoteRequest;
         try
         {
@@ -114,7 +113,7 @@ public class ResourceFacadeAdapter
         return new NewInstanceRequest<>( resource, this, adaptee, remoteRequest );
     }
 
-    <R> R callbackNewInstance( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+    <R> R callbackNewInstance( @Nonnull NewExecutorAdaptee adaptee,
                                @Nonnull Object remoteRequest,
                                @Nonnull Class<R> responseType,
                                @Nullable Map<String, Object> parameters,
@@ -148,7 +147,7 @@ public class ResourceFacadeAdapter
         checkNotNull( resource );
         checkNotNull( identifier );
 
-        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resource );
+        GetExecutorAdaptee adaptee = adaptee( GetExecutorAdaptee.class, resource );
         Object remoteRequest;
         try
         {
@@ -163,7 +162,7 @@ public class ResourceFacadeAdapter
         return new GetRequest<>( resource, identifier, this, adaptee, remoteRequest );
     }
 
-    <R> R callbackExecuteGet( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+    <R> R callbackExecuteGet( @Nonnull GetExecutorAdaptee adaptee,
                               @Nonnull Object remoteRequest,
                               @Nonnull Class<R> responseType,
                               @Nonnull Object identifier,
@@ -230,7 +229,7 @@ public class ResourceFacadeAdapter
     {
         checkNotNull( resource );
 
-        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resource );
+        ListExecutorAdaptee adaptee = adaptee( ListExecutorAdaptee.class, resource );
         Object remoteRequest;
         try
         {
@@ -245,7 +244,7 @@ public class ResourceFacadeAdapter
         return new ListRequest<>( resource, this, adaptee, remoteRequest );
     }
 
-    <R> List<R> callbackExecuteList( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+    <R> List<R> callbackExecuteList( @Nonnull ListExecutorAdaptee adaptee,
                                      @Nonnull Object remoteRequest,
                                      @Nonnull Class<R> responseType,
                                      @Nullable Map<String, Object> criteria,
@@ -319,9 +318,10 @@ public class ResourceFacadeAdapter
     {
         checkNotNull( resource );
 
-        Object source = mapper.map( resource, getSourceClassFor( resource.getClass() ) );
+        Class<?> remoteResource = evaluateRemoteResource( resource.getClass() );
+        Object source = mapper.map( resource, remoteResource );
 
-        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resource.getClass() );
+        InsertExecutorAdaptee adaptee = adaptee( InsertExecutorAdaptee.class, resource.getClass() );
         Object remoteRequest;
         try
         {
@@ -335,7 +335,7 @@ public class ResourceFacadeAdapter
         return ( InsertRequest<T> ) new InsertRequest<>( resource.getClass(), parentKey, this, adaptee, remoteRequest );
     }
 
-    <R> R callbackExecuteInsert( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+    <R> R callbackExecuteInsert( @Nonnull InsertExecutorAdaptee adaptee,
                                  @Nonnull Object remoteRequest,
                                  @Nonnull Class<R> responseType,
                                  @Nullable Object parentKey,
@@ -366,9 +366,10 @@ public class ResourceFacadeAdapter
         checkNotNull( resource );
         checkNotNull( identifier );
 
-        Object source = mapper.map( resource, getSourceClassFor( resource.getClass() ) );
+        Class<?> remoteResource = evaluateRemoteResource( resource.getClass() );
+        Object source = mapper.map( resource, remoteResource );
 
-        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resource.getClass() );
+        UpdateExecutorAdaptee adaptee = adaptee( UpdateExecutorAdaptee.class, resource.getClass() );
         Object remoteRequest;
         try
         {
@@ -382,7 +383,7 @@ public class ResourceFacadeAdapter
         return ( UpdateRequest<T> ) new UpdateRequest<>( resource.getClass(), identifier, this, adaptee, remoteRequest );
     }
 
-    <R> R callbackExecuteUpdate( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+    <R> R callbackExecuteUpdate( @Nonnull UpdateExecutorAdaptee adaptee,
                                  @Nonnull Object remoteRequest,
                                  @Nonnull Class<R> responseType,
                                  @Nonnull Object identifier,
@@ -413,12 +414,12 @@ public class ResourceFacadeAdapter
         checkNotNull( resource );
         checkNotNull( identifier );
 
-        Class<? extends Patch> resourceClass = resource.getClass();
-        Object source = mapper.map( resource, getSourceClassFor( resourceClass ) );
+        Class<?> remoteResource = evaluateRemoteResource( resource.getClass() );
+        Object source = mapper.map( resource, remoteResource );
 
-        String alias = resourceClass.getSimpleName();
+        String alias = remoteResource.getSimpleName();
         Class<T> responseType = resource.type();
-        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resourceClass );
+        PatchExecutorAdaptee adaptee = adaptee( PatchExecutorAdaptee.class, responseType );
         Object remoteRequest;
         try
         {
@@ -433,7 +434,7 @@ public class ResourceFacadeAdapter
         return new PatchRequest<>( responseType, identifier, this, adaptee, remoteRequest );
     }
 
-    <R> R callbackExecutePatch( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+    <R> R callbackExecutePatch( @Nonnull PatchExecutorAdaptee adaptee,
                                 @Nonnull Object remoteRequest,
                                 @Nonnull Class<R> responseType,
                                 @Nonnull Object identifier,
@@ -463,7 +464,7 @@ public class ResourceFacadeAdapter
         checkNotNull( resource );
         checkNotNull( identifier );
 
-        RestExecutorAdaptee<Object, Object, Object> adaptee = adaptee( resource );
+        DeleteExecutorAdaptee adaptee = adaptee( DeleteExecutorAdaptee.class, resource );
         Object remoteRequest;
         try
         {
@@ -477,7 +478,7 @@ public class ResourceFacadeAdapter
         return ( SingleRequest<T> ) new DeleteRequest( resource, identifier, this, adaptee, remoteRequest );
     }
 
-    Void callbackExecuteDelete( @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+    Void callbackExecuteDelete( @Nonnull DeleteExecutorAdaptee adaptee,
                                 @Nonnull Object remoteRequest,
                                 @Nonnull Class resource,
                                 @Nonnull Object identifier,
@@ -572,23 +573,45 @@ public class ResourceFacadeAdapter
         return toBeThrown;
     }
 
-    private Class<?> getSourceClassFor( Class<?> clazz )
+    private Class<?> evaluateRemoteResource( Class resource )
     {
-        Class<?> destinationClass = binder.getSourceClassFor( clazz );
-        if ( destinationClass == null )
+        Set<Type<?>> types = factory.lookupMappedClasses( TypeFactory.valueOf( resource ) );
+        Iterator<Type<?>> iterator = types.iterator();
+
+        Class<?> remoteResource;
+
+        if ( iterator.hasNext() )
         {
-            throw new IllegalArgumentException( "Missing mapped destination class for " + clazz );
+            remoteResource = iterator.next().getRawType();
+        }
+        else
+        {
+            // there is no mapping, use directly the given resource type
+            remoteResource = resource;
         }
 
-        return destinationClass;
+        return remoteResource;
     }
 
-    private RestExecutorAdaptee<Object, Object, Object> adaptee( Class<?> clazz )
+    private <A> A adaptee( Class<A> adapteeType, Class<?> resource )
     {
-        RestExecutorAdaptee<Object, Object, Object> adaptee = binder.adaptee( clazz );
+        Class<?> remoteResource = evaluateRemoteResource( resource );
+        A adaptee = injector.getExecutorAdaptee( adapteeType, remoteResource );
+
+        if ( adaptee == null && remoteResource == resource )
+        {
+            String msg = "Missing Guice binding of " + adapteeType.getSimpleName() + " adaptee interface for resource "
+                    + resource;
+            throw new NotFoundException( msg );
+        }
+
         if ( adaptee == null )
         {
-            throw new IllegalArgumentException( "Missing mapped adaptee for " + clazz );
+            String msg = "Missing Guice binding of " + adapteeType.getSimpleName()
+                    + " adaptee interface for remote resource "
+                    + remoteResource + ", mapped by resource " + resource + ".";
+
+            throw new NotFoundException( msg );
         }
 
         return adaptee;

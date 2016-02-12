@@ -37,4 +37,13 @@ public interface ResourceProviderInjector
      * @return the resource provider
      */
     <T> LocalResourceProvider<T> getExistingResourceProvider( @Nonnull Class<T> resource );
+
+    /**
+     * Returns the binding if it already exists, or null if does not exist.
+     *
+     * @param adapteeType the adaptee type to get
+     * @param resource    the generic type of adaptee to get
+     * @return the adaptee implementation for given arguments if any
+     */
+    <A> A getExecutorAdaptee( @Nonnull Class<A> adapteeType, @Nonnull Class<?> resource );
 }

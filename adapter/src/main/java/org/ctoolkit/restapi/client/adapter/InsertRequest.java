@@ -19,7 +19,7 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import org.ctoolkit.restapi.client.SingleRequest;
-import org.ctoolkit.restapi.client.adaptee.RestExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -40,7 +40,7 @@ public class InsertRequest<T>
 
     private final ResourceFacadeAdapter adapter;
 
-    private final RestExecutorAdaptee<Object, Object, Object> adaptee;
+    private final InsertExecutorAdaptee adaptee;
 
     private final Object remoteRequest;
 
@@ -49,7 +49,7 @@ public class InsertRequest<T>
     InsertRequest( @Nonnull Class<T> resource,
                    @Nullable Object parentKey,
                    @Nonnull ResourceFacadeAdapter adapter,
-                   @Nonnull RestExecutorAdaptee<Object, Object, Object> adaptee,
+                   @Nonnull InsertExecutorAdaptee adaptee,
                    @Nonnull Object remoteRequest )
     {
         this.resource = checkNotNull( resource );
