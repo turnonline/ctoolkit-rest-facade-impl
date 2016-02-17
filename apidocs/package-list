@@ -1,1 +1,6 @@
+org.ctoolkit.restapi.client.adapter
 org.ctoolkit.restapi.client.appengine
+org.ctoolkit.restapi.client.drive
+org.ctoolkit.restapi.client.googleapis
+org.ctoolkit.restapi.client.identity
+org.ctoolkit.restapi.client.identity.verifier
