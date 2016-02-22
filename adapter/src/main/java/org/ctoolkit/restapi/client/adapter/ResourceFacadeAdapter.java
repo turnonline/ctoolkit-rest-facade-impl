@@ -138,7 +138,15 @@ public class ResourceFacadeAdapter
             throw prepareUpdateException( e, responseType, null );
         }
 
-        return mapper.map( remoteInstance, responseType );
+        if ( remoteInstance.getClass() == responseType )
+        {
+            //noinspection unchecked
+            return ( R ) remoteInstance;
+        }
+        else
+        {
+            return mapper.map( remoteInstance, responseType );
+        }
     }
 
     @Override
@@ -207,7 +215,15 @@ public class ResourceFacadeAdapter
                     throw exception;
                 }
             }
-            response = mapper.map( remoteObject, responseType );
+            if ( remoteObject.getClass() == responseType )
+            {
+                //noinspection unchecked
+                response = ( R ) remoteObject;
+            }
+            else
+            {
+                response = mapper.map( remoteObject, responseType );
+            }
         }
 
         if ( requestForPersist && response != null )
@@ -288,13 +304,21 @@ public class ResourceFacadeAdapter
                     throw exception;
                 }
             }
-            if ( remoteList == null )
+            if ( remoteList == null || remoteList.isEmpty() )
             {
                 response = Lists.newArrayList();
             }
             else
             {
-                response = mapper.mapAsList( remoteList, responseType );
+                if ( remoteList.get( 0 ).getClass() == responseType )
+                {
+                    //noinspection unchecked
+                    response = ( List<R> ) remoteList;
+                }
+                else
+                {
+                    response = mapper.mapAsList( remoteList, responseType );
+                }
             }
         }
 
@@ -319,7 +343,16 @@ public class ResourceFacadeAdapter
         checkNotNull( resource );
 
         Class<?> remoteResource = evaluateRemoteResource( resource.getClass() );
-        Object source = mapper.map( resource, remoteResource );
+        Object source;
+
+        if ( resource.getClass() == remoteResource )
+        {
+            source = resource;
+        }
+        else
+        {
+            source = mapper.map( resource, remoteResource );
+        }
 
         InsertExecutorAdaptee adaptee = adaptee( InsertExecutorAdaptee.class, resource.getClass() );
         Object remoteRequest;
@@ -356,7 +389,15 @@ public class ResourceFacadeAdapter
             throw prepareUpdateException( e, responseType, parentKey );
         }
 
-        return mapper.map( source, responseType );
+        if ( source.getClass() == responseType )
+        {
+            //noinspection unchecked
+            return ( R ) source;
+        }
+        else
+        {
+            return mapper.map( source, responseType );
+        }
     }
 
     @Override
@@ -367,7 +408,16 @@ public class ResourceFacadeAdapter
         checkNotNull( identifier );
 
         Class<?> remoteResource = evaluateRemoteResource( resource.getClass() );
-        Object source = mapper.map( resource, remoteResource );
+        Object source;
+
+        if ( resource.getClass() == remoteResource )
+        {
+            source = resource;
+        }
+        else
+        {
+            source = mapper.map( resource, remoteResource );
+        }
 
         UpdateExecutorAdaptee adaptee = adaptee( UpdateExecutorAdaptee.class, resource.getClass() );
         Object remoteRequest;
@@ -405,7 +455,15 @@ public class ResourceFacadeAdapter
             throw prepareUpdateException( e, responseType, identifier );
         }
 
-        return mapper.map( source, responseType );
+        if ( source.getClass() == responseType )
+        {
+            //noinspection unchecked
+            return ( R ) source;
+        }
+        else
+        {
+            return mapper.map( source, responseType );
+        }
     }
 
     @Override
@@ -415,10 +473,24 @@ public class ResourceFacadeAdapter
         checkNotNull( identifier );
 
         Class<?> remoteResource = evaluateRemoteResource( resource.getClass() );
-        Object source = mapper.map( resource, remoteResource );
+        Object source;
+
+        if ( resource.getClass() == remoteResource )
+        {
+            source = resource;
+        }
+        else
+        {
+            source = mapper.map( resource, remoteResource );
+        }
 
         String alias = remoteResource.getSimpleName();
         Class<T> responseType = resource.type();
+        if ( responseType == null )
+        {
+            throw new NotFoundException( "The Patch.type() must return a non null value." );
+        }
+
         PatchExecutorAdaptee adaptee = adaptee( PatchExecutorAdaptee.class, responseType );
         Object remoteRequest;
         try
@@ -454,7 +526,15 @@ public class ResourceFacadeAdapter
             throw prepareUpdateException( e, responseType, identifier );
         }
 
-        return mapper.map( source, responseType );
+        if ( source.getClass() == responseType )
+        {
+            //noinspection unchecked
+            return ( R ) source;
+        }
+        else
+        {
+            return mapper.map( source, responseType );
+        }
     }
 
     @Override
@@ -600,16 +680,14 @@ public class ResourceFacadeAdapter
 
         if ( adaptee == null && remoteResource == resource )
         {
-            String msg = "Missing Guice binding of " + adapteeType.getSimpleName() + " adaptee interface for resource "
-                    + resource;
+            String msg = "Missing injector binding for " + adapteeType.getSimpleName() + "<" + resource + ">";
             throw new NotFoundException( msg );
         }
 
         if ( adaptee == null )
         {
-            String msg = "Missing Guice binding of " + adapteeType.getSimpleName()
-                    + " adaptee interface for remote resource "
-                    + remoteResource + ", mapped by resource " + resource + ".";
+            String msg = "Missing injector binding for remote resource " + adapteeType.getSimpleName() + "<"
+                    + remoteResource + "> Remote resource mapped by resource " + resource + ".";
 
             throw new NotFoundException( msg );
         }
