@@ -28,6 +28,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -46,28 +47,37 @@ public class BeeGetListAdaptee
     }
 
     @Override
-    public Object prepareGet( @Nonnull Identifier identifier ) throws IOException
+    public Object prepareGet( @Nonnull Identifier identifier )
+            throws IOException
     {
         return new FakeClient();
     }
 
     @Override
-    public RemoteBee executeGet( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public RemoteBee executeGet( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
-        return null;
+        return new RemoteBee();
     }
 
     @Override
-    public Object prepareList( @Nullable Identifier parentKey ) throws IOException
+    public Object prepareList( @Nullable Identifier parentKey )
+            throws IOException
     {
         return new FakeClient();
     }
 
     @Override
-    public List<RemoteBee> executeList( @Nonnull Object request, @Nullable Map<String, Object> criteria, @Nullable Locale locale )
+    public List<RemoteBee> executeList( @Nonnull Object request,
+                                        @Nullable Map<String, Object> criteria,
+                                        @Nullable Locale locale )
             throws IOException
     {
-        return null;
+        List<RemoteBee> bees = new ArrayList<>();
+        bees.add( new RemoteBee() );
+
+        return bees;
     }
 }

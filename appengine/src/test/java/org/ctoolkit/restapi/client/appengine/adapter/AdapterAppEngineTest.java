@@ -46,28 +46,35 @@ public class AdapterAppEngineTest
     {
         SingleRequest<RemoteOnly> request = resources.get( RemoteOnly.class, new Identifier( 1L ) );
         assertNotNull( request );
+        assertNotNull( request.execute() );
 
         SingleRequest<Foo> singleRequest = resources.newInstance( Foo.class );
         assertNotNull( singleRequest );
+        assertNotNull( singleRequest.execute() );
 
         singleRequest = resources.get( Foo.class, new Identifier( 1L ) );
         assertNotNull( singleRequest );
+        assertNotNull( singleRequest.execute() );
 
         Foo foo = new Foo();
         foo.setName( "John Foo" );
         singleRequest = resources.insert( foo );
         assertNotNull( singleRequest );
+        assertNotNull( singleRequest.execute() );
 
         foo = new Foo();
         foo.setName( "Michal Foo" );
         singleRequest = resources.update( foo, new Identifier( 1L ) );
         assertNotNull( singleRequest );
+        assertNotNull( singleRequest.execute() );
 
         Foo.InnerFoo inner = new Foo.InnerFoo();
         singleRequest = resources.patch( inner, new Identifier( 1L ) );
         assertNotNull( singleRequest );
+        assertNotNull( singleRequest.execute() );
 
         singleRequest = resources.delete( Foo.class, new Identifier( 1L ) );
         assertNotNull( singleRequest );
+        singleRequest.execute();
     }
 }

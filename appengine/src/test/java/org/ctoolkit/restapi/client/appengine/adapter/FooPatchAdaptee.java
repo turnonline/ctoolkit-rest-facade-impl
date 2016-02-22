@@ -44,16 +44,20 @@ public class FooPatchAdaptee
     }
 
     @Override
-    public Object preparePatch( @Nonnull Object resource, @Nonnull Identifier identifier, @Nonnull String alias )
+    public Object preparePatch( @Nonnull Object resource,
+                                @Nonnull Identifier identifier,
+                                @Nonnull String alias )
             throws IOException
     {
         return new FakeClient();
     }
 
     @Override
-    public RemoteFoo executePatch( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public RemoteFoo executePatch( @Nonnull Object request,
+                                   @Nullable Map<String, Object> parameters,
+                                   @Nullable Locale locale )
             throws IOException
     {
-        return null;
+        return new RemoteFoo();
     }
 }

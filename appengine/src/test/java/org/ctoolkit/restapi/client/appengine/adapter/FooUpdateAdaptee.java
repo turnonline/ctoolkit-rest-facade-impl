@@ -44,15 +44,19 @@ public class FooUpdateAdaptee
     }
 
     @Override
-    public Object prepareUpdate( @Nonnull RemoteFoo resource, @Nonnull Identifier identifier ) throws IOException
+    public Object prepareUpdate( @Nonnull RemoteFoo resource,
+                                 @Nonnull Identifier identifier )
+            throws IOException
     {
         return new FakeClient();
     }
 
     @Override
-    public RemoteFoo executeUpdate( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public RemoteFoo executeUpdate( @Nonnull Object request,
+                                    @Nullable Map<String, Object> parameters,
+                                    @Nullable Locale locale )
             throws IOException
     {
-        return null;
+        return new RemoteFoo();
     }
 }

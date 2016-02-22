@@ -44,15 +44,18 @@ public class FooInsertAdaptee
     }
 
     @Override
-    public Object prepareInsert( @Nonnull RemoteFoo resource, @Nullable Identifier parentKey ) throws IOException
+    public Object prepareInsert( @Nonnull RemoteFoo resource, @Nullable Identifier parentKey )
+            throws IOException
     {
         return new FakeClient();
     }
 
     @Override
-    public RemoteFoo executeInsert( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public RemoteFoo executeInsert( @Nonnull Object request,
+                                    @Nullable Map<String, Object> parameters,
+                                    @Nullable Locale locale )
             throws IOException
     {
-        return null;
+        return new RemoteFoo();
     }
 }

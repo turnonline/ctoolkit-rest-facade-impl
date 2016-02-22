@@ -44,15 +44,18 @@ public class FooGetAdaptee
     }
 
     @Override
-    public Object prepareGet( @Nonnull Identifier identifier ) throws IOException
+    public Object prepareGet( @Nonnull Identifier identifier )
+            throws IOException
     {
         return new FakeClient();
     }
 
     @Override
-    public RemoteFoo executeGet( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public RemoteFoo executeGet( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
-        return null;
+        return new RemoteFoo();
     }
 }

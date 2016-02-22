@@ -44,15 +44,18 @@ public class RemoteOnlyAdaptee
     }
 
     @Override
-    public Object prepareGet( @Nonnull Identifier identifier ) throws IOException
+    public Object prepareGet( @Nonnull Identifier identifier )
+            throws IOException
     {
         return new FakeClient();
     }
 
     @Override
-    public RemoteOnly executeGet( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public RemoteOnly executeGet( @Nonnull Object request,
+                                  @Nullable Map<String, Object> parameters,
+                                  @Nullable Locale locale )
             throws IOException
     {
-        return null;
+        return new RemoteOnly();
     }
 }

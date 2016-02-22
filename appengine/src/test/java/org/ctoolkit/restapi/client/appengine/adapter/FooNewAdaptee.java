@@ -43,16 +43,20 @@ public class FooNewAdaptee
     }
 
     @Override
-    public Object prepareNew( @Nullable String type, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public Object prepareNew( @Nullable String type,
+                              @Nullable Map<String, Object> parameters,
+                              @Nullable Locale locale )
             throws IOException
     {
         return new FakeClient();
     }
 
     @Override
-    public RemoteFoo executeNew( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public RemoteFoo executeNew( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
-        return null;
+        return new RemoteFoo();
     }
 }
