@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * The concrete implementation that works with {@link AbstractInputStreamContent}.
  *
- * @author <a href="mailto:aurel.medvegy@turnonline.biz">Aurel Medvegy</a>
+ * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class InputStreamMediaRequest<T>
         implements MediaRequest<T>

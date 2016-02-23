@@ -46,7 +46,7 @@ import java.util.Map;
 /**
  * Unit tests to test {@link ResourceFacadeAdapter}.
  *
- * @author <a href="mailto:aurel.medvegy@turnonline.biz">Aurel Medvegy</a>
+ * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @SuppressWarnings( {"unchecked", "ConstantConditions"} )
 public class ResourceFacadeAdapterTest

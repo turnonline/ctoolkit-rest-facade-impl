@@ -30,7 +30,7 @@ import java.io.InputStream;
 /**
  * The concrete implementation that works with {@link AbstractInputStreamContent}.
  *
- * @author <a href="mailto:aurel.medvegy@turnonline.biz">Aurel Medvegy</a>
+ * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class InputStreamMediaProvider
         implements MediaProvider<AbstractInputStreamContent>
