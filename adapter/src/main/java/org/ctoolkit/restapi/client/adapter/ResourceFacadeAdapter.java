@@ -179,6 +179,18 @@ public class ResourceFacadeAdapter
         return new GetRequest<>( resource, identifier, this, adaptee, remoteRequest );
     }
 
+    @Override
+    public <T> SingleRequest<T> get( @Nonnull Class<T> resource, @Nonnull String identifier )
+    {
+        return get( resource, new Identifier( identifier ) );
+    }
+
+    @Override
+    public <T> SingleRequest<T> get( @Nonnull Class<T> resource, @Nonnull Long identifier )
+    {
+        return get( resource, new Identifier( identifier ) );
+    }
+
     <R> R callbackExecuteGet( @Nonnull GetExecutorAdaptee adaptee,
                               @Nonnull Object remoteRequest,
                               @Nonnull Class<R> responseType,
@@ -424,6 +436,18 @@ public class ResourceFacadeAdapter
         return internalUpdate( resource, identifier, null );
     }
 
+    @Override
+    public <T> SingleRequest<T> update( @Nonnull T resource, @Nonnull String identifier )
+    {
+        return update( resource, new Identifier( identifier ) );
+    }
+
+    @Override
+    public <T> SingleRequest<T> update( @Nonnull T resource, @Nonnull Long identifier )
+    {
+        return update( resource, new Identifier( identifier ) );
+    }
+
     <T> SingleRequest<T> internalUpdate( @Nonnull T resource,
                                          @Nonnull Identifier identifier,
                                          @Nullable MediaProvider<?> provider )
@@ -583,6 +607,18 @@ public class ResourceFacadeAdapter
         }
 
         return ( SingleRequest ) new DeleteRequest( resource, identifier, this, adaptee, remoteRequest );
+    }
+
+    @Override
+    public <T> SingleRequest<T> delete( @Nonnull Class<T> resource, @Nonnull String identifier )
+    {
+        return delete( resource, new Identifier( identifier ) );
+    }
+
+    @Override
+    public <T> SingleRequest<T> delete( @Nonnull Class<T> resource, @Nonnull Long identifier )
+    {
+        return delete( resource, new Identifier( identifier ) );
     }
 
     Void callbackExecuteDelete( @Nonnull DeleteExecutorAdaptee adaptee,
