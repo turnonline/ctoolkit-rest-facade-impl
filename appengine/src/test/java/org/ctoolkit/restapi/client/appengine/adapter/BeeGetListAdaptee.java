@@ -21,7 +21,7 @@ package org.ctoolkit.restapi.client.appengine.adapter;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
-import org.ctoolkit.restapi.client.adapter.AbstractAdaptee;
+import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteBee;
 
 import javax.annotation.Nonnull;
@@ -37,13 +37,13 @@ import java.util.Map;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class BeeGetListAdaptee
-        extends AbstractAdaptee<FakeClient, RemoteBee>
+        extends AbstractGoogleClientAdaptee<FakeClient, RemoteBee>
         implements GetExecutorAdaptee<RemoteBee>, ListExecutorAdaptee<RemoteBee>
 {
     @Inject
-    public BeeGetListAdaptee( FakeClient turnonline )
+    public BeeGetListAdaptee( FakeClient client )
     {
-        super( turnonline );
+        super( client );
     }
 
     @Override

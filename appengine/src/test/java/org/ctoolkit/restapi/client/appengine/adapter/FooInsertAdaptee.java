@@ -20,7 +20,8 @@ package org.ctoolkit.restapi.client.appengine.adapter;
 
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
-import org.ctoolkit.restapi.client.adapter.AbstractAdaptee;
+import org.ctoolkit.restapi.client.adaptee.MediaProvider;
+import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
 
 import javax.annotation.Nonnull;
@@ -34,17 +35,19 @@ import java.util.Map;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class FooInsertAdaptee
-        extends AbstractAdaptee<FakeClient, RemoteFoo>
+        extends AbstractGoogleClientAdaptee<FakeClient, RemoteFoo>
         implements InsertExecutorAdaptee<RemoteFoo>
 {
     @Inject
-    public FooInsertAdaptee( FakeClient turnonline )
+    public FooInsertAdaptee( FakeClient client )
     {
-        super( turnonline );
+        super( client );
     }
 
     @Override
-    public Object prepareInsert( @Nonnull RemoteFoo resource, @Nullable Identifier parentKey )
+    public Object prepareInsert( @Nonnull RemoteFoo resource,
+                                 @Nullable Identifier parentKey,
+                                 @Nullable MediaProvider provider )
             throws IOException
     {
         return new FakeClient();

@@ -20,7 +20,7 @@ package org.ctoolkit.restapi.client.appengine.adapter;
 
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
-import org.ctoolkit.restapi.client.adapter.AbstractAdaptee;
+import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
 
 import javax.annotation.Nonnull;
@@ -34,13 +34,13 @@ import java.util.Map;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class RemoteOnlyAdaptee
-        extends AbstractAdaptee<FakeClient, RemoteOnly>
+        extends AbstractGoogleClientAdaptee<FakeClient, RemoteOnly>
         implements GetExecutorAdaptee<RemoteOnly>
 {
     @Inject
-    public RemoteOnlyAdaptee( FakeClient turnonline )
+    public RemoteOnlyAdaptee( FakeClient client )
     {
-        super( turnonline );
+        super( client );
     }
 
     @Override

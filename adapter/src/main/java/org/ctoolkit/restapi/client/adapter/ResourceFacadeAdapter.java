@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2016 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@ import ma.glasnost.orika.metadata.TypeFactory;
 import org.ctoolkit.restapi.client.ClientErrorException;
 import org.ctoolkit.restapi.client.HttpFailureException;
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.MediaRequest;
 import org.ctoolkit.restapi.client.NotFoundException;
 import org.ctoolkit.restapi.client.Patch;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
@@ -38,6 +39,7 @@ import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
@@ -111,6 +113,13 @@ public class ResourceFacadeAdapter
         }
 
         return new NewInstanceRequest<>( resource, this, adaptee, remoteRequest );
+    }
+
+    @Override
+    public <T> MediaRequest<T> media( @Nonnull T resource )
+    {
+        checkNotNull( resource );
+        return new InputStreamMediaRequest<>( this, resource );
     }
 
     <R> R callbackNewInstance( @Nonnull NewExecutorAdaptee adaptee,
@@ -337,8 +346,14 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
     public <T> SingleRequest<T> insert( @Nonnull T resource, @Nullable Identifier parentKey )
+    {
+        return internalInsert( resource, parentKey, null );
+    }
+
+    <T> SingleRequest<T> internalInsert( @Nonnull T resource,
+                                         @Nullable Identifier parentKey,
+                                         @Nullable MediaProvider<?> provider )
     {
         checkNotNull( resource );
 
@@ -354,18 +369,21 @@ public class ResourceFacadeAdapter
             source = mapper.map( resource, remoteResource );
         }
 
-        InsertExecutorAdaptee adaptee = adaptee( InsertExecutorAdaptee.class, resource.getClass() );
+        @SuppressWarnings( "unchecked" )
+        InsertExecutorAdaptee<Object> adaptee = adaptee( InsertExecutorAdaptee.class, resource.getClass() );
         Object remoteRequest;
         try
         {
-            remoteRequest = adaptee.prepareInsert( source, parentKey );
+            remoteRequest = adaptee.prepareInsert( source, parentKey, provider );
         }
         catch ( IOException e )
         {
             throw new ClientErrorException( 400, e.getMessage() );
         }
 
-        return ( InsertRequest<T> ) new InsertRequest<>( resource.getClass(), parentKey, this, adaptee, remoteRequest );
+        @SuppressWarnings( "unchecked" )
+        Class<T> resourceClass = ( Class<T> ) resource.getClass();
+        return new InsertRequest<>( resourceClass, parentKey, this, adaptee, remoteRequest );
     }
 
     <R> R callbackExecuteInsert( @Nonnull InsertExecutorAdaptee adaptee,
@@ -401,8 +419,14 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
     public <T> SingleRequest<T> update( @Nonnull T resource, @Nonnull Identifier identifier )
+    {
+        return internalUpdate( resource, identifier, null );
+    }
+
+    <T> SingleRequest<T> internalUpdate( @Nonnull T resource,
+                                         @Nonnull Identifier identifier,
+                                         @Nullable MediaProvider<?> provider )
     {
         checkNotNull( resource );
         checkNotNull( identifier );
@@ -419,18 +443,21 @@ public class ResourceFacadeAdapter
             source = mapper.map( resource, remoteResource );
         }
 
-        UpdateExecutorAdaptee adaptee = adaptee( UpdateExecutorAdaptee.class, resource.getClass() );
+        @SuppressWarnings( "unchecked" )
+        UpdateExecutorAdaptee<Object> adaptee = adaptee( UpdateExecutorAdaptee.class, resource.getClass() );
         Object remoteRequest;
         try
         {
-            remoteRequest = adaptee.prepareUpdate( source, identifier );
+            remoteRequest = adaptee.prepareUpdate( source, identifier, provider );
         }
         catch ( IOException e )
         {
             throw new ClientErrorException( 400, e.getMessage() );
         }
 
-        return ( UpdateRequest<T> ) new UpdateRequest<>( resource.getClass(), identifier, this, adaptee, remoteRequest );
+        @SuppressWarnings( "unchecked" )
+        Class<T> resourceClass = ( Class<T> ) resource.getClass();
+        return new UpdateRequest<>( resourceClass, identifier, this, adaptee, remoteRequest );
     }
 
     <R> R callbackExecuteUpdate( @Nonnull UpdateExecutorAdaptee adaptee,
@@ -555,7 +582,7 @@ public class ResourceFacadeAdapter
             throw new ClientErrorException( 400, e.getMessage() );
         }
 
-        return ( SingleRequest<T> ) new DeleteRequest( resource, identifier, this, adaptee, remoteRequest );
+        return ( SingleRequest ) new DeleteRequest( resource, identifier, this, adaptee, remoteRequest );
     }
 
     Void callbackExecuteDelete( @Nonnull DeleteExecutorAdaptee adaptee,
@@ -680,14 +707,14 @@ public class ResourceFacadeAdapter
 
         if ( adaptee == null && remoteResource == resource )
         {
-            String msg = "Missing injector binding for " + adapteeType.getSimpleName() + "<" + resource + ">";
+            String msg = "Missing binding for resource " + adapteeType.getSimpleName() + "<" + resource.getName() + ">";
             throw new NotFoundException( msg );
         }
 
         if ( adaptee == null )
         {
-            String msg = "Missing injector binding for remote resource " + adapteeType.getSimpleName() + "<"
-                    + remoteResource + "> Remote resource mapped by resource " + resource + ".";
+            String msg = "Missing binding for remote resource " + adapteeType.getSimpleName() + "<" + remoteResource.getName()
+                    + "> Remote resource mapped by resource " + resource.getName() + ".";
 
             throw new NotFoundException( msg );
         }

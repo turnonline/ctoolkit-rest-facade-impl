@@ -19,7 +19,9 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest;
+import com.google.api.client.http.AbstractInputStreamContent;
 import com.google.api.client.http.HttpHeaders;
+import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -36,27 +38,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <M> the concrete type of request's model object to work with
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class AbstractAdaptee<C, M>
+public class AbstractGoogleClientAdaptee<C, M>
 {
-    private final C turnonline;
+    private final C client;
 
-    public AbstractAdaptee( C turnonline )
+    public AbstractGoogleClientAdaptee( C client )
     {
-        this.turnonline = turnonline;
+        this.client = client;
     }
 
-    protected C getTurnonline()
+    protected final C client()
     {
-        return turnonline;
+        return client;
     }
 
-    protected AbstractGoogleJsonClientRequest get( Object request )
+    protected final AbstractGoogleJsonClientRequest get( Object request )
     {
         return ( AbstractGoogleJsonClientRequest ) request;
     }
 
     @SuppressWarnings( "unchecked" )
-    protected M execute( Object request ) throws IOException
+    protected final M execute( Object request ) throws IOException
     {
         return ( M ) get( request ).execute();
     }
@@ -67,7 +69,7 @@ public class AbstractAdaptee<C, M>
      * @param request the Google API client request
      * @param locale  the optional locale to be set
      */
-    protected void acceptLanguage( @Nonnull AbstractGoogleJsonClientRequest request, @Nullable Locale locale )
+    protected final void acceptLanguage( @Nonnull AbstractGoogleJsonClientRequest request, @Nullable Locale locale )
     {
         checkNotNull( request );
         acceptLanguage( request.getRequestHeaders(), locale );
@@ -79,7 +81,7 @@ public class AbstractAdaptee<C, M>
      * @param headers the Google API client HTTP headers
      * @param locale  the optional locale to be set
      */
-    protected void acceptLanguage( @Nonnull HttpHeaders headers, @Nullable Locale locale )
+    protected final void acceptLanguage( @Nonnull HttpHeaders headers, @Nullable Locale locale )
     {
         checkNotNull( headers );
 
@@ -96,8 +98,8 @@ public class AbstractAdaptee<C, M>
      * @param request  the Google API client request
      * @param criteria the optional resource parameters
      */
-    protected void fillCriteria( @Nonnull AbstractGoogleJsonClientRequest request,
-                                 @Nullable Map<String, Object> criteria )
+    protected final void fillCriteria( @Nonnull AbstractGoogleJsonClientRequest request,
+                                       @Nullable Map<String, Object> criteria )
     {
         checkNotNull( request );
 
@@ -122,13 +124,23 @@ public class AbstractAdaptee<C, M>
      * @param criteria the optional resource parameters
      * @param locale   the optional locale to be set
      */
-    protected void fill( @Nonnull AbstractGoogleJsonClientRequest request,
-                         @Nullable Map<String, Object> criteria,
-                         @Nullable Locale locale )
+    protected final void fill( @Nonnull AbstractGoogleJsonClientRequest request,
+                               @Nullable Map<String, Object> criteria,
+                               @Nullable Locale locale )
     {
         checkNotNull( request );
 
         fillCriteria( request, criteria );
         acceptLanguage( request, locale );
+    }
+
+    protected final AbstractInputStreamContent media( @Nullable MediaProvider<?> provider )
+    {
+        if ( provider == null )
+        {
+            return null;
+        }
+
+        return ( AbstractInputStreamContent ) provider.media();
     }
 }

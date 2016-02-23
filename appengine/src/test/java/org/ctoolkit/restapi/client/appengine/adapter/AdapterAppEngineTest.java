@@ -42,7 +42,7 @@ public class AdapterAppEngineTest
     private ResourceFacade resources;
 
     @Test
-    public void test()
+    public void facadeEndToEnd()
     {
         SingleRequest<RemoteOnly> request = resources.get( RemoteOnly.class, new Identifier( 1L ) );
         assertNotNull( request );

@@ -20,7 +20,7 @@ package org.ctoolkit.restapi.client.appengine.adapter;
 
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
-import org.ctoolkit.restapi.client.adapter.AbstractAdaptee;
+import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
 
 import javax.annotation.Nonnull;
@@ -33,13 +33,13 @@ import java.util.Locale;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class FooDeleteAdaptee
-        extends AbstractAdaptee<FakeClient, RemoteFoo>
+        extends AbstractGoogleClientAdaptee<FakeClient, RemoteFoo>
         implements DeleteExecutorAdaptee<RemoteFoo>
 {
     @Inject
-    public FooDeleteAdaptee( FakeClient turnonline )
+    public FooDeleteAdaptee( FakeClient client )
     {
-        super( turnonline );
+        super( client );
     }
 
     @Override

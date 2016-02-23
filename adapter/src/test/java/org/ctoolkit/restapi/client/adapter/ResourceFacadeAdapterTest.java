@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2016 Comvai, s.r.o. All Rights Reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 package org.ctoolkit.restapi.client.adapter;
 
 import ma.glasnost.orika.MapperFacade;
@@ -13,6 +31,7 @@ import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
@@ -167,7 +186,7 @@ public class ResourceFacadeAdapterTest
                 injector.getExecutorAdaptee( InsertExecutorAdaptee.class, ResourceNoMapping.class );
                 result = adaptee;
 
-                adaptee.prepareInsert( inputResource, ( Identifier ) any );
+                adaptee.prepareInsert( inputResource, ( Identifier ) any, ( MediaProvider ) any );
                 result = request;
 
                 adaptee.executeInsert( any, ( Map<String, Object> ) any, ( Locale ) any );
@@ -193,7 +212,7 @@ public class ResourceFacadeAdapterTest
                 injector.getExecutorAdaptee( UpdateExecutorAdaptee.class, ResourceNoMapping.class );
                 result = adaptee;
 
-                adaptee.prepareUpdate( inputResource, ( Identifier ) any );
+                adaptee.prepareUpdate( inputResource, ( Identifier ) any, ( MediaProvider ) any );
                 result = request;
 
                 adaptee.executeUpdate( any, ( Map<String, Object> ) any, ( Locale ) any );

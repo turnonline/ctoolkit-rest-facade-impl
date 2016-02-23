@@ -20,7 +20,7 @@ package org.ctoolkit.restapi.client.appengine.adapter;
 
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
-import org.ctoolkit.restapi.client.adapter.AbstractAdaptee;
+import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
 
 import javax.annotation.Nonnull;
@@ -34,13 +34,13 @@ import java.util.Map;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class FooPatchAdaptee
-        extends AbstractAdaptee<FakeClient, RemoteFoo>
+        extends AbstractGoogleClientAdaptee<FakeClient, RemoteFoo>
         implements PatchExecutorAdaptee<RemoteFoo>
 {
     @Inject
-    public FooPatchAdaptee( FakeClient turnonline )
+    public FooPatchAdaptee( FakeClient client )
     {
-        super( turnonline );
+        super( client );
     }
 
     @Override

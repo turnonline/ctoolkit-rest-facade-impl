@@ -22,10 +22,15 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpStatusCodes;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
+import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
+import org.ctoolkit.restapi.client.drive.adaptee.FileAdaptee;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiCredentialFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +53,13 @@ public class GoogleApiDriveModule
     @Override
     protected void configure()
     {
+        bind( new TypeLiteral<InsertExecutorAdaptee<File>>()
+        {
+        } ).to( FileAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<DeleteExecutorAdaptee<File>>()
+        {
+        } ).to( FileAdaptee.class ).in( Singleton.class );
     }
 
     @Provides
