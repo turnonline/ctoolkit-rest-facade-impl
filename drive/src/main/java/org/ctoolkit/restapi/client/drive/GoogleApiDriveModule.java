@@ -30,6 +30,7 @@ import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.PatchAdaptee;
 import org.ctoolkit.restapi.client.drive.adaptee.FileAdaptee;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiCredentialFactory;
 import org.slf4j.Logger;
@@ -58,6 +59,10 @@ public class GoogleApiDriveModule
         } ).to( FileAdaptee.class ).in( Singleton.class );
 
         bind( new TypeLiteral<DeleteExecutorAdaptee<File>>()
+        {
+        } ).to( FileAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<PatchAdaptee<Drive.Files>>()
         {
         } ).to( FileAdaptee.class ).in( Singleton.class );
     }

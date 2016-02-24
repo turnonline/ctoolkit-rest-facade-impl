@@ -24,9 +24,11 @@ import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.appengine.GuiceTestCase;
 import org.ctoolkit.restapi.client.appengine.adapter.model.Foo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
+import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingRequest;
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
+import java.io.IOException;
 
 import static org.testng.Assert.assertNotNull;
 
@@ -42,7 +44,7 @@ public class AdapterAppEngineTest
     private ResourceFacade resources;
 
     @Test
-    public void facadeEndToEnd()
+    public void facadeEndToEnd() throws IOException
     {
         SingleRequest<RemoteOnly> request = resources.get( RemoteOnly.class, new Identifier( 1L ) );
         assertNotNull( request );
@@ -53,6 +55,14 @@ public class AdapterAppEngineTest
         assertNotNull( singleRequest.execute() );
 
         singleRequest = resources.get( Foo.class, new Identifier( 1L ) );
+        assertNotNull( singleRequest );
+        assertNotNull( singleRequest.execute() );
+
+        singleRequest = resources.get( Foo.class, 1L );
+        assertNotNull( singleRequest );
+        assertNotNull( singleRequest.execute() );
+
+        singleRequest = resources.get( Foo.class, "identifier" );
         assertNotNull( singleRequest );
         assertNotNull( singleRequest.execute() );
 
@@ -68,12 +78,30 @@ public class AdapterAppEngineTest
         assertNotNull( singleRequest );
         assertNotNull( singleRequest.execute() );
 
+        singleRequest = resources.update( foo, 1L );
+        assertNotNull( singleRequest );
+        assertNotNull( singleRequest.execute() );
+
+        singleRequest = resources.update( foo, "identifier" );
+        assertNotNull( singleRequest );
+        assertNotNull( singleRequest.execute() );
+
         Foo.InnerFoo inner = new Foo.InnerFoo();
         singleRequest = resources.patch( inner, new Identifier( 1L ) );
         assertNotNull( singleRequest );
         assertNotNull( singleRequest.execute() );
 
+        resources.patch( UnderlyingRequest.class ).identifier( new Identifier( 1L ) ).build().export().execute();
+
         singleRequest = resources.delete( Foo.class, new Identifier( 1L ) );
+        assertNotNull( singleRequest );
+        singleRequest.execute();
+
+        singleRequest = resources.delete( Foo.class, 1L );
+        assertNotNull( singleRequest );
+        singleRequest.execute();
+
+        singleRequest = resources.delete( Foo.class, "identifier" );
         assertNotNull( singleRequest );
         singleRequest.execute();
     }

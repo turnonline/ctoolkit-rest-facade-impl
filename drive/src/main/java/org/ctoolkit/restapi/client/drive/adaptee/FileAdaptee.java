@@ -24,6 +24,7 @@ import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
+import org.ctoolkit.restapi.client.adaptee.PatchAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 
 import javax.annotation.Nonnull;
@@ -42,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class FileAdaptee
         extends AbstractGoogleClientAdaptee<Drive, File>
-        implements InsertExecutorAdaptee<File>, DeleteExecutorAdaptee<File>
+        implements InsertExecutorAdaptee<File>, DeleteExecutorAdaptee<File>, PatchAdaptee<Drive.Files>
 {
     @Inject
     public FileAdaptee( Drive client )
@@ -56,6 +57,8 @@ public class FileAdaptee
                                              @Nullable MediaProvider<?> provider )
             throws IOException
     {
+        checkNotNull( resource );
+
         Drive.Files.Create insert;
         if ( provider == null )
         {
@@ -75,6 +78,8 @@ public class FileAdaptee
                                @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
         fill( get( request ), parameters, locale );
         return execute( request );
     }
@@ -91,7 +96,16 @@ public class FileAdaptee
     public void executeDelete( @Nonnull Object request, @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
         acceptLanguage( get( request ), locale );
         execute( request );
+    }
+
+    @Override
+    public Drive.Files preparePatch( Object resource, Identifier identifier )
+            throws IOException
+    {
+        return client().files();
     }
 }

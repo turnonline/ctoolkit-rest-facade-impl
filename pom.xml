@@ -207,7 +207,7 @@
     </dependencyManagement>
 
     <properties>
-        <rest-client-facade-api.version>0.9-20160223.090947-2</rest-client-facade-api.version>
+        <rest-client-facade-api.version>0.9-20160224.042844-3</rest-client-facade-api.version>
         <google-api-client.version>1.21.0</google-api-client.version>
         <google-api-services-analytics.version>v3-rev123-1.21.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev11-1.21.0</google-api-services-drive.version>

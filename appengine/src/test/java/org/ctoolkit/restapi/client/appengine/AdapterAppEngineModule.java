@@ -29,6 +29,7 @@ import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.PatchAdaptee;
 import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.BeeGetListAdaptee;
@@ -46,6 +47,7 @@ import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteBee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteInnerFoo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
+import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingRequest;
 
 import javax.inject.Singleton;
 
@@ -98,6 +100,10 @@ public class AdapterAppEngineModule
 
         // RemoteOnly adaptee mapping, no local resource counterpart
         bind( new TypeLiteral<GetExecutorAdaptee<RemoteOnly>>()
+        {
+        } ).to( RemoteOnlyAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<PatchAdaptee<UnderlyingRequest>>()
         {
         } ).to( RemoteOnlyAdaptee.class ).in( Singleton.class );
     }

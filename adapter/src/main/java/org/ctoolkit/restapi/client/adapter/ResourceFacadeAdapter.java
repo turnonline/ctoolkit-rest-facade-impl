@@ -41,6 +41,7 @@ import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.PatchAdaptee;
 import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
@@ -589,6 +590,32 @@ public class ResourceFacadeAdapter
     }
 
     @Override
+    public <S> org.ctoolkit.restapi.client.PatchRequest<S> patch( @Nonnull Class<S> resource )
+    {
+        @SuppressWarnings( "unchecked" )
+        PatchAdaptee<S> adaptee = adaptee( PatchAdaptee.class, resource );
+
+        return new PatchRequestImpl<>( this, adaptee );
+    }
+
+    <S> S callbackPatchAdaptee( @Nonnull PatchAdaptee<S> adaptee,
+                                Object resource,
+                                Identifier identifier )
+    {
+        S remoteRequest;
+        try
+        {
+            remoteRequest = adaptee.preparePatch( resource, identifier );
+        }
+        catch ( IOException e )
+        {
+            throw new ClientErrorException( 400, e.getMessage() );
+        }
+
+        return remoteRequest;
+    }
+
+    @Override
     @SuppressWarnings( "unchecked" )
     public <T> SingleRequest<T> delete( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
@@ -743,14 +770,15 @@ public class ResourceFacadeAdapter
 
         if ( adaptee == null && remoteResource == resource )
         {
-            String msg = "Missing binding for resource " + adapteeType.getSimpleName() + "<" + resource.getName() + ">";
+            String msg = "Missing binding between adaptee and resource: " + adapteeType.getSimpleName() + "<"
+                    + resource.getName() + ">";
             throw new NotFoundException( msg );
         }
 
         if ( adaptee == null )
         {
-            String msg = "Missing binding for remote resource " + adapteeType.getSimpleName() + "<" + remoteResource.getName()
-                    + "> Remote resource mapped by resource " + resource.getName() + ".";
+            String msg = "Missing binding between adaptee and remote resource: " + adapteeType.getSimpleName() + "<"
+                    + remoteResource.getName() + "> Remote resource mapped by resource " + resource.getName() + ".";
 
             throw new NotFoundException( msg );
         }
