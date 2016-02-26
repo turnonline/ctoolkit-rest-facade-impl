@@ -60,6 +60,7 @@
         <module>analytics</module>
         <module>drive</module>
         <module>identity-toolkit</module>
+        <module>maps</module>
     </modules>
 
     <build>
@@ -146,6 +147,11 @@
                 <artifactId>gitkitclient</artifactId>
                 <version>${gitkitclient.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.maps</groupId>
+                <artifactId>google-maps-services</artifactId>
+                <version>${google-maps-services.version}</version>
+            </dependency>
             <!-- Google APIs dependencies -->
             <dependency>
                 <groupId>com.google.appengine</groupId>
@@ -212,6 +218,7 @@
         <google-api-services-analytics.version>v3-rev123-1.21.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev11-1.21.0</google-api-services-drive.version>
         <google-api-services-identitytoolkit.version>v3-rev203-1.21.0</google-api-services-identitytoolkit.version>
+        <google-maps-services.version>0.1.12-gac</google-maps-services.version>
         <gitkitclient.version>1.2.5</gitkitclient.version>
         <appengine.version>1.9.32</appengine.version>
         <jmockit.version>1.21</jmockit.version>
