@@ -1,0 +1,4 @@
+org.ctoolkit.restapi.client.adapter
+org.ctoolkit.restapi.client.appengine
+org.ctoolkit.restapi.client.appengine.adapter
+org.ctoolkit.restapi.client.appengine.adapter.model
