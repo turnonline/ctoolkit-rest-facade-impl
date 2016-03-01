@@ -22,13 +22,13 @@
     <parent>
         <groupId>org.ctoolkit.restapi</groupId>
         <artifactId>rest-client-facade-impl</artifactId>
-        <version>0.11</version>
+        <version>0.12-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>rest-client-facade-adapter</artifactId>
-    <version>0.11</version>
+    <version>0.12-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Uniform REST Client Facade API Adapter Impl</name>
     <description>
