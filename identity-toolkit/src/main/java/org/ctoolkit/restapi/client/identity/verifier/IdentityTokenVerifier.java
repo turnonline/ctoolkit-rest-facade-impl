@@ -25,9 +25,10 @@ import org.ctoolkit.restapi.client.TokenVerifier;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.identity.Identity;
 import org.joda.time.Instant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.security.SignatureException;
 
 /**
  * The {@link Identity} token verifier.
@@ -37,6 +38,8 @@ import java.security.SignatureException;
 class IdentityTokenVerifier
         implements TokenVerifier<Identity>
 {
+    public static final Logger logger = LoggerFactory.getLogger( IdentityTokenVerifier.class );
+
     private final JsonTokenHelper helper;
 
     @Inject
@@ -54,9 +57,10 @@ class IdentityTokenVerifier
         {
             jsonToken = helper.verifyAndDeserialize( token );
         }
-        catch ( SignatureException e )
+        catch ( Exception e )
         {
-            throw new UnauthorizedException( e );
+            logger.error( "Token: " + token, e );
+            throw new UnauthorizedException( e.getMessage() );
         }
 
         Instant issuedAt = jsonToken.getIssuedAt();
