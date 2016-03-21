@@ -29,6 +29,11 @@ import java.util.Date;
 public class Identity
         implements Serializable
 {
+    /**
+     * The identity toolkit default token cookie name.
+     */
+    public static final String GTOKEN = "gtoken";
+
     private static final long serialVersionUID = 4181935959696889561L;
 
     private Date issuedAt;

@@ -18,20 +18,10 @@
 
 package org.ctoolkit.restapi.client.identity.verifier;
 
-import com.google.api.services.identitytoolkit.IdentityToolkit;
-import com.google.identitytoolkit.HttpSender;
-import com.google.identitytoolkit.JsonTokenHelper;
-import com.google.identitytoolkit.RpcHelper;
 import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import org.ctoolkit.restapi.client.TokenVerifier;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiCredentialFactory;
 import org.ctoolkit.restapi.client.identity.Identity;
-
-import javax.inject.Singleton;
-import java.io.InputStream;
 
 /**
  * The verifier guice module.
@@ -47,18 +37,5 @@ public class VerifierModule
         bind( new TypeLiteral<TokenVerifier<Identity>>()
         {
         } ).to( IdentityTokenVerifier.class ).asEagerSingleton();
-    }
-
-    @Provides
-    @Singleton
-    JsonTokenHelper provideJsonTokenHelper( GoogleApiCredentialFactory factory, Injector injector )
-    {
-        HttpSender sender = injector.getInstance( HttpSender.class );
-        InputStream stream = factory.getServiceAccountPrivateKeyP12Stream();
-        String serviceAccount = factory.getServiceAccountEmail();
-
-        RpcHelper rpcHelper = new RpcHelper( sender, IdentityToolkit.DEFAULT_BASE_URL, serviceAccount, stream );
-
-        return new JsonTokenHelper( rpcHelper, factory.getApiKey(), factory.getProjectId() );
     }
 }

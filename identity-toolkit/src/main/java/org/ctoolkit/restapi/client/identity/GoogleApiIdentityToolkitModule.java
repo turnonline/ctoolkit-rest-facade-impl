@@ -21,7 +21,11 @@ package org.ctoolkit.restapi.client.identity;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpStatusCodes;
 import com.google.api.services.identitytoolkit.IdentityToolkit;
+import com.google.identitytoolkit.HttpSender;
+import com.google.identitytoolkit.JsonTokenHelper;
+import com.google.identitytoolkit.RpcHelper;
 import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
 import com.google.inject.Provides;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
@@ -32,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.Collections;
@@ -90,5 +95,23 @@ public class GoogleApiIdentityToolkitModule
         }
 
         return builder.build();
+    }
+
+    @Provides
+    @Singleton
+    JsonTokenHelper provideJsonTokenHelper( GoogleApiCredentialFactory factory, RpcHelper rpcHelper )
+    {
+        return new JsonTokenHelper( rpcHelper, factory.getApiKey(), factory.getProjectId() );
+    }
+
+    @Provides
+    @Singleton
+    RpcHelper provideRpcHelper( GoogleApiCredentialFactory factory, Injector injector )
+    {
+        HttpSender sender = injector.getInstance( HttpSender.class );
+        InputStream stream = factory.getServiceAccountPrivateKeyP12Stream();
+        String serviceAccount = factory.getServiceAccountEmail();
+
+        return new RpcHelper( sender, IdentityToolkit.DEFAULT_BASE_URL, serviceAccount, stream );
     }
 }
