@@ -778,7 +778,8 @@ public class ResourceFacadeAdapter
         if ( adaptee == null )
         {
             String msg = "Missing binding between adaptee and remote resource: " + adapteeType.getSimpleName() + "<"
-                    + remoteResource.getName() + "> Remote resource mapped by resource " + resource.getName() + ".";
+                    + remoteResource.getName() + ">. The remote resource " + remoteResource.getName()
+                    + " is being mapped to " + resource.getName() + ".";
 
             throw new NotFoundException( msg );
         }
