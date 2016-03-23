@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.testng.Assert.assertNull;
+
 /**
  * Unit tests to test {@link ResourceFacadeAdapter}.
  *
@@ -273,6 +275,78 @@ public class ResourceFacadeAdapterTest
         tested.delete( ResourceNoMapping.class, new Identifier( 1L ) ).execute();
 
         new NoMappingVerifications();
+    }
+
+    @Test
+    public void insertReturnsNoContent( @Mocked final InsertExecutorAdaptee adaptee,
+                                        @Mocked final RemoteRequest request,
+                                        @Mocked final ResourceNoMapping inputResource )
+            throws IOException
+    {
+        new NonStrictExpectations()
+        {
+            {
+                injector.getExecutorAdaptee( InsertExecutorAdaptee.class, ResourceNoMapping.class );
+                result = adaptee;
+
+                adaptee.prepareInsert( inputResource, ( Identifier ) any, ( MediaProvider ) any );
+                result = request;
+
+                adaptee.executeInsert( any, ( Map<String, Object> ) any, ( Locale ) any );
+                result = null;
+            }
+        };
+
+        assertNull( tested.insert( inputResource, new Identifier( 1L ) ).execute() );
+    }
+
+    @Test
+    public void updateReturnsNoContent( @Mocked final UpdateExecutorAdaptee adaptee,
+                                        @Mocked final RemoteRequest request,
+                                        @Mocked final ResourceNoMapping inputResource )
+            throws IOException
+    {
+        new NonStrictExpectations()
+        {
+            {
+                injector.getExecutorAdaptee( UpdateExecutorAdaptee.class, ResourceNoMapping.class );
+                result = adaptee;
+
+                adaptee.prepareUpdate( inputResource, ( Identifier ) any, ( MediaProvider ) any );
+                result = request;
+
+                adaptee.executeUpdate( any, ( Map<String, Object> ) any, ( Locale ) any );
+                result = null;
+            }
+        };
+
+        assertNull( tested.update( inputResource, new Identifier( 1L ) ).execute() );
+    }
+
+    @Test
+    public void patchReturnsNoContent( @Mocked final PatchExecutorAdaptee adaptee,
+                                       @Mocked final RemoteRequest request,
+                                       @Mocked final PatchResourceNoMapping inputResource )
+            throws IOException
+    {
+        new NonStrictExpectations()
+        {
+            {
+                injector.getExecutorAdaptee( PatchExecutorAdaptee.class, ResourceNoMapping.class );
+                result = adaptee;
+
+                adaptee.preparePatch( any, ( Identifier ) any, anyString );
+                result = request;
+
+                adaptee.executePatch( any, ( Map<String, Object> ) any, ( Locale ) any );
+                result = null;
+
+                inputResource.type();
+                result = ResourceNoMapping.class;
+            }
+        };
+
+        assertNull( tested.patch( inputResource, new Identifier( 1L ) ).execute() );
     }
 
     @SuppressWarnings( "ConstantConditions" )
