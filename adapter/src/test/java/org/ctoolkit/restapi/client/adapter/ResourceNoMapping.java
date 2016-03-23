@@ -20,6 +20,7 @@ package org.ctoolkit.restapi.client.adapter;
 
 /**
  * The resource model for testing purpose.
+ * No mappings means that client resource instance will interact directly with adaptee as remote resource.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */

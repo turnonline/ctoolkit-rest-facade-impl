@@ -420,6 +420,11 @@ public class ResourceFacadeAdapter
             throw prepareUpdateException( e, responseType, parentKey );
         }
 
+        if ( source == null )
+        {
+            return null;
+        }
+
         if ( source.getClass() == responseType )
         {
             //noinspection unchecked
@@ -507,6 +512,11 @@ public class ResourceFacadeAdapter
             throw prepareUpdateException( e, responseType, identifier );
         }
 
+        if ( source == null )
+        {
+            return null;
+        }
+
         if ( source.getClass() == responseType )
         {
             //noinspection unchecked
@@ -576,6 +586,11 @@ public class ResourceFacadeAdapter
         catch ( IOException e )
         {
             throw prepareUpdateException( e, responseType, identifier );
+        }
+
+        if ( source == null )
+        {
+            return null;
         }
 
         if ( source.getClass() == responseType )
