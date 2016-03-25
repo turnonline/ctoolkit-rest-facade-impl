@@ -129,7 +129,7 @@ public class ResourceFacadeAdapterTest
                 adaptee.prepareList( ( Identifier ) any );
                 result = request;
 
-                adaptee.executeList( any, ( Map<String, Object> ) any, ( Locale ) any );
+                adaptee.executeList( any, ( Map<String, Object> ) any, ( Locale ) any, -1, -1 );
                 result = new ArrayList<>();
 
                 // returns null to make sure no provider is being injected
@@ -161,7 +161,7 @@ public class ResourceFacadeAdapterTest
                 adaptee.prepareList( ( Identifier ) any );
                 result = request;
 
-                adaptee.executeList( any, ( Map<String, Object> ) any, ( Locale ) any );
+                adaptee.executeList( any, ( Map<String, Object> ) any, ( Locale ) any, -1, -1 );
                 result = resources;
 
                 // returns null to make sure no provider is being injected

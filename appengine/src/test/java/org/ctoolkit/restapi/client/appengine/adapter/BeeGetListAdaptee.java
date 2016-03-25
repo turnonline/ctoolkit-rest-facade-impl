@@ -72,7 +72,9 @@ public class BeeGetListAdaptee
     @Override
     public List<RemoteBee> executeList( @Nonnull Object request,
                                         @Nullable Map<String, Object> criteria,
-                                        @Nullable Locale locale )
+                                        @Nullable Locale locale,
+                                        int start,
+                                        int length )
             throws IOException
     {
         List<RemoteBee> bees = new ArrayList<>();

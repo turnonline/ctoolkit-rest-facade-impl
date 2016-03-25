@@ -44,6 +44,10 @@ public class ListRequest<T>
 
     private final Object remoteRequest;
 
+    private int start = -1;
+
+    private int length = -1;
+
     ListRequest( @Nonnull Class<T> resource,
                  @Nonnull ResourceFacadeAdapter adapter,
                  @Nonnull ListExecutorAdaptee adaptee,
@@ -69,6 +73,19 @@ public class ListRequest<T>
     }
 
     @Override
+    public List<T> execute( int start, int length )
+    {
+        if ( start < 0 || length < 0 )
+        {
+            String msg = "start: '" + start + "' or length: '" + length + "' property cannot have negative values.";
+            throw new IllegalArgumentException( msg );
+        }
+        this.start = start;
+        this.length = length;
+        return execute( null, null );
+    }
+
+    @Override
     public List<T> execute( Map<String, Object> criteria )
     {
         return execute( criteria, null );
@@ -83,6 +100,29 @@ public class ListRequest<T>
     @Override
     public List<T> execute( Map<String, Object> criteria, Locale locale )
     {
-        return adapter.callbackExecuteList( adaptee, remoteRequest, resource, criteria, locale );
+        return adapter.callbackExecuteList( adaptee, remoteRequest, resource, criteria, locale, start, length );
+    }
+
+    @Override
+    public void setFirstResult( int start )
+    {
+        if ( start < 0 )
+        {
+            String msg = "start: '" + start + "' property cannot have negative value.";
+            throw new IllegalArgumentException( msg );
+        }
+
+        this.start = start;
+    }
+
+    @Override
+    public void setMaxResults( int length )
+    {
+        if ( length < 0 )
+        {
+            String msg = "length: '" + length + "' property cannot have negative value.";
+            throw new IllegalArgumentException( msg );
+        }
+        this.length = length;
     }
 }
