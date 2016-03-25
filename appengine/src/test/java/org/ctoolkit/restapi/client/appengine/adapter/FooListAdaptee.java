@@ -55,7 +55,9 @@ public class FooListAdaptee
     @Override
     public List<RemoteFoo> executeList( @Nonnull Object request,
                                         @Nullable Map<String, Object> criteria,
-                                        @Nullable Locale locale )
+                                        @Nullable Locale locale,
+                                        int start,
+                                        int length )
             throws IOException
     {
         List<RemoteFoo> list = new ArrayList<>();

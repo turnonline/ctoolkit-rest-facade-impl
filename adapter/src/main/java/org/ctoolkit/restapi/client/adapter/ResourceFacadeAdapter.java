@@ -286,7 +286,9 @@ public class ResourceFacadeAdapter
                                      @Nonnull Object remoteRequest,
                                      @Nonnull Class<R> responseType,
                                      @Nullable Map<String, Object> criteria,
-                                     @Nullable Locale locale )
+                                     @Nullable Locale locale,
+                                     int start,
+                                     int length )
     {
         checkNotNull( responseType );
 
@@ -312,7 +314,7 @@ public class ResourceFacadeAdapter
             List<?> remoteList;
             try
             {
-                remoteList = adaptee.executeList( remoteRequest, criteria, locale );
+                remoteList = adaptee.executeList( remoteRequest, criteria, locale, start, length );
             }
             catch ( IOException e )
             {
