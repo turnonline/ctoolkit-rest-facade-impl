@@ -22,13 +22,13 @@
     <parent>
         <groupId>org.ctoolkit.restapi</groupId>
         <artifactId>rest-client-facade-impl</artifactId>
-        <version>0.14-SNAPSHOT</version>
+        <version>0.14</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>rest-client-facade-appengine</artifactId>
-    <version>0.14-SNAPSHOT</version>
+    <version>0.14</version>
     <packaging>jar</packaging>
     <name>Uniform REST Client Facade API AppEngine Impl</name>
     <description>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>org.ctoolkit.restapi</groupId>
             <artifactId>rest-client-facade-adapter</artifactId>
-            <version>0.14-SNAPSHOT</version>
+            <version>0.14</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>

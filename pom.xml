@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ctoolkit.restapi</groupId>
     <artifactId>rest-client-facade-impl</artifactId>
-    <version>0.14-SNAPSHOT</version>
+    <version>0.14</version>
     <packaging>pom</packaging>
     <name>Uniform REST Client Parent Project</name>
     <description>Uniform client facade API implementation to perform common operations on top of REST.</description>
@@ -38,7 +38,7 @@
         <connection>scm:git:[fetch=]git@github.com:turnonline/rest-client-facade-impl.git</connection>
         <developerConnection>scm:git:[push=]git@github.com:turnonline/rest-client-facade-impl.git</developerConnection>
         <url>https://github.com/turnonline/rest-client-facade-impl</url>
-        <tag>HEAD</tag>
+        <tag>rest-client-facade-impl-0.14</tag>
     </scm>
 
     <issueManagement>
