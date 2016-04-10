@@ -20,6 +20,7 @@ package org.ctoolkit.restapi.client.identity;
 
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpStatusCodes;
+import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.identitytoolkit.IdentityToolkit;
 import com.google.identitytoolkit.HttpSender;
 import com.google.identitytoolkit.JsonTokenHelper;
@@ -101,7 +102,13 @@ public class GoogleApiIdentityToolkitModule
     @Singleton
     JsonTokenHelper provideJsonTokenHelper( GoogleApiCredentialFactory factory, RpcHelper rpcHelper )
     {
-        return new JsonTokenHelper( rpcHelper, factory.getProjectId() );
+        String projectId = factory.getProjectId();
+        if ( Strings.isNullOrEmpty( projectId ) )
+        {
+            throw new IllegalArgumentException( "ProjectId (audience) must be provided, cannot be empty!" );
+        }
+
+        return new JsonTokenHelper( rpcHelper, projectId );
     }
 
     @Provides
