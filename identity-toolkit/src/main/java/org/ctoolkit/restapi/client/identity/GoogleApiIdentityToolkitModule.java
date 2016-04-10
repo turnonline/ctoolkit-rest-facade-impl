@@ -101,7 +101,7 @@ public class GoogleApiIdentityToolkitModule
     @Singleton
     JsonTokenHelper provideJsonTokenHelper( GoogleApiCredentialFactory factory, RpcHelper rpcHelper )
     {
-        return new JsonTokenHelper( rpcHelper, factory.getApiKey(), factory.getProjectId() );
+        return new JsonTokenHelper( rpcHelper, factory.getProjectId() );
     }
 
     @Provides
