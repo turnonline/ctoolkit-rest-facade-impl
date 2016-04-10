@@ -30,14 +30,70 @@ public class IdentityTokenResolver
     }
 
     /**
-     * Parse identity token taken from given request. It's looking for {@link Identity#GTOKEN} cookie to parse and verify
-     * in order to create instance of the {@link Identity}. If no token found or expired, returns <tt>null</tt>.
+     * Parse identity token taken from given request. It's looking for {@link Identity#GTOKEN} cookie to parse
+     * and verify in order to create instance of the {@link Identity}. If fails throws {@link UnauthorizedException}.
      *
      * @param httpRequest the current HTTP servlet request
      * @return the parsed token as {@link Identity} instance
-     * @throws UnauthorizedException thrown in case of invalid token
+     * @throws UnauthorizedException thrown in case of missing, invalid, or expired token
      */
-    public Identity resolve( HttpServletRequest httpRequest )
+    public Identity verifyOrThrow( HttpServletRequest httpRequest )
+    {
+        String token = getToken( httpRequest );
+        if ( Strings.isNullOrEmpty( token ) )
+        {
+            throw new UnauthorizedException( "No " + Identity.GTOKEN + " cookie has found in the given request!" );
+        }
+
+        return internalVerifyAndGet( token, true );
+    }
+
+    /**
+     * Parse identity token taken from given request. It's looking for {@link Identity#GTOKEN} cookie to parse
+     * and verify in order to create instance of the {@link Identity}.
+     * If fails for whatever reason returns <tt>null</tt>.
+     *
+     * @param httpRequest the current HTTP servlet request
+     * @return the parsed token as {@link Identity} instance or <tt>null</tt>
+     */
+    public Identity verifyAndGet( HttpServletRequest httpRequest )
+    {
+        Identity identity;
+        try
+        {
+            String token = getToken( httpRequest );
+            identity = internalVerifyAndGet( token, false );
+        }
+        catch ( Exception e )
+        {
+            identity = null;
+        }
+        return identity;
+    }
+
+    private Identity internalVerifyAndGet( String token, boolean throwIfExpired )
+    {
+        if ( !Strings.isNullOrEmpty( token ) )
+        {
+            Identity json = tokenVerifier.verifyAndGet( token );
+
+            if ( json.getExpiration().after( new Date() ) )
+            {
+                return json;
+            }
+            else
+            {
+                if ( throwIfExpired )
+                {
+                    throw new UnauthorizedException( "The given token has expired!" );
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private String getToken( HttpServletRequest httpRequest )
     {
         Cookie[] cookies = httpRequest.getCookies();
 
@@ -57,17 +113,7 @@ public class IdentityTokenResolver
             }
         }
 
-        if ( !Strings.isNullOrEmpty( token ) )
-        {
-            Identity json = tokenVerifier.verifyAndGet( token );
-
-            if ( json.getExpiration().after( new Date() ) )
-            {
-                return json;
-            }
-        }
-
-        return null;
+        return token;
     }
 
     /**
