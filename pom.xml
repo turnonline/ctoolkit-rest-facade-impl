@@ -17,7 +17,8 @@
   ~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.ctoolkit.maven</groupId>
@@ -77,57 +78,16 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>servlet-api</artifactId>
-                <version>${servlet-api.version}</version>
-                <scope>provided</scope>
+                <groupId>org.ctoolkit.maven</groupId>
+                <artifactId>ctoolkit-bom</artifactId>
+                <version>${ctoolkit-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.ctoolkit.restapi</groupId>
                 <artifactId>rest-client-facade-api</artifactId>
                 <version>${rest-client-facade-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.inject</groupId>
-                <artifactId>guice</artifactId>
-                <version>3.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.api-client</groupId>
-                <artifactId>google-api-client</artifactId>
-                <version>${google-api-client.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.guava</groupId>
-                        <artifactId>guava-jdk5</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${jackson-core.version}</version>
-            </dependency>
-            <!-- Google APIs dependencies -->
-            <dependency>
-                <groupId>com.google.api-client</groupId>
-                <artifactId>google-api-client-appengine</artifactId>
-                <version>${google-api-client.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.oauth-client</groupId>
-                <artifactId>google-oauth-client</artifactId>
-                <version>${google-api-client.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.http-client</groupId>
-                <artifactId>google-http-client-jackson2</artifactId>
-                <version>${google-api-client.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.apis</groupId>
@@ -149,82 +109,26 @@
                 <artifactId>gitkitclient</artifactId>
                 <version>${gitkitclient.version}</version>
             </dependency>
-            <!-- Google APIs dependencies -->
-            <dependency>
-                <groupId>com.google.appengine</groupId>
-                <artifactId>appengine-api-1.0-sdk</artifactId>
-                <version>${appengine.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.google.appengine</groupId>
-                <artifactId>appengine-jsr107cache</artifactId>
-                <version>${appengine.version}</version>
-            </dependency>
-            <!-- Once javax.cache:cache-api fully supported on AppEngine replace jsr107cache  -->
-            <dependency>
-                <groupId>net.sf.jsr107cache</groupId>
-                <artifactId>jsr107cache</artifactId>
-                <version>1.1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>18.0</version>
-            </dependency>
-            <dependency>
-                <groupId>ma.glasnost.orika</groupId>
-                <artifactId>orika-core</artifactId>
-                <version>1.4.5</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.6.6</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.code.findbugs</groupId>
-                <artifactId>jsr305</artifactId>
-                <version>2.0.3</version>
-                <scope>provided</scope>
-            </dependency>
             <dependency>
                 <groupId>org.jmockit</groupId>
                 <artifactId>jmockit</artifactId>
                 <version>${jmockit.version}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <version>${testng.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.ctoolkit.test</groupId>
-                <artifactId>ctoolkit-test</artifactId>
-                <version>${ctoolkit-test.version}</version>
-                <scope>test</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
-        <servlet-api.version>2.5</servlet-api.version>
+        <ctoolkit-bom.version>1.9.36-20160510.164543-1</ctoolkit-bom.version>
         <rest-client-facade-api.version>0.10</rest-client-facade-api.version>
-        <google-api-client.version>1.21.0</google-api-client.version>
-        <jackson-core.version>2.1.3</jackson-core.version>
         <google-api-services-analytics.version>v3-rev123-1.21.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev11-1.21.0</google-api-services-drive.version>
         <google-api-services-identitytoolkit.version>v3-rev203-1.21.0</google-api-services-identitytoolkit.version>
         <gitkitclient.version>1.2.6</gitkitclient.version>
-        <appengine.version>1.9.34</appengine.version>
-        <jmockit.version>1.22</jmockit.version>
+        <jmockit.version>1.23</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
         <jmockit.setting>
             -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar
         </jmockit.setting>
-        <testng.version>6.9.10</testng.version>
-        <ctoolkit-test.version>1.0</ctoolkit-test.version>
     </properties>
 </project>
