@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.ctoolkit.maven</groupId>
         <artifactId>ctoolkit-parent</artifactId>
-        <version>2</version>
+        <version>3</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -152,7 +152,7 @@
             <dependency>
                 <groupId>org.ctoolkit.test</groupId>
                 <artifactId>ctoolkit-test</artifactId>
-                <version>1.1</version>
+                <version>1.2</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
