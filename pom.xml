@@ -78,9 +78,19 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-api-1.0-sdk</artifactId>
+                <version>${appengine.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-jsr107cache</artifactId>
+                <version>${appengine.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.ctoolkit.maven</groupId>
-                <artifactId>ctoolkit-bom</artifactId>
-                <version>${ctoolkit-bom.version}</version>
+                <artifactId>ctoolkit-library-bom</artifactId>
+                <version>${ctoolkit-library-bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -110,16 +120,41 @@
                 <version>${gitkitclient.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-testing</artifactId>
+                <version>${appengine.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-api-stubs</artifactId>
+                <version>${appengine.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.jmockit</groupId>
                 <artifactId>jmockit</artifactId>
                 <version>${jmockit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>6.9.10</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ctoolkit.test</groupId>
+                <artifactId>ctoolkit-test</artifactId>
+                <version>1.1</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
-        <ctoolkit-bom.version>1.9.36-20160510.164543-1</ctoolkit-bom.version>
+        <ctoolkit-library-bom.version>1</ctoolkit-library-bom.version>
+        <appengine.version>1.9.36</appengine.version>
         <rest-client-facade-api.version>0.10</rest-client-facade-api.version>
         <google-api-services-analytics.version>v3-rev123-1.21.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev11-1.21.0</google-api-services-drive.version>
