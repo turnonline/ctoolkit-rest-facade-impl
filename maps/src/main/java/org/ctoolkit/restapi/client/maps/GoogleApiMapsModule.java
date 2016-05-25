@@ -18,25 +18,18 @@
 
 package org.ctoolkit.restapi.client.maps;
 
-import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpStatusCodes;
-import com.google.api.client.http.HttpTransport;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.DistanceMatrixApi;
 import com.google.maps.DistanceMatrixApiRequest;
+import com.google.maps.GaeRequestHandler;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApiRequest;
-import org.ctoolkit.restapi.client.RemoteServerErrorException;
-import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiCredentialFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -70,26 +63,11 @@ public class GoogleApiMapsModule
     private GeoApiContext provideGeoApiContext( GoogleApiCredentialFactory factory )
     {
         String apiKey = checkNotNull( factory.getApiKey() );
-        HttpRequestFactory requestFactory;
 
-        try
-        {
-            HttpTransport transport = factory.getHttpTransport();
-            requestFactory = transport.createRequestFactory();
-        }
-        catch ( GeneralSecurityException e )
-        {
-            logger.error( "Application name: " + factory.getApplicationName() + " API Key: " + apiKey, e );
-            throw new UnauthorizedException( e.getMessage() );
-        }
-        catch ( IOException e )
-        {
-            logger.error( "Application name: " + factory.getApplicationName() + " API Key: " + apiKey, e );
-            throw new RemoteServerErrorException( HttpStatusCodes.STATUS_CODE_SERVER_ERROR, e.getMessage() );
-        }
-
-        GeoApiContext context = new GeoApiContext( requestFactory );
+        GeoApiContext context = new GeoApiContext( new GaeRequestHandler() );
         context.setApiKey( apiKey );
+
+        logger.info( "GeoApiContext has been initialized." );
 
         return context;
     }

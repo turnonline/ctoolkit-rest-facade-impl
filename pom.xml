@@ -124,6 +124,16 @@
                 <groupId>com.google.maps</groupId>
                 <artifactId>google-maps-services</artifactId>
                 <version>${google-maps-services.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.appengine</groupId>
+                        <artifactId>appengine-api-1.0-sdk</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.squareup.okhttp</groupId>
+                        <artifactId>okhttp</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.google.appengine</groupId>
@@ -165,7 +175,7 @@
         <google-api-services-analytics.version>v3-rev123-1.21.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev11-1.21.0</google-api-services-drive.version>
         <google-api-services-identitytoolkit.version>v3-rev203-1.21.0</google-api-services-identitytoolkit.version>
-        <google-maps-services.version>0.1.12-gac</google-maps-services.version>
+        <google-maps-services.version>0.1.14</google-maps-services.version>
         <gitkitclient.version>1.2.6</gitkitclient.version>
         <jmockit.version>1.23</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
