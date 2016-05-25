@@ -17,19 +17,18 @@
   ~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
   -->
 
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.ctoolkit.restapi</groupId>
         <artifactId>ctoolkit-rest-facade-impl</artifactId>
-        <version>0.15-SNAPSHOT</version>
+        <version>0.15</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ctoolkit-client-maps</artifactId>
-    <version>0.15-SNAPSHOT</version>
+    <version>0.15</version>
     <packaging>jar</packaging>
     <name>Google API CtoolkiT Client - Google Maps</name>
     <description>
@@ -52,7 +51,7 @@
         <dependency>
             <groupId>org.ctoolkit.restapi</groupId>
             <artifactId>ctoolkit-rest-facade-adapter</artifactId>
-            <version>0.15-SNAPSHOT</version>
+            <version>0.15</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
