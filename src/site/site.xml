@@ -20,7 +20,7 @@
     <bannerLeft>
         <name>Uniform client facade API implementation to perform common operations on top of REST.</name>
         <src>http://maven.apache.org/images/apache-maven-project-2.png</src>
-        <href>https://github.com/turnonline/rest-client-facade-impl</href>
+        <href>https://github.com/turnonline/ctoolkit-rest-facade-impl</href>
     </bannerLeft>
     <body>
         <menu name="REST Client Facade API Implementation Project">
