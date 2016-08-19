@@ -84,6 +84,9 @@ class IdentityTokenVerifier
         identity.setProviderId( json.has( JsonTokenHelper.ID_TOKEN_PROVIDER )
                 ? json.get( JsonTokenHelper.ID_TOKEN_PROVIDER ).getAsString() : null );
 
+        identity.setPhotoUrl( json.has( JsonTokenHelper.ID_TOKEN_PHOTO_URL )
+                ? json.get( JsonTokenHelper.ID_TOKEN_PHOTO_URL ).getAsString() : null );
+
         return identity;
     }
 

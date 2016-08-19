@@ -50,6 +50,8 @@ public class Identity
 
     private String providerId;
 
+    private String photoUrl;
+
     public Identity()
     {
     }
@@ -122,5 +124,15 @@ public class Identity
     public void setProviderId( String providerId )
     {
         this.providerId = providerId;
+    }
+
+    public String getPhotoUrl()
+    {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl( String photoUrl )
+    {
+        this.photoUrl = photoUrl;
     }
 }
