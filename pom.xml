@@ -60,6 +60,7 @@
         <module>drive</module>
         <module>identity-toolkit</module>
         <module>maps</module>
+        <module>migration-agent</module>
     </modules>
 
     <build>
