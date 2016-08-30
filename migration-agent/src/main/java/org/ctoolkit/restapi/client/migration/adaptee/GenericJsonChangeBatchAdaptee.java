@@ -35,6 +35,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -48,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:pohorelec@comvai.com">Jozef Pohorelec</a>
  */
 public class GenericJsonChangeBatchAdaptee
-        extends AbstractGoogleClientAdaptee<CtoolkitAgent, ChangeBatch>
+        extends AbstractGoogleClientAdaptee<Provider<CtoolkitAgent>, ChangeBatch>
         implements
         GetExecutorAdaptee<ChangeBatch>,
         InsertExecutorAdaptee<ChangeBatch>,
@@ -57,7 +58,7 @@ public class GenericJsonChangeBatchAdaptee
         DeleteExecutorAdaptee<ChangeBatch>
 {
     @Inject
-    public GenericJsonChangeBatchAdaptee( CtoolkitAgent ctoolkitAgent )
+    public GenericJsonChangeBatchAdaptee( Provider<CtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -68,7 +69,7 @@ public class GenericJsonChangeBatchAdaptee
     {
         checkNotNull( identifier );
 
-        return client().change().get( identifier.getString() );
+        return client().get().changeBatch().get( identifier.getString() );
     }
 
     @Override
@@ -88,7 +89,7 @@ public class GenericJsonChangeBatchAdaptee
             throws IOException
     {
         checkNotNull( resource );
-        return client().change().insert( resource );
+        return client().get().changeBatch().insert( resource );
     }
 
     @Override
@@ -110,7 +111,7 @@ public class GenericJsonChangeBatchAdaptee
         checkNotNull( resource );
         checkNotNull( identifier );
 
-        return client().change().update( identifier.getString(), resource );
+        return client().get().changeBatch().update( identifier.getString(), resource );
     }
 
     @Override
@@ -127,7 +128,7 @@ public class GenericJsonChangeBatchAdaptee
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
         checkNotNull( identifier );
-        return client().change().delete( identifier.getString() );
+        return client().get().changeBatch().delete( identifier.getString() );
     }
 
     @Override
@@ -139,7 +140,7 @@ public class GenericJsonChangeBatchAdaptee
     @Override
     public Object prepareList( @Nullable Identifier identifier ) throws IOException
     {
-        return client().change().list();
+        return client().get().changeBatch().list();
     }
 
     @Override

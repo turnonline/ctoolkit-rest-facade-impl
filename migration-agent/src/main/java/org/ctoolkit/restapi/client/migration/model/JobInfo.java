@@ -1,11 +1,14 @@
 package org.ctoolkit.restapi.client.migration.model;
 
+import java.io.Serializable;
+
 /**
  * Job info
  *
  * @author <a href="mailto:pohorelec@comvai.com">Jozef Pohorelec</a>
  */
 public abstract class JobInfo
+        implements Serializable
 {
     private String id;
 

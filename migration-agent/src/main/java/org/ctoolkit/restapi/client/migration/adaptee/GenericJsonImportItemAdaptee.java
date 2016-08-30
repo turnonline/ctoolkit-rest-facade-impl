@@ -31,6 +31,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -43,7 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:pohorelec@comvai.com">Jozef Pohorelec</a>
  */
 public class GenericJsonImportItemAdaptee
-        extends AbstractGoogleClientAdaptee<CtoolkitAgent, ImportItem>
+        extends AbstractGoogleClientAdaptee<Provider<CtoolkitAgent>, ImportItem>
         implements
         GetExecutorAdaptee<ImportItem>,
         InsertExecutorAdaptee<ImportItem>,
@@ -51,7 +52,7 @@ public class GenericJsonImportItemAdaptee
         DeleteExecutorAdaptee<ImportItem>
 {
     @Inject
-    public GenericJsonImportItemAdaptee( CtoolkitAgent ctoolkitAgent )
+    public GenericJsonImportItemAdaptee( Provider<CtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -62,7 +63,7 @@ public class GenericJsonImportItemAdaptee
     {
         checkNotNull( identifier );
 
-        return client().migrationImport().item().get( identifier.getString(), identifier.getChild().getString() );
+        return client().get().importBatch().item().get( identifier.getString(), identifier.getChild().getString() );
     }
 
     @Override
@@ -84,7 +85,7 @@ public class GenericJsonImportItemAdaptee
         checkNotNull( resource );
         checkNotNull( parentKey );
 
-        return client().migrationImport().item().insert( parentKey.getString(), resource );
+        return client().get().importBatch().item().insert( parentKey.getString(), resource );
     }
 
     @Override
@@ -106,7 +107,7 @@ public class GenericJsonImportItemAdaptee
         checkNotNull( resource );
         checkNotNull( identifier );
 
-        return client().migrationImport().item().update( identifier.getString(), identifier.getChild().getString(), resource );
+        return client().get().importBatch().item().update( identifier.getString(), identifier.getChild().getString(), resource );
     }
 
     @Override
@@ -123,7 +124,7 @@ public class GenericJsonImportItemAdaptee
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
         checkNotNull( identifier );
-        return client().migrationImport().item().delete( identifier.getString(), identifier.getChild().getString() );
+        return client().get().importBatch().item().delete( identifier.getString(), identifier.getChild().getString() );
     }
 
     @Override

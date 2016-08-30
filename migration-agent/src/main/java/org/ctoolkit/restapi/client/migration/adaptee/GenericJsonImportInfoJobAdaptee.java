@@ -32,6 +32,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -44,7 +45,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:pohorelec@comvai.com">Jozef Pohorelec</a>
  */
 public class GenericJsonImportInfoJobAdaptee
-        extends AbstractGoogleClientAdaptee<CtoolkitAgent, ImportJobInfo>
+        extends AbstractGoogleClientAdaptee<Provider<CtoolkitAgent>, ImportJobInfo>
         implements
         GetExecutorAdaptee<ImportJobInfo>,
         InsertExecutorAdaptee<ImportJobInfo>,
@@ -52,7 +53,7 @@ public class GenericJsonImportInfoJobAdaptee
         DeleteExecutorAdaptee<ImportJobInfo>
 {
     @Inject
-    public GenericJsonImportInfoJobAdaptee( CtoolkitAgent ctoolkitAgent )
+    public GenericJsonImportInfoJobAdaptee( Provider<CtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -63,7 +64,7 @@ public class GenericJsonImportInfoJobAdaptee
     {
         checkNotNull( identifier );
 
-        return client().migrationImport().job().progress( identifier.getString() );
+        return client().get().importBatch().job().progress( identifier.getString() );
     }
 
     @Override
@@ -83,7 +84,7 @@ public class GenericJsonImportInfoJobAdaptee
             throws IOException
     {
         checkNotNull( resource );
-        return client().migrationImport().job().start( resource.getId() );
+        return client().get().importBatch().job().start( resource.getId() );
     }
 
     @Override
@@ -105,7 +106,7 @@ public class GenericJsonImportInfoJobAdaptee
         checkNotNull( resource );
         checkNotNull( identifier );
 
-        return client().migrationImport().job().cancel( identifier.getString() );
+        return client().get().importBatch().job().cancel( identifier.getString() );
     }
 
     @Override
@@ -122,7 +123,7 @@ public class GenericJsonImportInfoJobAdaptee
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
         checkNotNull( identifier );
-        return client().migrationImport().job().delete( identifier.getString() );
+        return client().get().importBatch().job().delete( identifier.getString() );
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.ctoolkit.restapi.client.migration.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
  *
  * @author <a href="mailto:pohorelec@comvai.com">Jozef Pohorelec</a>
  */
-public class ChangeBatch
+public class ChangeBatch implements Serializable
 {
     private String key;
 

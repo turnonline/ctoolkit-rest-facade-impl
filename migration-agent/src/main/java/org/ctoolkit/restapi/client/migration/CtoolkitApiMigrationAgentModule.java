@@ -44,10 +44,10 @@ import java.util.Set;
  *
  * @author <a href="mailto:pohorelec@comvai.com">Jozef Pohorelec</a>
  */
-public class CToolkitApiMigrationAgentModule
+public class CtoolkitApiMigrationAgentModule
         extends AbstractModule
 {
-    private static final Logger logger = LoggerFactory.getLogger( CToolkitApiMigrationAgentModule.class );
+    private static final Logger logger = LoggerFactory.getLogger( CtoolkitApiMigrationAgentModule.class );
 
     @Override
     protected void configure()
@@ -205,8 +205,7 @@ public class CToolkitApiMigrationAgentModule
     }
 
     @Provides
-    @Singleton
-    CtoolkitAgent provideDrive( CToolkitApiMigrationGoogleApiCredentialFactory factory )
+    CtoolkitAgent provideCtoolkitAgent( CtoolkitApiMigrationAgentGoogleApiCredentialFactory factory )
     {
         Set<String> scopes = CtoolkitAgentScopes.all();
         CtoolkitAgent.Builder builder;
@@ -216,6 +215,7 @@ public class CToolkitApiMigrationAgentModule
             HttpRequestInitializer credential = factory.authorize( scopes, null );
             builder = new CtoolkitAgent.Builder( factory.getHttpTransport(), factory.getJsonFactory(), credential );
             builder.setApplicationName( factory.getApplicationName() );
+            builder.setRootUrl( factory.getEndpointUrl() );
         }
         catch ( GeneralSecurityException e )
         {

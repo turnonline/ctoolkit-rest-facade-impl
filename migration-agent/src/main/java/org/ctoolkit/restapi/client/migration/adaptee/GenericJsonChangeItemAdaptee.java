@@ -32,6 +32,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -44,7 +45,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:pohorelec@comvai.com">Jozef Pohorelec</a>
  */
 public class GenericJsonChangeItemAdaptee
-        extends AbstractGoogleClientAdaptee<CtoolkitAgent, ChangeItem>
+        extends AbstractGoogleClientAdaptee<Provider<CtoolkitAgent>, ChangeItem>
         implements
         GetExecutorAdaptee<ChangeItem>,
         InsertExecutorAdaptee<ChangeItem>,
@@ -52,7 +53,7 @@ public class GenericJsonChangeItemAdaptee
         DeleteExecutorAdaptee<ChangeItem>
 {
     @Inject
-    public GenericJsonChangeItemAdaptee( CtoolkitAgent ctoolkitAgent )
+    public GenericJsonChangeItemAdaptee( Provider<CtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -63,7 +64,7 @@ public class GenericJsonChangeItemAdaptee
     {
         checkNotNull( identifier );
 
-        return client().change().item().get( identifier.getString(), identifier.getChild().getString() );
+        return client().get().changeBatch().item().get( identifier.getString(), identifier.getChild().getString() );
     }
 
     @Override
@@ -85,7 +86,7 @@ public class GenericJsonChangeItemAdaptee
         checkNotNull( resource );
         checkNotNull( parentKey );
 
-        return client().change().item().insert( parentKey.getString(), resource );
+        return client().get().changeBatch().item().insert( parentKey.getString(), resource );
     }
 
     @Override
@@ -107,7 +108,7 @@ public class GenericJsonChangeItemAdaptee
         checkNotNull( resource );
         checkNotNull( identifier );
 
-        return client().change().item().update( identifier.getString(), identifier.getChild().getString(), resource );
+        return client().get().changeBatch().item().update( identifier.getString(), identifier.getChild().getString(), resource );
     }
 
     @Override
@@ -124,7 +125,7 @@ public class GenericJsonChangeItemAdaptee
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
         checkNotNull( identifier );
-        return client().change().item().delete( identifier.getString(), identifier.getChild().getString() );
+        return client().get().changeBatch().item().delete( identifier.getString(), identifier.getChild().getString() );
     }
 
     @Override

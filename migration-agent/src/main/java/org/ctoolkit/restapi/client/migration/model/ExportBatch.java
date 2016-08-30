@@ -1,5 +1,6 @@
 package org.ctoolkit.restapi.client.migration.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
  * @author <a href="mailto:pohorelec@comvai.com">Jozef Pohorelec</a>
  */
 public class ExportBatch
+        implements Serializable
 {
     private String key;
 
@@ -24,6 +26,7 @@ public class ExportBatch
     private List<ExportItem> items = new ArrayList<>();
 
     public static class ExportItem
+            implements Serializable
     {
         private String key;
 
@@ -103,7 +106,7 @@ public class ExportBatch
             return "Item{" +
                     "key='" + key + '\'' +
                     ", name=" + name +
-                    ", xml.length=" + (xml != null ? xml.length : null) +
+                    ", xml.length=" + ( xml != null ? xml.length : null ) +
                     ", entityToExport='" + entityToExport + '\'' +
                     ", createDate=" + createDate +
                     ", updateDate=" + updateDate +

@@ -32,6 +32,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -44,7 +45,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:pohorelec@comvai.com">Jozef Pohorelec</a>
  */
 public class GenericJsonExportJobInfoAdaptee
-        extends AbstractGoogleClientAdaptee<CtoolkitAgent, ExportJobInfo>
+        extends AbstractGoogleClientAdaptee<Provider<CtoolkitAgent>, ExportJobInfo>
         implements
         GetExecutorAdaptee<ExportJobInfo>,
         InsertExecutorAdaptee<ExportJobInfo>,
@@ -52,7 +53,7 @@ public class GenericJsonExportJobInfoAdaptee
         DeleteExecutorAdaptee<ExportJobInfo>
 {
     @Inject
-    public GenericJsonExportJobInfoAdaptee( CtoolkitAgent ctoolkitAgent )
+    public GenericJsonExportJobInfoAdaptee( Provider<CtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -63,7 +64,7 @@ public class GenericJsonExportJobInfoAdaptee
     {
         checkNotNull( identifier );
 
-        return client().export().job().progress( identifier.getString() );
+        return client().get().exportBatch().job().progress( identifier.getString() );
     }
 
     @Override
@@ -83,7 +84,7 @@ public class GenericJsonExportJobInfoAdaptee
             throws IOException
     {
         checkNotNull( resource );
-        return client().export().job().start( resource.getId() );
+        return client().get().exportBatch().job().start( resource.getId() );
     }
 
     @Override
@@ -105,7 +106,7 @@ public class GenericJsonExportJobInfoAdaptee
         checkNotNull( resource );
         checkNotNull( identifier );
 
-        return client().export().job().cancel( identifier.getString() );
+        return client().get().exportBatch().job().cancel( identifier.getString() );
     }
 
     @Override
@@ -122,7 +123,7 @@ public class GenericJsonExportJobInfoAdaptee
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
         checkNotNull( identifier );
-        return client().export().job().delete( identifier.getString() );
+        return client().get().exportBatch().job().delete( identifier.getString() );
     }
 
     @Override
