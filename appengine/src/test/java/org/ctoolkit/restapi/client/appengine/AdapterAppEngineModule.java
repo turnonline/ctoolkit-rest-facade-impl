@@ -50,6 +50,7 @@ import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
 import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingRequest;
 
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
@@ -128,5 +129,11 @@ public class AdapterAppEngineModule
         factory.classMap( Bee.class, RemoteBee.class ).byDefault().register();
 
         return factory.getMapperFacade();
+    }
+
+    @Provides
+    HttpServletRequest provideHttpServletRequest()
+    {
+        throw new UnsupportedOperationException( "Not implemnted as not needed yet" );
     }
 }
