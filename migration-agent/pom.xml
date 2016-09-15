@@ -54,4 +54,35 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>gwt-maven-plugin</artifactId>
+                <version>${gwt.version}</version>
+                <configuration>
+                    <skip>false</skip>
+                    <deploy>${project.build.directory}/deploy</deploy>
+                    <logLevel>INFO</logLevel>
+                    <extraJvmArgs>-Xmx512m</extraJvmArgs>
+                    <style>OBFUSCATED</style>
+                </configuration>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <module>org.ctoolkit.restapi.client.migration.ClientMigrationAgent</module>
+                        </configuration>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <gwt.version>2.7.0</gwt.version>
+    </properties>
+
 </project>
