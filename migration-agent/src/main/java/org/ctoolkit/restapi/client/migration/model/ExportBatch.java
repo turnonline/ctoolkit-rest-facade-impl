@@ -32,7 +32,9 @@ public class ExportBatch
 
         private String name;
 
-        private byte[] xml;
+        private String data;
+
+        private DataType dataType = DataType.JSON;
 
         private String entityToExport;
 
@@ -60,14 +62,24 @@ public class ExportBatch
             this.name = name;
         }
 
-        public byte[] getXml()
+        public String getData()
         {
-            return xml;
+            return data;
         }
 
-        public void setXml( byte[] xml )
+        public void setData( String data )
         {
-            this.xml = xml;
+            this.data = data;
+        }
+
+        public DataType getDataType()
+        {
+            return dataType;
+        }
+
+        public void setDataType( DataType dataType )
+        {
+            this.dataType = dataType;
         }
 
         public String getEntityToExport()
@@ -106,9 +118,9 @@ public class ExportBatch
             return "Item{" +
                     "key='" + key + '\'' +
                     ", name=" + name +
-                    ", xml.length=" + ( xml != null ? xml.length : null ) +
                     ", entityToExport='" + entityToExport + '\'' +
                     ", createDate=" + createDate +
+                    ", dataType=" + dataType +
                     ", updateDate=" + updateDate +
                     '}';
         }

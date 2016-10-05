@@ -32,7 +32,9 @@ public class ImportBatch
 
         private String name;
 
-        private byte[] xml;
+        private String data;
+
+        private DataType dataType = DataType.JSON;
 
         private Date createDate;
 
@@ -58,14 +60,24 @@ public class ImportBatch
             this.name = name;
         }
 
-        public byte[] getXml()
+        public String getData()
         {
-            return xml;
+            return data;
         }
 
-        public void setXml( byte[] xml )
+        public void setData( String data )
         {
-            this.xml = xml;
+            this.data = data;
+        }
+
+        public DataType getDataType()
+        {
+            return dataType;
+        }
+
+        public void setDataType( DataType dataType )
+        {
+            this.dataType = dataType;
         }
 
         public Date getCreateDate()
@@ -94,7 +106,7 @@ public class ImportBatch
             return "Item{" +
                     "key='" + key + '\'' +
                     ", name=" + name +
-                    ", xml.length=" + ( xml != null ? xml.length : null ) +
+                    ", dataType=" + dataType +
                     ", createDate=" + createDate +
                     ", updateDate=" + updateDate +
                     '}';

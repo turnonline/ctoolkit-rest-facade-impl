@@ -24,13 +24,15 @@ public class ChangeBatch implements Serializable
 
     private List<ChangeItem> items = new ArrayList<>();
 
-    public static class ChangeItem
+    public static class ChangeItem implements Serializable
     {
         private String key;
 
         private String name;
 
-        private byte[] xml;
+        private String data;
+
+        private DataType dataType = DataType.JSON;
 
         private Date createDate;
 
@@ -56,14 +58,24 @@ public class ChangeBatch implements Serializable
             this.name = name;
         }
 
-        public byte[] getXml()
+        public String getData()
         {
-            return xml;
+            return data;
         }
 
-        public void setXml( byte[] xml )
+        public void setData( String data )
         {
-            this.xml = xml;
+            this.data = data;
+        }
+
+        public DataType getDataType()
+        {
+            return dataType;
+        }
+
+        public void setDataType( DataType dataType )
+        {
+            this.dataType = dataType;
         }
 
         public Date getCreateDate()
@@ -92,7 +104,7 @@ public class ChangeBatch implements Serializable
             return "Item{" +
                     "key='" + key + '\'' +
                     ", name=" + name +
-                    ", xml.length=" + (xml != null ? xml.length : null) +
+                    ", dataType=" + dataType +
                     ", createDate=" + createDate +
                     ", updateDate=" + updateDate +
                     '}';
