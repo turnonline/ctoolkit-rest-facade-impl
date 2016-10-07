@@ -14,6 +14,8 @@ public abstract class JobInfo
 
     private String mapReduceJobId;
 
+    private String token;
+
     private int totalItems;
 
     private int processedItems;
@@ -40,6 +42,16 @@ public abstract class JobInfo
     public void setMapReduceJobId( String mapReduceJobId )
     {
         this.mapReduceJobId = mapReduceJobId;
+    }
+
+    public String getToken()
+    {
+        return token;
+    }
+
+    public void setToken( String token )
+    {
+        this.token = token;
     }
 
     public int getTotalItems()
@@ -88,6 +100,7 @@ public abstract class JobInfo
         return "JobInfo{" +
                 "id='" + id + '\'' +
                 ", mapReduceJobId='" + mapReduceJobId + '\'' +
+                ", token='" + token + '\'' +
                 ", totalItems=" + totalItems +
                 ", processedItems=" + processedItems +
                 ", state=" + state +

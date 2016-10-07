@@ -18,9 +18,13 @@ public class ChangeBatch implements Serializable
 
     private String mapReduceJobId;
 
+    private String token;
+
     private Date createDate;
 
     private Date updateDate;
+
+    private ChangeJobInfo jobInfo;
 
     private List<ChangeItem> items = new ArrayList<>();
 
@@ -141,6 +145,16 @@ public class ChangeBatch implements Serializable
         this.mapReduceJobId = mapReduceJobId;
     }
 
+    public String getToken()
+    {
+        return token;
+    }
+
+    public void setToken( String token )
+    {
+        this.token = token;
+    }
+
     public Date getCreateDate()
     {
         return createDate;
@@ -161,6 +175,16 @@ public class ChangeBatch implements Serializable
         this.updateDate = updateDate;
     }
 
+    public ChangeJobInfo getJobInfo()
+    {
+        return jobInfo;
+    }
+
+    public void setJobInfo( ChangeJobInfo jobInfo )
+    {
+        this.jobInfo = jobInfo;
+    }
+
     public List<ChangeItem> getItems()
     {
         return items;
@@ -178,8 +202,10 @@ public class ChangeBatch implements Serializable
                 "key='" + key + '\'' +
                 ", name=" + name +
                 ", mapReduceJobId='" + mapReduceJobId + '\'' +
+                ", token='" + token + '\'' +
                 ", createDate=" + createDate +
                 ", updateDate=" + updateDate +
+                ", jobInfo=" + jobInfo +
                 ", items=" + items +
                 '}';
     }

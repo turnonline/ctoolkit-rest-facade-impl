@@ -19,9 +19,13 @@ public class ExportBatch
 
     private String mapReduceJobId;
 
+    private String token;
+
     private Date createDate;
 
     private Date updateDate;
+
+    private ChangeJobInfo jobInfo;
 
     private List<ExportItem> items = new ArrayList<>();
 
@@ -156,6 +160,16 @@ public class ExportBatch
         this.mapReduceJobId = mapReduceJobId;
     }
 
+    public String getToken()
+    {
+        return token;
+    }
+
+    public void setToken( String token )
+    {
+        this.token = token;
+    }
+
     public Date getCreateDate()
     {
         return createDate;
@@ -176,6 +190,16 @@ public class ExportBatch
         this.updateDate = updateDate;
     }
 
+    public ChangeJobInfo getJobInfo()
+    {
+        return jobInfo;
+    }
+
+    public void setJobInfo( ChangeJobInfo jobInfo )
+    {
+        this.jobInfo = jobInfo;
+    }
+
     public List<ExportItem> getItems()
     {
         return items;
@@ -193,8 +217,10 @@ public class ExportBatch
                 "key='" + key + '\'' +
                 ", name=" + name +
                 ", mapReduceJobId='" + mapReduceJobId + '\'' +
+                ", token='" + token + '\'' +
                 ", createDate=" + createDate +
                 ", updateDate=" + updateDate +
+                ", jobInfo=" + jobInfo +
                 ", items=" + items +
                 '}';
     }

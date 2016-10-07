@@ -19,9 +19,13 @@ public class ImportBatch
 
     private String mapReduceJobId;
 
+    private String token;
+
     private Date createDate;
 
     private Date updateDate;
+
+    private ImportJobInfo jobInfo;
 
     private List<ImportItem> items = new ArrayList<>();
 
@@ -143,6 +147,16 @@ public class ImportBatch
         this.mapReduceJobId = mapReduceJobId;
     }
 
+    public String getToken()
+    {
+        return token;
+    }
+
+    public void setToken( String token )
+    {
+        this.token = token;
+    }
+
     public Date getCreateDate()
     {
         return createDate;
@@ -163,6 +177,16 @@ public class ImportBatch
         this.updateDate = updateDate;
     }
 
+    public ImportJobInfo getJobInfo()
+    {
+        return jobInfo;
+    }
+
+    public void setJobInfo( ImportJobInfo jobInfo )
+    {
+        this.jobInfo = jobInfo;
+    }
+
     public List<ImportItem> getItems()
     {
         return items;
@@ -180,8 +204,10 @@ public class ImportBatch
                 "key='" + key + '\'' +
                 ", name=" + name +
                 ", mapReduceJobId='" + mapReduceJobId + '\'' +
+                ", token='" + token + '\'' +
                 ", createDate=" + createDate +
                 ", updateDate=" + updateDate +
+                ", jobInfo=" + jobInfo +
                 ", items=" + items +
                 '}';
     }
