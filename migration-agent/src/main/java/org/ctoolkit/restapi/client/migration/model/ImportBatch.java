@@ -40,6 +40,8 @@ public class ImportBatch
 
         private DataType dataType = DataType.JSON;
 
+        private JobState state;
+
         private Date createDate;
 
         private Date updateDate;
@@ -84,6 +86,16 @@ public class ImportBatch
             this.dataType = dataType;
         }
 
+        public JobState getState()
+        {
+            return state;
+        }
+
+        public void setState( JobState state )
+        {
+            this.state = state;
+        }
+
         public Date getCreateDate()
         {
             return createDate;
@@ -111,6 +123,7 @@ public class ImportBatch
                     "key='" + key + '\'' +
                     ", name=" + name +
                     ", dataType=" + dataType +
+                    ", state=" + state +
                     ", createDate=" + createDate +
                     ", updateDate=" + updateDate +
                     '}';

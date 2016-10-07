@@ -40,6 +40,8 @@ public class ExportBatch
 
         private DataType dataType = DataType.JSON;
 
+        private JobState state;
+
         private String entityToExport;
 
         private Date createDate;
@@ -86,6 +88,16 @@ public class ExportBatch
             this.dataType = dataType;
         }
 
+        public JobState getState()
+        {
+            return state;
+        }
+
+        public void setState( JobState state )
+        {
+            this.state = state;
+        }
+
         public String getEntityToExport()
         {
             return entityToExport;
@@ -125,6 +137,7 @@ public class ExportBatch
                     ", entityToExport='" + entityToExport + '\'' +
                     ", createDate=" + createDate +
                     ", dataType=" + dataType +
+                    ", state=" + state +
                     ", updateDate=" + updateDate +
                     '}';
         }
