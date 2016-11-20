@@ -18,26 +18,27 @@
 
 package org.ctoolkit.restapi.client.appengine;
 
+import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
+import com.google.inject.Binding;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Provides;
+import com.google.inject.name.Names;
 import org.ctoolkit.restapi.client.ResourceFacade;
-import org.ctoolkit.restapi.client.adapter.Constants;
 import org.ctoolkit.restapi.client.adapter.OboIdentityTokenSubscriber;
 import org.ctoolkit.restapi.client.adapter.ResourceFacadeAdapter;
 import org.ctoolkit.restapi.client.adapter.ResourceProviderInjector;
-import org.ctoolkit.restapi.client.googleapis.ApiKey;
-import org.ctoolkit.restapi.client.googleapis.ApplicationName;
-import org.ctoolkit.restapi.client.googleapis.ClientId;
-import org.ctoolkit.restapi.client.googleapis.DevelopmentEnvironment;
-import org.ctoolkit.restapi.client.googleapis.EndpointUrl;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiCredentialFactory;
-import org.ctoolkit.restapi.client.googleapis.P12FileName;
-import org.ctoolkit.restapi.client.googleapis.ProjectId;
-import org.ctoolkit.restapi.client.googleapis.ServiceAccountEmail;
+import org.ctoolkit.restapi.client.googleapis.Credential;
+import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 
 import javax.inject.Singleton;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The client facade API AppEngine guice module.
@@ -53,84 +54,118 @@ public class FacadeAppEngineModule
         bind( ResourceFacade.class ).to( ResourceFacadeAdapter.class ).in( Singleton.class );
         bind( ResourceProviderInjector.class ).to( ResourceProviderGuiceInjector.class );
         bind( EventBus.class ).in( Singleton.class );
-        bind( GoogleApiCredentialFactory.class ).to( GoogleApiCredentialFactoryAppEngine.class ).in( Singleton.class );
+        bind( GoogleApiProxyFactory.class ).to( GoogleApiProxyFactoryAppEngine.class ).in( Singleton.class );
         bind( OboIdentityTokenSubscriber.class ).asEagerSingleton();
     }
 
     @Provides
     @Singleton
-    GoogleApiCredentialFactory.Builder provideGoogleApiFactoryBuilder( GoogleApiInit holder )
+    @Credential
+    Map<String, String> provideCredentialProperties( Injector injector )
     {
-        GoogleApiCredentialFactory.Builder builder = new GoogleApiCredentialFactory.Builder();
-
-        builder.setApplicationName( holder.appName );
-        builder.setDevelopmentEnvironment( holder.isDevelopmentEnvironment );
-
-        if ( holder.fileName != null )
-        {
-            builder.setFileName( holder.fileName );
-        }
-
-        if ( holder.projectId != null )
-        {
-            builder.setProjectId( holder.projectId );
-        }
-
-        if ( holder.clientId != null )
-        {
-            builder.setClientId( holder.clientId );
-        }
-
-        if ( holder.serviceAccountEmail != null )
-        {
-            builder.setServiceAccountEmail( holder.serviceAccountEmail );
-        }
-
-        if ( holder.apiKey != null )
-        {
-            builder.setApiKey( holder.apiKey );
-        }
-
-        if ( holder.endpointUrl != null )
-        {
-            builder.setEndpointUrl( holder.endpointUrl );
-        }
-
-        return builder;
+        return new CredentialMap( injector );
     }
 
-    static class GoogleApiInit
+    private static class CredentialMap
+            implements Map<String, String>
     {
-        @Inject( optional = true )
-        @ProjectId
-        String projectId = null;
+        private final Injector injector;
 
-        @Inject( optional = true )
-        @ClientId
-        String clientId = null;
+        CredentialMap( Injector injector )
+        {
+            this.injector = injector;
+        }
 
-        @Inject( optional = true )
-        @ApplicationName
-        String appName = Constants.DEFAULT_APP_NAME;
+        @Override
+        public int size()
+        {
+            throw new UnsupportedOperationException();
+        }
 
-        @Inject( optional = true )
-        @ServiceAccountEmail
-        String serviceAccountEmail = null;
+        @Override
+        public boolean isEmpty()
+        {
+            throw new UnsupportedOperationException();
+        }
 
-        @Inject( optional = true )
-        @P12FileName
-        String fileName = null;
+        @Override
+        public boolean containsKey( Object property )
+        {
+            checkNotNull( property );
+            if ( Strings.isNullOrEmpty( property.toString() ) )
+            {
+                return false;
+            }
 
-        @Inject( optional = true )
-        @ApiKey
-        String apiKey = null;
+            Key<String> key = Key.get( String.class, Names.named( property.toString() ) );
+            Binding<String> binding = injector.getExistingBinding( key );
+            return binding != null;
+        }
 
-        @Inject( optional = true )
-        @EndpointUrl
-        String endpointUrl = null;
+        @Override
+        public boolean containsValue( Object value )
+        {
+            throw new UnsupportedOperationException();
+        }
 
-        @Inject( optional = true )
-        @DevelopmentEnvironment
-        Boolean isDevelopmentEnvironment = Boolean.FALSE;
+        @Override
+        public String get( Object property )
+        {
+            checkNotNull( property );
+            if ( Strings.isNullOrEmpty( property.toString() ) )
+            {
+                return null;
+            }
+
+            Key<String> key = Key.get( String.class, Names.named( property.toString() ) );
+            Binding<String> binding = injector.getExistingBinding( key );
+            return binding == null ? null : binding.getProvider().get();
+        }
+
+        @Override
+        public String put( String key, String value )
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String remove( Object key )
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @SuppressWarnings( "NullableProblems" )
+        @Override
+        public void putAll( Map<? extends String, ? extends String> m )
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void clear()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @SuppressWarnings( "NullableProblems" )
+        @Override
+        public Set<String> keySet()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @SuppressWarnings( "NullableProblems" )
+        @Override
+        public Collection<String> values()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @SuppressWarnings( "NullableProblems" )
+        @Override
+        public Set<Entry<String, String>> entrySet()
+        {
+            throw new UnsupportedOperationException();
+        }
     }
 }

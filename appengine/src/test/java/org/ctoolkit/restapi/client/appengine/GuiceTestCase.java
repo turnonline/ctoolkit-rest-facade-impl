@@ -24,11 +24,16 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.common.testing.TearDown;
 import com.google.guiceberry.GuiceBerryModule;
 import com.google.guiceberry.testng.TestNgGuiceBerry;
+import com.google.inject.name.Names;
+import org.ctoolkit.restapi.client.googleapis.GoogleApiCredential;
 import org.ctoolkit.test.appengine.ServiceConfigModule;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:medvegy@comvai.com">Aurel Medvegy</a>
@@ -63,6 +68,31 @@ public class GuiceTestCase
     {
         // setting the SystemProperty.Environment.Value.Development
         System.setProperty( "com.google.appengine.runtime.environment", "Development" );
+
+        // default credential configuration
+        GoogleApiCredential credential = new GoogleApiCredential();
+        credential.setProjectId( "appid-103" );
+        credential.setClientId( "4top4.apps.googleusercontent.com" );
+        credential.setServiceAccountEmail( "service.account@cloud.com" );
+        credential.setFileName( "/org/ctoolkit/restapi/private-key.p12" );
+        credential.setApiKey( "AIzaSz" );
+        credential.setEndpointUrl( "http://localhost:8990/_ah/api/" );
+        credential.setCredentialOn( true );
+        credential.setNumberOfRetries( 3 );
+
+        InputStream stream = GuiceTestCase.class.getResourceAsStream( "credential.properties" );
+        Properties drive = new Properties();
+        try
+        {
+            drive.load( stream );
+        }
+        catch ( IOException e )
+        {
+            e.printStackTrace();
+        }
+
+        Names.bindProperties( binder(), credential );
+        Names.bindProperties( binder(), drive );
 
         install( new FacadeAppEngineModule() );
         install( new GuiceBerryModule() );
