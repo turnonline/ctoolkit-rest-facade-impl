@@ -311,7 +311,7 @@ public abstract class GoogleApiProxyFactory
         String serviceAccountEmail = getServiceAccountEmail( prefix );
         if ( serviceAccountEmail == null )
         {
-            throw new NullPointerException();
+            throw new NullPointerException( "Missing service account email." );
         }
 
         // p12 file load right before usage
