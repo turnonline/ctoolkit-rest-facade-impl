@@ -94,6 +94,13 @@ public class GoogleApiProxyFactoryTest
     }
 
     @Test
+    public void getReadTimeoutMissingConfig()
+    {
+        int numberOfRetries = tested.getReadTimeout( null );
+        assertEquals( numberOfRetries, 20000 );
+    }
+
+    @Test
     public void isCredentialOnMissingConfig()
     {
         boolean credentialOn = tested.isCredentialOn( null );

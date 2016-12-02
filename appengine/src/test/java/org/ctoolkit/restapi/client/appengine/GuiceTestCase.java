@@ -79,6 +79,7 @@ public class GuiceTestCase
         credential.setEndpointUrl( "http://localhost:8990/_ah/api/" );
         credential.setCredentialOn( true );
         credential.setNumberOfRetries( 3 );
+        credential.setRequestReadTimeout( 15000 );
 
         InputStream stream = GuiceTestCase.class.getResourceAsStream( "credential.properties" );
         Properties drive = new Properties();

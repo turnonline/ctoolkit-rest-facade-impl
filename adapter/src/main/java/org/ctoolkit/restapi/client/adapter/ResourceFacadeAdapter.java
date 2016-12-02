@@ -32,6 +32,7 @@ import org.ctoolkit.restapi.client.MediaRequest;
 import org.ctoolkit.restapi.client.NotFoundException;
 import org.ctoolkit.restapi.client.Patch;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
+import org.ctoolkit.restapi.client.RequestTimeoutException;
 import org.ctoolkit.restapi.client.ResourceFacade;
 import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.UnauthorizedException;
@@ -52,6 +53,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -709,6 +711,11 @@ public class ResourceFacadeAdapter
             statusCode = ( ( HttpResponseException ) e ).getStatusCode();
             statusMessage = ( ( HttpResponseException ) e ).getStatusMessage();
         }
+        else if ( e instanceof SocketTimeoutException )
+        {
+            statusCode = 408;
+            statusMessage = e.getMessage();
+        }
 
         logger.warn( "Resource " + resource.getName() + ", identifier: " + identifier, e );
 
@@ -731,6 +738,10 @@ public class ResourceFacadeAdapter
         else if ( HttpStatusCodes.STATUS_CODE_NOT_FOUND == statusCode )
         {
             toBeThrown = new NotFoundException( statusMessage );
+        }
+        else if ( 408 == statusCode )
+        {
+            toBeThrown = new RequestTimeoutException( statusMessage );
         }
         else if ( 409 == statusCode )
         {

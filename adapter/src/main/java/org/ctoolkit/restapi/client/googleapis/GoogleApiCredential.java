@@ -63,6 +63,8 @@ public class GoogleApiCredential
 
     static final String PROPERTY_NUMBER_OF_RETRIES = "numberOfRetries";
 
+    static final String PROPERTY_READ_TIMEOUT = "readTimeout";
+
     static final String CREDENTIAL_ATTR = "credential.";
 
     private static final long serialVersionUID = -2258904700906913513L;
@@ -82,6 +84,7 @@ public class GoogleApiCredential
      * <li>{@link #setEndpointUrl(String)}</li>
      * <li>{@link #setCredentialOn(boolean)}</li>
      * <li>{@link #setNumberOfRetries(int)}</li>
+     * <li>{@link #setRequestReadTimeout(int)}</li>
      * </ul>
      */
     public GoogleApiCredential()
@@ -102,6 +105,7 @@ public class GoogleApiCredential
      * <li>{@link #setEndpointUrl(String)}</li>
      * <li>{@link #setCredentialOn(boolean)}</li>
      * <li>{@link #setNumberOfRetries(int)}</li>
+     * <li>{@link #setRequestReadTimeout(int)}</li>
      * </ul>
      *
      * @param prefix the prefix used to identify specific credential
@@ -127,6 +131,7 @@ public class GoogleApiCredential
      * <li>credential.default.endpointUrl</li>
      * <li>credential.default.credentialOn</li>
      * <li>credential.default.numberOfRetries</li>
+     * <li>credential.default.readTimeout</li>
      * <li>credential.drive.projectId</li>
      * <li>credential.drive.clientId</li>
      * <li>..</li>
@@ -286,6 +291,26 @@ public class GoogleApiCredential
             numberOfRetries = 1;
         }
         setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_NUMBER_OF_RETRIES, String.valueOf( numberOfRetries ) );
+        return this;
+    }
+
+    /**
+     * Sets the timeout in milliseconds to read data from an established connection or {@code 0} for
+     * an infinite timeout.
+     * <p>
+     * By default it is 20000 (20 seconds).
+     * </p>
+     *
+     * @param readTimeout the request read timeout to be set
+     * @return this instance to chain
+     */
+    public GoogleApiCredential setRequestReadTimeout( int readTimeout )
+    {
+        if ( readTimeout < 0 )
+        {
+            readTimeout = 0;
+        }
+        setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_READ_TIMEOUT, String.valueOf( readTimeout ) );
         return this;
     }
 }

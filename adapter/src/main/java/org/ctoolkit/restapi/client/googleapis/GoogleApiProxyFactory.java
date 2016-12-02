@@ -51,6 +51,7 @@ import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERT
 import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_FILE_NAME;
 import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_NUMBER_OF_RETRIES;
 import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_PROJECT_ID;
+import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_READ_TIMEOUT;
 import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_SERVICE_ACCOUNT_EMAIL;
 
 /**
@@ -232,6 +233,34 @@ public abstract class GoogleApiProxyFactory
     }
 
     /**
+     * Returns value set by {@link GoogleApiCredential#setRequestReadTimeout(int)}
+     * or defined by property file.
+     * If specific credential wouldn't not be found, default will be returned 20000 (20 seconds).
+     *
+     * @param prefix the prefix used to identify specific credential or null for default
+     * @return the request read timeout in milliseconds
+     */
+    public int getReadTimeout( @Nullable String prefix )
+    {
+        if ( Strings.isNullOrEmpty( prefix ) )
+        {
+            prefix = DEFAULT_CREDENTIAL_PREFIX;
+        }
+
+        String property = PROPERTY_READ_TIMEOUT;
+        String value = credential.get( CREDENTIAL_ATTR + prefix + "." + property );
+        if ( value == null )
+        {
+            value = credential.get( CREDENTIAL_ATTR + DEFAULT_CREDENTIAL_PREFIX + "." + property );
+        }
+        if ( value == null )
+        {
+            value = "20000";
+        }
+        return Integer.valueOf( value );
+    }
+
+    /**
      * Returns value set by {@link GoogleApiCredential#setCredentialOn(boolean)}
      * or defined by property file.
      * If specific credential wouldn't not be found, default will be returned.
@@ -323,6 +352,7 @@ public abstract class GoogleApiProxyFactory
                 .setServiceAccountScopes( scopes )
                 .setServiceAccountPrivateKeyFromP12File( new File( resource.getPath() ) )
                 .setServiceAccountUser( userAccount )
+                .setRequestInitializer( newRequestConfig( prefix ) )
                 .build();
     }
 
@@ -336,6 +366,31 @@ public abstract class GoogleApiProxyFactory
     {
         String fileName = getFileName( prefix );
         return GoogleApiProxyFactory.class.getResourceAsStream( fileName );
+    }
+
+    public HttpRequestInitializer newRequestConfig( @Nullable String prefix )
+    {
+        return new RequestConfig( prefix );
+    }
+
+    private class RequestConfig
+            implements HttpRequestInitializer
+    {
+        private final int numberOfRetries;
+
+        private final int readTimeout;
+
+        private RequestConfig( String prefix )
+        {
+            this.numberOfRetries = getNumberOfRetries( prefix );
+            this.readTimeout = getReadTimeout( prefix );
+        }
+
+        public void initialize( HttpRequest request )
+        {
+            request.setNumberOfRetries( numberOfRetries );
+            request.setReadTimeout( readTimeout );
+        }
     }
 
     /**
@@ -361,13 +416,6 @@ public abstract class GoogleApiProxyFactory
                 {
                     super.intercept( request );
                     eventBus.post( new BeforeRequestEvent( request ) );
-                }
-
-                @Override
-                public void initialize( HttpRequest request ) throws IOException
-                {
-                    super.initialize( request );
-                    request.setNumberOfRetries( getNumberOfRetries( prefix ) );
                 }
             };
         }

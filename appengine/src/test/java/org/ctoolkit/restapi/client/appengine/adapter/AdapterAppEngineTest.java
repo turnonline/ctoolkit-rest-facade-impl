@@ -77,6 +77,10 @@ public class AdapterAppEngineTest
     String numberOfRetries;
 
     @Inject
+    @Named( "credential.default.readTimeout" )
+    String readTimeout;
+
+    @Inject
     private ResourceFacade resources;
 
     @Inject
@@ -175,6 +179,9 @@ public class AdapterAppEngineTest
 
         int numberOfRetries = builder.getNumberOfRetries( null );
         assertEquals( numberOfRetries, Integer.valueOf( this.numberOfRetries ).intValue() );
+
+        int readTimeout = builder.getReadTimeout( null );
+        assertEquals( readTimeout, Integer.valueOf( this.readTimeout ).intValue() );
     }
 
     @Test
@@ -208,6 +215,9 @@ public class AdapterAppEngineTest
 
         int numberOfRetries = builder.getNumberOfRetries( prefix );
         assertEquals( numberOfRetries, 2 );
+
+        int readTimeout = builder.getReadTimeout( prefix );
+        assertEquals( readTimeout, 45000 );
     }
 
     @Test
@@ -241,5 +251,8 @@ public class AdapterAppEngineTest
 
         int numberOfRetries = builder.getNumberOfRetries( prefix );
         assertEquals( numberOfRetries, Integer.valueOf( this.numberOfRetries ).intValue() );
+
+        int readTimeout = builder.getReadTimeout( prefix );
+        assertEquals( readTimeout, Integer.valueOf( this.readTimeout ).intValue() );
     }
 }
