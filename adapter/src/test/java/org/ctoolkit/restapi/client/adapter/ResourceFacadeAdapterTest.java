@@ -18,16 +18,19 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import com.google.api.client.googleapis.media.MediaHttpDownloader;
+import com.google.api.client.http.GenericUrl;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
+import mockit.Expectations;
 import mockit.Injectable;
 import mockit.Mocked;
-import mockit.NonStrictExpectations;
 import mockit.Tested;
 import mockit.Verifications;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
@@ -35,14 +38,20 @@ import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
+import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 
 /**
@@ -65,13 +74,16 @@ public class ResourceFacadeAdapterTest
     @Injectable
     private ResourceProviderInjector injector;
 
+    @Injectable
+    private GoogleApiProxyFactory apiFactory;
+
     @Test
     public void noResourceMappingNewInstance( @Mocked final NewExecutorAdaptee adaptee,
                                               @Mocked final RemoteRequest request,
                                               @Mocked final ResourceNoMapping resource )
             throws IOException
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 injector.getExecutorAdaptee( NewExecutorAdaptee.class, ResourceNoMapping.class );
@@ -96,7 +108,7 @@ public class ResourceFacadeAdapterTest
                                       @Mocked final ResourceNoMapping resource )
             throws IOException
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 injector.getExecutorAdaptee( GetExecutorAdaptee.class, ResourceNoMapping.class );
@@ -120,7 +132,7 @@ public class ResourceFacadeAdapterTest
                                                     @Mocked final RemoteRequest request )
             throws IOException
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 injector.getExecutorAdaptee( ListExecutorAdaptee.class, ResourceNoMapping.class );
@@ -152,7 +164,7 @@ public class ResourceFacadeAdapterTest
         final List<ResourceNoMapping> resources = new ArrayList<>();
         resources.add( responseResource );
 
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 injector.getExecutorAdaptee( ListExecutorAdaptee.class, ResourceNoMapping.class );
@@ -182,7 +194,7 @@ public class ResourceFacadeAdapterTest
                                          @Mocked final ResourceNoMapping responseResource )
             throws IOException
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 injector.getExecutorAdaptee( InsertExecutorAdaptee.class, ResourceNoMapping.class );
@@ -208,7 +220,7 @@ public class ResourceFacadeAdapterTest
                                          @Mocked final ResourceNoMapping responseResource )
             throws IOException
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 injector.getExecutorAdaptee( UpdateExecutorAdaptee.class, ResourceNoMapping.class );
@@ -234,7 +246,7 @@ public class ResourceFacadeAdapterTest
                                         @Mocked final ResourceNoMapping responseResource )
             throws IOException
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 injector.getExecutorAdaptee( PatchExecutorAdaptee.class, ResourceNoMapping.class );
@@ -261,7 +273,7 @@ public class ResourceFacadeAdapterTest
                                          @Mocked final RemoteRequest request )
             throws IOException
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 injector.getExecutorAdaptee( DeleteExecutorAdaptee.class, ResourceNoMapping.class );
@@ -283,7 +295,7 @@ public class ResourceFacadeAdapterTest
                                         @Mocked final ResourceNoMapping inputResource )
             throws IOException
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 injector.getExecutorAdaptee( InsertExecutorAdaptee.class, ResourceNoMapping.class );
@@ -306,7 +318,7 @@ public class ResourceFacadeAdapterTest
                                         @Mocked final ResourceNoMapping inputResource )
             throws IOException
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 injector.getExecutorAdaptee( UpdateExecutorAdaptee.class, ResourceNoMapping.class );
@@ -329,7 +341,7 @@ public class ResourceFacadeAdapterTest
                                        @Mocked final PatchResourceNoMapping inputResource )
             throws IOException
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 injector.getExecutorAdaptee( PatchExecutorAdaptee.class, ResourceNoMapping.class );
@@ -347,6 +359,113 @@ public class ResourceFacadeAdapterTest
         };
 
         assertNull( tested.patch( inputResource, new Identifier( 1L ) ).execute() );
+    }
+
+    @Test
+    public void prepareDownloadRequest( @Mocked final DownloadExecutorAdaptee adaptee )
+            throws GeneralSecurityException, IOException
+    {
+        final String prefix = "myapi";
+
+        new Expectations()
+        {
+            {
+                injector.getExecutorAdaptee( DownloadExecutorAdaptee.class, ResourceNoMapping.class );
+                result = adaptee;
+
+                adaptee.getApiPrefix();
+                result = prefix;
+            }
+        };
+
+        final ByteArrayOutputStream content = new ByteArrayOutputStream();
+        final Identifier id = new Identifier( 1L );
+
+        DownloadRequest request = tested.prepareDownloadRequest( ResourceNoMapping.class, id, content, null );
+        assertNotNull( request );
+
+        new Verifications()
+        {
+            {
+                apiFactory.newRequestConfig( prefix );
+                times = 1;
+
+                apiFactory.getHttpTransport();
+                times = 1;
+            }
+        };
+    }
+
+    @Test( expectedExceptions = IllegalArgumentException.class )
+    public void executeDownloadNullUrl( @Mocked final MediaHttpDownloader downloader,
+                                        @Mocked final DownloadExecutorAdaptee adaptee )
+            throws IOException
+    {
+        new Expectations()
+        {
+            {
+                adaptee.prepareDownloadUrl( ( Identifier ) any, anyString, ( Map<String, Object> ) any, ( Locale ) any );
+                result = null;
+            }
+        };
+
+        ByteArrayOutputStream content = new ByteArrayOutputStream();
+        Identifier id = new Identifier( 1L );
+
+        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, null, null, null );
+    }
+
+    @Test( expectedExceptions = RuntimeException.class )
+    public void executeDownloadException( @Mocked final MediaHttpDownloader downloader,
+                                          @Mocked final DownloadExecutorAdaptee adaptee )
+            throws IOException
+    {
+        final URL url = new URL( "https://www.ctoolkit.org/download" );
+
+        new Expectations()
+        {
+            {
+                adaptee.prepareDownloadUrl( ( Identifier ) any, anyString, ( Map<String, Object> ) any, ( Locale ) any );
+                result = url;
+
+                downloader.download( ( GenericUrl ) any, ( OutputStream ) any );
+                result = new IOException();
+            }
+        };
+
+        ByteArrayOutputStream content = new ByteArrayOutputStream();
+        final Identifier id = new Identifier( 1L );
+
+        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, null, null, null );
+    }
+
+    @Test
+    public void executeDownload( @Mocked final MediaHttpDownloader downloader,
+                                 @Mocked final DownloadExecutorAdaptee adaptee )
+            throws IOException
+    {
+        final Identifier id = new Identifier( 1L );
+        final Locale locale = Locale.ENGLISH;
+        final URL url = new URL( "https://www.ctoolkit.org/download" );
+
+        new Expectations()
+        {
+            {
+                adaptee.prepareDownloadUrl( id, null, null, locale );
+                result = url;
+            }
+        };
+
+        final ByteArrayOutputStream content = new ByteArrayOutputStream();
+        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, null, null, locale );
+
+        new Verifications()
+        {
+            {
+                downloader.download( new GenericUrl( url ), content );
+                times = 1;
+            }
+        };
     }
 
     @SuppressWarnings( "ConstantConditions" )

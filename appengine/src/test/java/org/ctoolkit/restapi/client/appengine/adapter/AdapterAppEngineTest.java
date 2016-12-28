@@ -31,10 +31,13 @@ import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * The adapter running on local AppEngine.
@@ -108,6 +111,12 @@ public class AdapterAppEngineTest
         singleRequest = resources.get( Foo.class, "identifier" );
         assertNotNull( singleRequest );
         assertNotNull( singleRequest.execute() );
+
+        ByteArrayOutputStream content = new ByteArrayOutputStream();
+        SingleRequest dr = resources.media( Foo.class ).downloadTo( content ).identifiedBy( 1L );
+        assertNull( dr.execute() );
+        String errorMessage = "Output stream has expected to be populated by downloaded content!";
+        assertTrue( content.size() > 0, errorMessage );
 
         Foo foo = new Foo();
         foo.setName( "John Foo" );

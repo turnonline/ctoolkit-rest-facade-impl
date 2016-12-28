@@ -25,6 +25,7 @@ import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
@@ -67,6 +68,10 @@ public class AdapterAppEngineModule
         } ).to( FooNewAdaptee.class ).in( Singleton.class );
 
         bind( new TypeLiteral<GetExecutorAdaptee<RemoteFoo>>()
+        {
+        } ).to( FooGetAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<DownloadExecutorAdaptee<RemoteFoo>>()
         {
         } ).to( FooGetAdaptee.class ).in( Singleton.class );
 
