@@ -20,9 +20,12 @@ package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpStatusCodes;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -58,6 +61,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.SocketTimeoutException;
@@ -140,9 +144,26 @@ public class ResourceFacadeAdapter
             throw new IllegalArgumentException( msg + identifier + " Resource: " + resource.getName() );
         }
 
+        HttpHeaders headers = null;
+        if ( locale != null )
+        {
+            headers = createHttpHeaders();
+            String languageTag = new java.util.Locale( locale.getLanguage(), locale.getCountry() ).toLanguageTag();
+            headers.put( com.google.common.net.HttpHeaders.ACCEPT_LANGUAGE, languageTag );
+        }
+
+        if ( !Strings.isNullOrEmpty( type ) )
+        {
+            if ( headers == null )
+            {
+                headers = createHttpHeaders();
+            }
+            headers.setContentType( type );
+        }
+
         try
         {
-            downloader.download( new GenericUrl( path ), output );
+            downloader.download( new GenericUrl( path ), headers, output );
         }
         catch ( IOException e )
         {
@@ -150,6 +171,12 @@ public class ResourceFacadeAdapter
             throw prepareUpdateException( e, resource, identifier );
         }
         return null;
+    }
+
+    @VisibleForTesting
+    HttpHeaders createHttpHeaders()
+    {
+        return new HttpHeaders();
     }
 
     /**
@@ -832,6 +859,11 @@ public class ResourceFacadeAdapter
         {
             statusCode = HttpStatusCodes.STATUS_CODE_SERVICE_UNAVAILABLE;
             statusMessage = "Unknown host: " + e.getMessage();
+        }
+        else if ( e instanceof SSLHandshakeException )
+        {
+            statusCode = HttpStatusCodes.STATUS_CODE_UNAUTHORIZED;
+            statusMessage = e.getMessage();
         }
         else
         {

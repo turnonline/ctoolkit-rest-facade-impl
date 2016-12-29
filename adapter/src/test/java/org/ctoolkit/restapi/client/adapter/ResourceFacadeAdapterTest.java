@@ -20,6 +20,7 @@ package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -51,6 +52,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 
@@ -428,7 +430,7 @@ public class ResourceFacadeAdapterTest
                 adaptee.prepareDownloadUrl( ( Identifier ) any, anyString, ( Map<String, Object> ) any, ( Locale ) any );
                 result = url;
 
-                downloader.download( ( GenericUrl ) any, ( OutputStream ) any );
+                downloader.download( ( GenericUrl ) any, ( HttpHeaders ) any, ( OutputStream ) any );
                 result = new IOException();
             }
         };
@@ -445,24 +447,36 @@ public class ResourceFacadeAdapterTest
             throws IOException
     {
         final Identifier id = new Identifier( 1L );
-        final Locale locale = Locale.ENGLISH;
+        // expected content type
+        final String type = "application/pdf";
+        final Locale locale = Locale.GERMANY;
         final URL url = new URL( "https://www.ctoolkit.org/download" );
+        final HttpHeaders headers = new HttpHeaders();
 
-        new Expectations()
+        new Expectations( tested )
         {
             {
-                adaptee.prepareDownloadUrl( id, null, null, locale );
+                adaptee.prepareDownloadUrl( id, type, null, locale );
                 result = url;
+
+                tested.createHttpHeaders();
+                result = headers;
             }
         };
 
         final ByteArrayOutputStream content = new ByteArrayOutputStream();
-        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, null, null, locale );
+        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, type, null, locale );
+
+        String languageTag = ( String ) headers.get( com.google.common.net.HttpHeaders.ACCEPT_LANGUAGE );
+        assertEquals( languageTag, "de-DE", "Accept Language" );
+
+        String contentType = headers.getContentType();
+        assertEquals( contentType, type, "Content Type" );
 
         new Verifications()
         {
             {
-                downloader.download( new GenericUrl( url ), content );
+                downloader.download( new GenericUrl( url ), headers, content );
                 times = 1;
             }
         };

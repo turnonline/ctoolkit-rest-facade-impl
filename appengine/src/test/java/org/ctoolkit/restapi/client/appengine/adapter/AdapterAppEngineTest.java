@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -113,8 +114,9 @@ public class AdapterAppEngineTest
         assertNotNull( singleRequest.execute() );
 
         ByteArrayOutputStream content = new ByteArrayOutputStream();
-        SingleRequest dr = resources.media( Foo.class ).downloadTo( content ).identifiedBy( 1L );
-        assertNull( dr.execute() );
+        String type = "application/pdf";
+        SingleRequest dr = resources.media( Foo.class ).downloadTo( content, type ).identifiedBy( 1L );
+        assertNull( dr.execute( Locale.GERMANY ) );
         String errorMessage = "Output stream has expected to be populated by downloaded content!";
         assertTrue( content.size() > 0, errorMessage );
 

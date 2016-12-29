@@ -327,7 +327,7 @@ public abstract class GoogleApiProxyFactory
     /**
      * Creates the thread-safe Google-specific implementation of the OAuth 2.0.
      *
-     * @param scopes      the space-separated OAuth scopes to use with the the service account flow
+     * @param scopes      the space-separated OAuth scopes to use with the service account flow
      *                    or {@code null} for none.
      * @param userAccount the email address. If you want to impersonate a user account, specify the email address.
      *                    Useful for domain-wide delegation.
