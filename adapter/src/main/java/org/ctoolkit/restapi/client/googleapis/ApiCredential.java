@@ -18,16 +18,12 @@
 
 package org.ctoolkit.restapi.client.googleapis;
 
-import com.google.api.client.http.HttpRequest;
-import com.google.common.base.Strings;
-import org.ctoolkit.restapi.client.adapter.Constants;
-
+import javax.annotation.Nonnull;
+import java.util.Map;
 import java.util.Properties;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 /**
- * The Google API credential holder represents a map of credential used to authenticate client calls to APIs.
+ * The API credential holder represents a map of credential used to authenticate client calls to APIs.
  * Default credential will be always used if any specific wouldn't be found.
  * Specific credential are optional unless default credential are defined.
  * <p>
@@ -40,9 +36,15 @@ import static com.google.common.base.Preconditions.checkArgument;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class GoogleApiCredential
+public class ApiCredential
         extends Properties
 {
+    public static final String DEFAULT_APP_NAME = "ctoolkit:facade-api";
+
+    public static final String DEFAULT_NUMBER_OF_RETRIES = "1";
+
+    public static final String DEFAULT_READ_TIMEOUT = "20000";
+
     static final String DEFAULT_CREDENTIAL_PREFIX = "default";
 
     static final String PROPERTY_PROJECT_ID = "projectId";
@@ -69,7 +71,7 @@ public class GoogleApiCredential
 
     private static final long serialVersionUID = -2258904700906913513L;
 
-    private final String prefix;
+    protected final String prefix;
 
     /**
      * Creates default credential used to authenticate all calls unless specified another instance for a specific API.
@@ -87,7 +89,7 @@ public class GoogleApiCredential
      * <li>{@link #setRequestReadTimeout(int)}</li>
      * </ul>
      */
-    public GoogleApiCredential()
+    public ApiCredential()
     {
         this( DEFAULT_CREDENTIAL_PREFIX );
     }
@@ -110,9 +112,12 @@ public class GoogleApiCredential
      *
      * @param prefix the prefix used to identify specific credential
      */
-    public GoogleApiCredential( String prefix )
+    public ApiCredential( String prefix )
     {
-        checkArgument( !Strings.isNullOrEmpty( prefix ), "Prefix cannot be null or empty!" );
+        if ( isNullOrEmpty( prefix ) )
+        {
+            throw new IllegalArgumentException( String.valueOf( "Prefix cannot be null or empty!" ) );
+        }
         this.prefix = prefix + ".";
         setApplicationName( null );
     }
@@ -137,12 +142,16 @@ public class GoogleApiCredential
      * <li>..</li>
      * </ul>
      *
-     * @param defaults map of credential
+     * @param properties the map of credential and config properties
+     * @param prefix     the base prefix of this credential instance
      */
-    public GoogleApiCredential( Properties defaults )
+    public ApiCredential( @Nonnull Map<String, String> properties, String prefix )
     {
-        super( defaults );
-        this.prefix = DEFAULT_CREDENTIAL_PREFIX + ".";
+        this( prefix );
+        for ( String next : properties.keySet() )
+        {
+            setProperty( next, properties.get( next ) );
+        }
     }
 
     /**
@@ -151,9 +160,9 @@ public class GoogleApiCredential
      * @param projectId the application ID
      * @return this instance to chain
      */
-    public GoogleApiCredential setProjectId( String projectId )
+    public ApiCredential setProjectId( String projectId )
     {
-        if ( !Strings.isNullOrEmpty( projectId ) )
+        if ( !isNullOrEmpty( projectId ) )
         {
             setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_PROJECT_ID, projectId );
         }
@@ -166,9 +175,9 @@ public class GoogleApiCredential
      * @param clientId the Client ID
      * @return this instance to chain
      */
-    public GoogleApiCredential setClientId( String clientId )
+    public ApiCredential setClientId( String clientId )
     {
-        if ( !Strings.isNullOrEmpty( clientId ) )
+        if ( !isNullOrEmpty( clientId ) )
         {
             setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_CLIENT_ID, clientId );
         }
@@ -181,9 +190,9 @@ public class GoogleApiCredential
      * @param serviceEmail the service email
      * @return this instance to chain
      */
-    public GoogleApiCredential setServiceAccountEmail( String serviceEmail )
+    public ApiCredential setServiceAccountEmail( String serviceEmail )
     {
-        if ( !Strings.isNullOrEmpty( serviceEmail ) )
+        if ( !isNullOrEmpty( serviceEmail ) )
         {
             setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_SERVICE_ACCOUNT_EMAIL, serviceEmail );
         }
@@ -192,20 +201,20 @@ public class GoogleApiCredential
 
     /**
      * Sets the name of the client application. If the application name is {@code null} or blank,
-     * the application will use default name {@link org.ctoolkit.restapi.client.adapter.Constants#DEFAULT_APP_NAME}.
+     * the application will use default name {@link #DEFAULT_APP_NAME}.
      *
      * @param applicationName the application name to be used as caller name
      * @return this instance to chain
      */
-    public GoogleApiCredential setApplicationName( String applicationName )
+    public ApiCredential setApplicationName( String applicationName )
     {
-        if ( !Strings.isNullOrEmpty( applicationName ) )
+        if ( !isNullOrEmpty( applicationName ) )
         {
             setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_APPLICATION_NAME, applicationName );
         }
         else
         {
-            setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_APPLICATION_NAME, Constants.DEFAULT_APP_NAME );
+            setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_APPLICATION_NAME, DEFAULT_APP_NAME );
         }
         return this;
     }
@@ -220,9 +229,9 @@ public class GoogleApiCredential
      * @param fileName the relative path to file
      * @return this instance to chain
      */
-    public GoogleApiCredential setFileName( String fileName )
+    public ApiCredential setFileName( String fileName )
     {
-        if ( !Strings.isNullOrEmpty( fileName ) )
+        if ( !isNullOrEmpty( fileName ) )
         {
             setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_FILE_NAME, fileName );
         }
@@ -235,9 +244,9 @@ public class GoogleApiCredential
      * @param apiKey the API Key to be set
      * @return this instance to chain
      */
-    public GoogleApiCredential setApiKey( String apiKey )
+    public ApiCredential setApiKey( String apiKey )
     {
-        if ( !Strings.isNullOrEmpty( apiKey ) )
+        if ( !isNullOrEmpty( apiKey ) )
         {
             setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_API_KEY, apiKey );
         }
@@ -250,9 +259,9 @@ public class GoogleApiCredential
      * @param endpointUrl the endpoint URL to be set
      * @return this instance to chain
      */
-    public GoogleApiCredential setEndpointUrl( String endpointUrl )
+    public ApiCredential setEndpointUrl( String endpointUrl )
     {
-        if ( !Strings.isNullOrEmpty( endpointUrl ) )
+        if ( !isNullOrEmpty( endpointUrl ) )
         {
             setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_ENDPOINT_URL, endpointUrl );
         }
@@ -266,7 +275,7 @@ public class GoogleApiCredential
      * @param credentialOn true use these credential in order to authenticate calls
      * @return this instance to chain
      */
-    public GoogleApiCredential setCredentialOn( boolean credentialOn )
+    public ApiCredential setCredentialOn( boolean credentialOn )
     {
         String valueOf = String.valueOf( credentialOn );
         setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_CREDENTIAL_ON, valueOf );
@@ -282,9 +291,8 @@ public class GoogleApiCredential
      *
      * @param numberOfRetries the number of retries
      * @return this instance to chain
-     * @see HttpRequest#setNumberOfRetries(int)
      */
-    public GoogleApiCredential setNumberOfRetries( int numberOfRetries )
+    public ApiCredential setNumberOfRetries( int numberOfRetries )
     {
         if ( numberOfRetries < 0 )
         {
@@ -304,7 +312,7 @@ public class GoogleApiCredential
      * @param readTimeout the request read timeout to be set
      * @return this instance to chain
      */
-    public GoogleApiCredential setRequestReadTimeout( int readTimeout )
+    public ApiCredential setRequestReadTimeout( int readTimeout )
     {
         if ( readTimeout < 0 )
         {
@@ -312,5 +320,26 @@ public class GoogleApiCredential
         }
         setProperty( CREDENTIAL_ATTR + prefix + PROPERTY_READ_TIMEOUT, String.valueOf( readTimeout ) );
         return this;
+    }
+
+    /**
+     * Searches for the property with the specified key in this property list.
+     *
+     * @param property the the property key
+     * @return the property string value
+     */
+    protected final String getStringValue( String property )
+    {
+        if ( isNullOrEmpty( property ) )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        return getProperty( CREDENTIAL_ATTR + prefix + "." + property );
+    }
+
+    private boolean isNullOrEmpty( String string )
+    {
+        return string == null || string.length() == 0;
     }
 }

@@ -25,8 +25,6 @@ package org.ctoolkit.restapi.client.adapter;
  */
 public interface Constants
 {
-    String DEFAULT_APP_NAME = "ctoolkit:rest-client-facade-api";
-
     /**
      * The identity toolkit token header name to forward it via facade call.
      */

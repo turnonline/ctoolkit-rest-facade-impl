@@ -21,11 +21,11 @@ package org.ctoolkit.restapi.client.appengine.adapter;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.ResourceFacade;
 import org.ctoolkit.restapi.client.SingleRequest;
-import org.ctoolkit.restapi.client.adapter.Constants;
 import org.ctoolkit.restapi.client.appengine.GuiceTestCase;
 import org.ctoolkit.restapi.client.appengine.adapter.model.Foo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
 import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingRequest;
+import org.ctoolkit.restapi.client.googleapis.ApiCredential;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.testng.annotations.Test;
 
@@ -174,7 +174,7 @@ public class AdapterAppEngineTest
 
         // default app name test, not configured by client
         String applicationName = builder.getApplicationName( null );
-        assertEquals( applicationName, Constants.DEFAULT_APP_NAME );
+        assertEquals( applicationName, ApiCredential.DEFAULT_APP_NAME );
 
         String fileName = builder.getFileName( null );
         assertEquals( fileName, this.fileName );
@@ -246,7 +246,7 @@ public class AdapterAppEngineTest
         assertEquals( serviceEmail, this.serviceAccountEmail );
 
         String applicationName = builder.getApplicationName( prefix );
-        assertEquals( applicationName, Constants.DEFAULT_APP_NAME );
+        assertEquals( applicationName, ApiCredential.DEFAULT_APP_NAME );
 
         String fileName = builder.getFileName( prefix );
         assertEquals( fileName, this.fileName );

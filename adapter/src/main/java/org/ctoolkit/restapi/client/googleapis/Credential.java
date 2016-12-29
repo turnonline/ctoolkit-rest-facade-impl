@@ -28,7 +28,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 
 /**
- * The annotation used differentiate configurations as credential specific.
+ * The annotation used differentiate configurations as credential.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */

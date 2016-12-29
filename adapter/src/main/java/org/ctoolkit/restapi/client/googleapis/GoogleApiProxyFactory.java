@@ -41,18 +41,20 @@ import java.util.Map;
 import java.util.MissingResourceException;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.CREDENTIAL_ATTR;
-import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.DEFAULT_CREDENTIAL_PREFIX;
-import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_API_KEY;
-import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_APPLICATION_NAME;
-import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_CLIENT_ID;
-import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_CREDENTIAL_ON;
-import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_ENDPOINT_URL;
-import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_FILE_NAME;
-import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_NUMBER_OF_RETRIES;
-import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_PROJECT_ID;
-import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_READ_TIMEOUT;
-import static org.ctoolkit.restapi.client.googleapis.GoogleApiCredential.PROPERTY_SERVICE_ACCOUNT_EMAIL;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.CREDENTIAL_ATTR;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.DEFAULT_CREDENTIAL_PREFIX;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.DEFAULT_NUMBER_OF_RETRIES;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.DEFAULT_READ_TIMEOUT;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_API_KEY;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_APPLICATION_NAME;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_CLIENT_ID;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_CREDENTIAL_ON;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_ENDPOINT_URL;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_FILE_NAME;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_NUMBER_OF_RETRIES;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_PROJECT_ID;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_READ_TIMEOUT;
+import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_SERVICE_ACCOUNT_EMAIL;
 
 /**
  * The factory to build proxy instance to allow authenticated calls to Google APIs on behalf of the application
@@ -107,7 +109,7 @@ public abstract class GoogleApiProxyFactory
     }
 
     /**
-     * Returns value set by {@link GoogleApiCredential#setProjectId(String)}
+     * Returns value set by {@link ApiCredential#setProjectId(String)}
      * or defined by property file.
      * If specific credential wouldn't not be found, default will be returned.
      *
@@ -121,7 +123,7 @@ public abstract class GoogleApiProxyFactory
     }
 
     /**
-     * Returns value set by {@link GoogleApiCredential#setClientId(String)}
+     * Returns value set by {@link ApiCredential#setClientId(String)}
      * or defined by property file.
      * If specific credential wouldn't not be found, default will be returned.
      *
@@ -135,7 +137,7 @@ public abstract class GoogleApiProxyFactory
     }
 
     /**
-     * Returns value set by {@link GoogleApiCredential#setServiceAccountEmail(String)}
+     * Returns value set by {@link ApiCredential#setServiceAccountEmail(String)}
      * or defined by property file.
      * If specific credential wouldn't not be found, default will be returned.
      *
@@ -149,7 +151,7 @@ public abstract class GoogleApiProxyFactory
     }
 
     /**
-     * Returns value set by {@link GoogleApiCredential#setApplicationName(String)}
+     * Returns value set by {@link ApiCredential#setApplicationName(String)}
      * or defined by property file.
      * If specific credential wouldn't not be found, default will be returned.
      *
@@ -163,7 +165,7 @@ public abstract class GoogleApiProxyFactory
     }
 
     /**
-     * Returns value set by {@link GoogleApiCredential#setFileName(String)}
+     * Returns value set by {@link ApiCredential#setFileName(String)}
      * or defined by property file.
      * If specific credential wouldn't not be found, default will be returned.
      *
@@ -177,7 +179,7 @@ public abstract class GoogleApiProxyFactory
     }
 
     /**
-     * Returns value set by {@link GoogleApiCredential#setApiKey(String)}
+     * Returns value set by {@link ApiCredential#setApiKey(String)}
      * or defined by property file.
      * If specific credential wouldn't not be found, default will be returned.
      *
@@ -191,7 +193,7 @@ public abstract class GoogleApiProxyFactory
     }
 
     /**
-     * Returns value set by {@link GoogleApiCredential#setEndpointUrl(String)}
+     * Returns value set by {@link ApiCredential#setEndpointUrl(String)}
      * or defined by property file.
      * If specific credential wouldn't not be found, default will be returned.
      *
@@ -205,7 +207,7 @@ public abstract class GoogleApiProxyFactory
     }
 
     /**
-     * Returns value set by {@link GoogleApiCredential#setNumberOfRetries(int)}
+     * Returns value set by {@link ApiCredential#setNumberOfRetries(int)}
      * or defined by property file.
      * If specific credential wouldn't not be found, default will be returned.
      *
@@ -227,13 +229,13 @@ public abstract class GoogleApiProxyFactory
         }
         if ( value == null )
         {
-            value = "1";
+            value = DEFAULT_NUMBER_OF_RETRIES;
         }
         return Integer.valueOf( value );
     }
 
     /**
-     * Returns value set by {@link GoogleApiCredential#setRequestReadTimeout(int)}
+     * Returns value set by {@link ApiCredential#setRequestReadTimeout(int)}
      * or defined by property file.
      * If specific credential wouldn't not be found, default will be returned 20000 (20 seconds).
      *
@@ -255,13 +257,13 @@ public abstract class GoogleApiProxyFactory
         }
         if ( value == null )
         {
-            value = "20000";
+            value = DEFAULT_READ_TIMEOUT;
         }
         return Integer.valueOf( value );
     }
 
     /**
-     * Returns value set by {@link GoogleApiCredential#setCredentialOn(boolean)}
+     * Returns value set by {@link ApiCredential#setCredentialOn(boolean)}
      * or defined by property file.
      * If specific credential wouldn't not be found, default will be returned.
      *
@@ -319,7 +321,7 @@ public abstract class GoogleApiProxyFactory
         }
 
         String fullProperty = CREDENTIAL_ATTR + DEFAULT_CREDENTIAL_PREFIX + "." + property;
-        String className = GoogleApiCredential.class.getName();
+        String className = ApiCredential.class.getName();
         String message = "No value configured for default credential: '" + fullProperty + "'";
         throw new MissingResourceException( message, className, fullProperty );
     }
