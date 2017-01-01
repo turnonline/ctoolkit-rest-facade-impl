@@ -25,7 +25,7 @@ import com.google.common.testing.TearDown;
 import com.google.guiceberry.GuiceBerryModule;
 import com.google.guiceberry.testng.TestNgGuiceBerry;
 import com.google.inject.name.Names;
-import org.ctoolkit.restapi.client.googleapis.ApiCredential;
+import org.ctoolkit.restapi.client.ApiCredential;
 import org.ctoolkit.test.appengine.ServiceConfigModule;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;

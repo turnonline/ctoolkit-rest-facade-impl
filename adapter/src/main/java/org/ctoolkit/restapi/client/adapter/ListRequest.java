@@ -18,6 +18,8 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.Request;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.RetrievalRequest;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 
@@ -43,6 +45,8 @@ public class ListRequest<T>
     private final ListExecutorAdaptee adaptee;
 
     private final Object remoteRequest;
+
+    private RequestCredential credential;
 
     private int start = -1;
 
@@ -98,9 +102,20 @@ public class ListRequest<T>
     }
 
     @Override
-    public List<T> execute( Map<String, Object> criteria, Locale locale )
+    public List<T> execute( Map<String, Object> parameters, Locale locale )
     {
-        return adapter.callbackExecuteList( adaptee, remoteRequest, resource, criteria, locale, start, length );
+        if ( credential != null )
+        {
+            parameters = credential.populate( parameters );
+        }
+        return adapter.callbackExecuteList( adaptee, remoteRequest, resource, parameters, locale, start, length );
+    }
+
+    @Override
+    public Request<List<T>> config( RequestCredential credential )
+    {
+        this.credential = credential;
+        return this;
     }
 
     @Override

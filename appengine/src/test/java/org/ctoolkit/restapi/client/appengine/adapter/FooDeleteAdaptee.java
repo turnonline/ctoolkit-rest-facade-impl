@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
@@ -49,7 +50,10 @@ public class FooDeleteAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request, @Nullable Locale locale ) throws IOException
+    public void executeDelete( @Nonnull Object request,
+                               @Nullable Map<String, Object> parameters,
+                               @Nullable Locale locale )
+            throws IOException
     {
 
     }

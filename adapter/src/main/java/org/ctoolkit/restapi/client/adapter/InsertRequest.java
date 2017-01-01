@@ -18,6 +18,8 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.Request;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 
@@ -45,6 +47,8 @@ public class InsertRequest<T>
     private final Object remoteRequest;
 
     private Object parentKey;
+
+    private RequestCredential credential;
 
     InsertRequest( @Nonnull Class<T> resource,
                    @Nullable Object parentKey,
@@ -88,6 +92,17 @@ public class InsertRequest<T>
     @Override
     public T execute( Map<String, Object> parameters, Locale locale )
     {
+        if ( credential != null )
+        {
+            parameters = credential.populate( parameters );
+        }
         return adapter.callbackExecuteInsert( adaptee, remoteRequest, resource, parentKey, parameters, locale );
+    }
+
+    @Override
+    public Request<T> config( RequestCredential credential )
+    {
+        this.credential = credential;
+        return this;
     }
 }

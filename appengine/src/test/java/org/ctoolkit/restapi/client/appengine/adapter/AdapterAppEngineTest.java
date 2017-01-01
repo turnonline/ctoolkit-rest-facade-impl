@@ -18,6 +18,7 @@
 
 package org.ctoolkit.restapi.client.appengine.adapter;
 
+import org.ctoolkit.restapi.client.ApiCredential;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.ResourceFacade;
 import org.ctoolkit.restapi.client.SingleRequest;
@@ -25,7 +26,6 @@ import org.ctoolkit.restapi.client.appengine.GuiceTestCase;
 import org.ctoolkit.restapi.client.appengine.adapter.model.Foo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
 import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingRequest;
-import org.ctoolkit.restapi.client.googleapis.ApiCredential;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.testng.annotations.Test;
 

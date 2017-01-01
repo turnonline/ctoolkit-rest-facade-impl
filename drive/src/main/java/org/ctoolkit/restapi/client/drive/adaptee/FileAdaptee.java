@@ -93,7 +93,9 @@ public class FileAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request, @Nullable Locale locale )
+    public void executeDelete( @Nonnull Object request,
+                               @Nullable Map<String, Object> parameters,
+                               @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );

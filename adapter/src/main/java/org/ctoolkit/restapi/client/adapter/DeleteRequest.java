@@ -18,6 +18,8 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.Request;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 
@@ -44,6 +46,8 @@ public class DeleteRequest
     private final DeleteExecutorAdaptee adaptee;
 
     private final Object remoteRequest;
+
+    private RequestCredential credential;
 
     DeleteRequest( @Nonnull Class resource,
                    @Nonnull Object identifier,
@@ -86,6 +90,17 @@ public class DeleteRequest
     @Override
     public Void execute( Map<String, Object> parameters, Locale locale )
     {
-        return adapter.callbackExecuteDelete( adaptee, remoteRequest, resource, identifier, locale );
+        if ( credential != null )
+        {
+            parameters = credential.populate( parameters );
+        }
+        return adapter.callbackExecuteDelete( adaptee, remoteRequest, resource, identifier, parameters, locale );
+    }
+
+    @Override
+    public Request<Void> config( RequestCredential credential )
+    {
+        this.credential = credential;
+        return this;
     }
 }

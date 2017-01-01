@@ -19,6 +19,8 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import org.ctoolkit.restapi.client.ClientErrorException;
+import org.ctoolkit.restapi.client.Request;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 
@@ -44,6 +46,8 @@ public class NewInstanceRequest<T>
     private final NewExecutorAdaptee adaptee;
 
     private final Object remoteRequest;
+
+    private RequestCredential credential;
 
     NewInstanceRequest( @Nonnull Class<T> resource,
                         @Nonnull ResourceFacadeAdapter adapter,
@@ -96,6 +100,17 @@ public class NewInstanceRequest<T>
             }
         }
 
+        if ( credential != null )
+        {
+            parameters = credential.populate( parameters );
+        }
         return adapter.callbackNewInstance( adaptee, remoteRequest, resource, parameters, locale );
+    }
+
+    @Override
+    public Request<T> config( RequestCredential credential )
+    {
+        this.credential = credential;
+        return this;
     }
 }

@@ -27,6 +27,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
+import org.ctoolkit.restapi.client.ApiCredential;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
 
 import javax.annotation.Nonnull;
@@ -41,20 +42,20 @@ import java.util.Map;
 import java.util.MissingResourceException;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.CREDENTIAL_ATTR;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.DEFAULT_CREDENTIAL_PREFIX;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.DEFAULT_NUMBER_OF_RETRIES;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.DEFAULT_READ_TIMEOUT;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_API_KEY;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_APPLICATION_NAME;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_CLIENT_ID;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_CREDENTIAL_ON;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_ENDPOINT_URL;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_FILE_NAME;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_NUMBER_OF_RETRIES;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_PROJECT_ID;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_READ_TIMEOUT;
-import static org.ctoolkit.restapi.client.googleapis.ApiCredential.PROPERTY_SERVICE_ACCOUNT_EMAIL;
+import static org.ctoolkit.restapi.client.ApiCredential.CREDENTIAL_ATTR;
+import static org.ctoolkit.restapi.client.ApiCredential.DEFAULT_CREDENTIAL_PREFIX;
+import static org.ctoolkit.restapi.client.ApiCredential.DEFAULT_NUMBER_OF_RETRIES;
+import static org.ctoolkit.restapi.client.ApiCredential.DEFAULT_READ_TIMEOUT;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_API_KEY;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_APPLICATION_NAME;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_CLIENT_ID;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_CREDENTIAL_ON;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_ENDPOINT_URL;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_FILE_NAME;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_NUMBER_OF_RETRIES;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_PROJECT_ID;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_READ_TIMEOUT;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_SERVICE_ACCOUNT_EMAIL;
 
 /**
  * The factory to build proxy instance to allow authenticated calls to Google APIs on behalf of the application

@@ -810,13 +810,14 @@ public class ResourceFacadeAdapter
                                 @Nonnull Object remoteRequest,
                                 @Nonnull Class resource,
                                 @Nonnull Object identifier,
+                                @Nullable Map<String, Object> parameters,
                                 @Nullable Locale locale )
     {
         checkNotNull( identifier );
 
         try
         {
-            adaptee.executeDelete( remoteRequest, locale );
+            adaptee.executeDelete( remoteRequest, parameters, locale );
         }
         catch ( IOException e )
         {

@@ -20,6 +20,8 @@ package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.Request;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 
@@ -52,6 +54,8 @@ public class DownloadRequest
     private final OutputStream output;
 
     private final String type;
+
+    private RequestCredential credential;
 
     /**
      * Constructor.
@@ -109,6 +113,17 @@ public class DownloadRequest
     @Override
     public Void execute( Map<String, Object> params, Locale locale )
     {
+        if ( credential != null )
+        {
+            params = credential.populate( params );
+        }
         return adapter.executeDownload( downloader, adaptee, resource, identifier, output, type, params, locale );
+    }
+
+    @Override
+    public Request<Void> config( RequestCredential credential )
+    {
+        this.credential = credential;
+        return this;
     }
 }
