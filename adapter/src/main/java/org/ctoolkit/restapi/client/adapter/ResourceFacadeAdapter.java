@@ -38,6 +38,7 @@ import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.NotFoundException;
 import org.ctoolkit.restapi.client.Patch;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.RequestTimeoutException;
 import org.ctoolkit.restapi.client.ResourceFacade;
 import org.ctoolkit.restapi.client.SingleRequest;
@@ -137,6 +138,10 @@ public class ResourceFacadeAdapter
         checkNotNull( identifier );
         checkNotNull( output );
 
+        //noinspection MismatchedQueryAndUpdateOfCollection
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( params, false );
+
         URL path = adaptee.prepareDownloadUrl( identifier, type, params, locale );
         if ( path == null )
         {
@@ -159,6 +164,16 @@ public class ResourceFacadeAdapter
                 headers = createHttpHeaders();
             }
             headers.setContentType( type );
+        }
+
+        String apiKey = credential.getApiKey();
+        if ( !Strings.isNullOrEmpty( apiKey ) )
+        {
+            if ( headers == null )
+            {
+                headers = createHttpHeaders();
+            }
+            headers.setAuthorization( apiKey );
         }
 
         try

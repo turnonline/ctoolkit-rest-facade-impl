@@ -30,6 +30,7 @@ import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
@@ -48,6 +49,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -452,11 +454,17 @@ public class ResourceFacadeAdapterTest
         final Locale locale = Locale.GERMANY;
         final URL url = new URL( "https://www.ctoolkit.org/download" );
         final HttpHeaders headers = new HttpHeaders();
+        final Map<String, Object> params = new HashMap<>();
+
+        //noinspection MismatchedQueryAndUpdateOfCollection
+        RequestCredential credential = new RequestCredential();
+        credential.setApiKey( "SecretABC" );
+        credential.populate( params );
 
         new Expectations( tested )
         {
             {
-                adaptee.prepareDownloadUrl( id, type, null, locale );
+                adaptee.prepareDownloadUrl( id, type, params, locale );
                 result = url;
 
                 tested.createHttpHeaders();
@@ -465,13 +473,16 @@ public class ResourceFacadeAdapterTest
         };
 
         final ByteArrayOutputStream content = new ByteArrayOutputStream();
-        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, type, null, locale );
+        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, type, params, locale );
 
         String languageTag = ( String ) headers.get( com.google.common.net.HttpHeaders.ACCEPT_LANGUAGE );
         assertEquals( languageTag, "de-DE", "Accept Language" );
 
         String contentType = headers.getContentType();
         assertEquals( contentType, type, "Content Type" );
+
+        String authorization = headers.getAuthorization();
+        assertEquals( authorization, "SecretABC", "Authorization" );
 
         new Verifications()
         {
