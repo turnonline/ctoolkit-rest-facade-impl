@@ -23,8 +23,13 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.PemReader;
+import com.google.api.client.util.SecurityUtils;
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import org.ctoolkit.restapi.client.ApiCredential;
@@ -35,8 +40,15 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Collection;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -52,6 +64,7 @@ import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_CLIENT_ID;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_CREDENTIAL_ON;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_ENDPOINT_URL;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_FILE_NAME;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_FILE_NAME_JSON_STREAM;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_NUMBER_OF_RETRIES;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_PROJECT_ID;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_READ_TIMEOUT;
@@ -177,6 +190,20 @@ public abstract class GoogleApiProxyFactory
     public final String getFileName( @Nullable String prefix )
     {
         return getStringValue( prefix, PROPERTY_FILE_NAME );
+    }
+
+    /**
+     * Returns value set by {@link ApiCredential#setFileNameJsonStream(String)}
+     * or defined by property file.
+     * If specific credential wouldn't not be found, default will be returned.
+     *
+     * @param prefix the prefix used to identify specific credential or null for default
+     * @return the file name path
+     * @throws MissingResourceException if default credential was requested and haven't been found
+     */
+    public final String getFileNameJsonStream( @Nullable String prefix )
+    {
+        return getStringValue( prefix, PROPERTY_FILE_NAME_JSON_STREAM );
     }
 
     /**
@@ -340,29 +367,64 @@ public abstract class GoogleApiProxyFactory
     public HttpRequestInitializer authorize( Collection<String> scopes, String userAccount, String prefix )
             throws GeneralSecurityException, IOException
     {
-        String serviceAccountEmail = getServiceAccountEmail( prefix );
-        if ( serviceAccountEmail == null )
+        if ( isJsonConfiguration( prefix ) )
         {
-            throw new NullPointerException( "Missing service account email." );
+            // json file load right before usage
+            InputStream json = getServiceAccountJsonStream( prefix );
+
+            return new ConfiguredByJsonGoogleCredential( json )
+                    .setTransport( getHttpTransport() )
+                    .setJsonFactory( getJsonFactory() )
+                    .setServiceAccountScopes( scopes )
+                    .setServiceAccountUser( userAccount )
+                    .setRequestInitializer( newRequestConfig( prefix ) )
+                    .build();
         }
+        else
+        {
+            String serviceAccountEmail = getServiceAccountEmail( prefix );
+            if ( serviceAccountEmail == null )
+            {
+                throw new NullPointerException( "Missing service account email." );
+            }
 
-        // p12 file load right before usage
-        URL resource = getServiceAccountPrivateKeyP12Resource( prefix );
+            // p12 file load right before usage
+            URL resource = getServiceAccountPrivateKeyP12Resource( prefix );
 
-        return new ConfiguredGoogleCredential( prefix ).setTransport( getHttpTransport() )
-                .setJsonFactory( getJsonFactory() )
-                .setServiceAccountId( serviceAccountEmail )
-                .setServiceAccountScopes( scopes )
-                .setServiceAccountPrivateKeyFromP12File( new File( resource.getPath() ) )
-                .setServiceAccountUser( userAccount )
-                .setRequestInitializer( newRequestConfig( prefix ) )
-                .build();
+            return new ConfiguredGoogleCredential()
+                    .setTransport( getHttpTransport() )
+                    .setJsonFactory( getJsonFactory() )
+                    .setServiceAccountId( serviceAccountEmail )
+                    .setServiceAccountScopes( scopes )
+                    .setServiceAccountPrivateKeyFromP12File( new File( resource.getPath() ) )
+                    .setServiceAccountUser( userAccount )
+                    .setRequestInitializer( newRequestConfig( prefix ) )
+                    .build();
+        }
+    }
+
+    public boolean isJsonConfiguration( String prefix )
+    {
+        try
+        {
+            return getFileNameJsonStream( prefix ) != null;
+        }
+        catch ( MissingResourceException e )
+        {
+            return false;
+        }
     }
 
     public URL getServiceAccountPrivateKeyP12Resource( String prefix )
     {
         String fileName = getFileName( prefix );
         return GoogleApiProxyFactory.class.getResource( fileName );
+    }
+
+    public InputStream getServiceAccountJsonStream( String prefix )
+    {
+        String fileName = getFileNameJsonStream( prefix );
+        return GoogleApiProxyFactory.class.getResourceAsStream( fileName );
     }
 
     public InputStream getServiceAccountPrivateKeyP12Stream( String prefix )
@@ -402,13 +464,6 @@ public abstract class GoogleApiProxyFactory
     private class ConfiguredGoogleCredential
             extends GoogleCredential.Builder
     {
-        private final String prefix;
-
-        ConfiguredGoogleCredential( String prefix )
-        {
-            this.prefix = prefix;
-        }
-
         @Override
         public GoogleCredential build()
         {
@@ -421,6 +476,57 @@ public abstract class GoogleApiProxyFactory
                     eventBus.post( new BeforeRequestEvent( request ) );
                 }
             };
+        }
+    }
+
+    private class ConfiguredByJsonGoogleCredential
+            extends ConfiguredGoogleCredential
+    {
+        public ConfiguredByJsonGoogleCredential( InputStream jsonStream ) throws IOException
+        {
+            JsonObjectParser parser = new JsonObjectParser( GoogleApiProxyFactory.this.getJsonFactory() );
+            GenericJson fileContents = parser.parseAndClose( jsonStream, Charsets.UTF_8, GenericJson.class );
+
+            String clientId = ( String ) fileContents.get( "client_id" );
+            String clientEmail = ( String ) fileContents.get( "client_email" );
+            String privateKeyPem = ( String ) fileContents.get( "private_key" );
+            String privateKeyId = ( String ) fileContents.get( "private_key_id" );
+
+            if ( clientId == null || clientEmail == null || privateKeyPem == null || privateKeyId == null )
+            {
+                throw new IOException( "Error reading service account credential from stream, "
+                        + "expecting  'client_id', 'client_email', 'private_key' and 'private_key_id'." );
+            }
+
+            PrivateKey privateKey = privateKeyFromPkcs8( privateKeyPem );
+
+            // setup credential from json
+            setServiceAccountId( clientEmail );
+            setServiceAccountPrivateKey( privateKey );
+            setServiceAccountPrivateKeyId( privateKeyId );
+        }
+    }
+
+    private PrivateKey privateKeyFromPkcs8( String privateKeyPem ) throws IOException
+    {
+        Reader reader = new StringReader( privateKeyPem );
+        PemReader.Section section = PemReader.readFirstSectionAndClose( reader, "PRIVATE KEY" );
+        if ( section == null )
+        {
+            throw new IOException( "Invalid PKCS8 data." );
+        }
+
+        byte[] bytes = section.getBase64DecodedBytes();
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec( bytes );
+
+        try
+        {
+            KeyFactory keyFactory = SecurityUtils.getRsaKeyFactory();
+            return keyFactory.generatePrivate( keySpec );
+        }
+        catch ( NoSuchAlgorithmException | InvalidKeySpecException e )
+        {
+            throw new IOException( "Unexpected exception reading PKCS data", e );
         }
     }
 }
