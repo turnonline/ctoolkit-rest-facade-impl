@@ -127,7 +127,7 @@ public class GenericJsonImportInfoJobAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object o, @Nullable Locale locale ) throws IOException
+    public void executeDelete( @Nonnull Object o, @Nullable Map<String, Object> parameters, @Nullable Locale locale ) throws IOException
     {
         execute( o );
     }

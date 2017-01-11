@@ -1,7 +1,7 @@
 package org.ctoolkit.restapi.client.migration;
 
 import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpStatusCodes;
+import com.google.api.client.http.HttpTransport;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
@@ -15,13 +15,12 @@ import org.ctoolkit.api.migration.model.ExportJobInfo;
 import org.ctoolkit.api.migration.model.ImportBatch;
 import org.ctoolkit.api.migration.model.ImportItem;
 import org.ctoolkit.api.migration.model.ImportJobInfo;
-import org.ctoolkit.restapi.client.RemoteServerErrorException;
-import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
+import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonChangeBatchAdaptee;
 import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonChangeItemAdaptee;
 import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonChangeJobInfoAdaptee;
@@ -47,6 +46,8 @@ import java.util.Set;
 public class CtoolkitApiMigrationAgentModule
         extends AbstractModule
 {
+    public static final String API_PREFIX = "migrationAgent";
+
     private static final Logger logger = LoggerFactory.getLogger( CtoolkitApiMigrationAgentModule.class );
 
     @Override
@@ -205,34 +206,32 @@ public class CtoolkitApiMigrationAgentModule
     }
 
     @Provides
-    CtoolkitAgent provideCtoolkitAgent( CtoolkitApiMigrationAgentGoogleApiCredentialFactory factory )
+    @Singleton
+    CtoolkitAgent provideCtoolkitmigration(GoogleApiProxyFactory factory )
     {
+        HttpTransport httpTransport;
+        HttpRequestInitializer credential;
         Set<String> scopes = CtoolkitAgentScopes.all();
-        CtoolkitAgent.Builder builder;
+
+        String applicationName = factory.getApplicationName(API_PREFIX);
 
         try
         {
-            HttpRequestInitializer credential = factory.authorize( scopes, null );
-            builder = new CtoolkitAgent.Builder( factory.getHttpTransport(), factory.getJsonFactory(), credential );
-            builder.setApplicationName( factory.getApplicationName() );
-            builder.setRootUrl( factory.getEndpointUrl() );
+            httpTransport = factory.getHttpTransport();
+            credential = factory.authorize( scopes, null, API_PREFIX );
         }
-        catch ( GeneralSecurityException e )
+        catch ( GeneralSecurityException | IOException e )
         {
-            logger.error( "Failed. Scopes: " + scopes.toString()
-                    + " Application name: " + factory.getApplicationName()
-                    + " Service account: " + factory.getServiceAccountEmail(), e );
-            throw new UnauthorizedException( e.getMessage() );
-        }
-        catch ( IOException e )
-        {
-            logger.error( "Failed. Scopes: " + scopes.toString()
-                    + " Application name: " + factory.getApplicationName()
-                    + " Service account: " + factory.getServiceAccountEmail(), e );
+            logger.error( "Scopes: " + scopes.toString()
+                    + " Application name: " + applicationName
+                    + " Service account: " + factory.getServiceAccountEmail(API_PREFIX), e );
 
-            throw new RemoteServerErrorException( HttpStatusCodes.STATUS_CODE_SERVER_ERROR, e.getMessage() );
+            throw new IllegalArgumentException( "Error occurred during providing ctoolkit migration REST API" );
         }
 
-        return builder.build();
+        return new CtoolkitAgent.Builder( httpTransport, factory.getJsonFactory(), credential )
+                .setApplicationName( applicationName )
+                .setRootUrl( factory.getEndpointUrl(API_PREFIX) )
+                .build();
     }
 }

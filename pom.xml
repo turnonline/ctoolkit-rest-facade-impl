@@ -101,6 +101,11 @@
                 <version>${ctoolkit-rest-facade-api.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.ctoolkit.restapi</groupId>
+                <artifactId>ctoolkit-rest-facade-adapter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.apis</groupId>
                 <artifactId>google-api-services-analytics</artifactId>
                 <version>${google-api-services-analytics.version}</version>
