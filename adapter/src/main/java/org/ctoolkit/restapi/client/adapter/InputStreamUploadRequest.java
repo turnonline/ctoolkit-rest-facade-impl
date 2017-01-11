@@ -21,7 +21,7 @@ package org.ctoolkit.restapi.client.adapter;
 import com.google.api.client.http.AbstractInputStreamContent;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.SingleRequest;
-import org.ctoolkit.restapi.client.UploadMediaRequest;
+import org.ctoolkit.restapi.client.SingleUploadMediaRequest;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 
 import javax.annotation.Nonnull;
@@ -34,8 +34,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class InputStreamUploadMediaRequest<T>
-        implements UploadMediaRequest<T>
+public class InputStreamUploadRequest<T>
+        implements SingleUploadMediaRequest<T>
 {
     private final ResourceFacadeAdapter adapter;
 
@@ -46,13 +46,13 @@ public class InputStreamUploadMediaRequest<T>
     /**
      * Creates an instance based on the given input.
      *
-     * @param adapter  the adapter to callback execute method
+     * @param adapter  the adapter to interact with
      * @param resource the resource instance to be associated with provided media content
      * @param provider the provider to provide concrete instance of media content
      */
-    InputStreamUploadMediaRequest( @Nonnull ResourceFacadeAdapter adapter,
-                                   @Nonnull T resource,
-                                   @Nonnull MediaProvider<AbstractInputStreamContent> provider )
+    InputStreamUploadRequest( @Nonnull ResourceFacadeAdapter adapter,
+                              @Nonnull T resource,
+                              @Nonnull MediaProvider<AbstractInputStreamContent> provider )
     {
         this.adapter = checkNotNull( adapter );
         this.resource = checkNotNull( resource );

@@ -27,7 +27,7 @@ import com.google.maps.DistanceMatrixApiRequest;
 import com.google.maps.GaeRequestHandler;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApiRequest;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiCredentialFactory;
+import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +51,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class GoogleApiMapsModule
         extends AbstractModule
 {
+    public static final String API_PREFIX = "maps";
+
     private static final Logger logger = LoggerFactory.getLogger( GoogleApiMapsModule.class );
 
     private GeoApiContext context;
@@ -60,9 +62,9 @@ public class GoogleApiMapsModule
     {
     }
 
-    private GeoApiContext provideGeoApiContext( GoogleApiCredentialFactory factory )
+    private GeoApiContext provideGeoApiContext( GoogleApiProxyFactory factory )
     {
-        String apiKey = checkNotNull( factory.getApiKey() );
+        String apiKey = checkNotNull( factory.getApiKey( API_PREFIX ) );
 
         GeoApiContext context = new GeoApiContext( new GaeRequestHandler() );
         context.setApiKey( apiKey );
@@ -73,7 +75,7 @@ public class GoogleApiMapsModule
     }
 
     @Provides
-    DirectionsApiRequest provideDirectionsApiRequest( GoogleApiCredentialFactory factory )
+    DirectionsApiRequest provideDirectionsApiRequest( GoogleApiProxyFactory factory )
     {
         if ( context == null )
         {
@@ -83,7 +85,7 @@ public class GoogleApiMapsModule
     }
 
     @Provides
-    DistanceMatrixApiRequest provideDistanceMatrixApiRequest( GoogleApiCredentialFactory factory )
+    DistanceMatrixApiRequest provideDistanceMatrixApiRequest( GoogleApiProxyFactory factory )
     {
         if ( context == null )
         {
@@ -93,7 +95,7 @@ public class GoogleApiMapsModule
     }
 
     @Provides
-    GeocodingApiRequest provideGeocodingApiRequest( GoogleApiCredentialFactory factory )
+    GeocodingApiRequest provideGeocodingApiRequest( GoogleApiProxyFactory factory )
     {
         if ( context == null )
         {

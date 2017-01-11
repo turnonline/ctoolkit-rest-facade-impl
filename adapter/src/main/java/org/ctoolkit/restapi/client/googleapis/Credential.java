@@ -22,18 +22,19 @@ import javax.inject.Qualifier;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 
 /**
- * The annotation to set the name of your application for Google API calls.
+ * The annotation used differentiate configurations as credential.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Qualifier
-@Target( {METHOD, PARAMETER, FIELD} )
+@Target( {CONSTRUCTOR, METHOD, PARAMETER, FIELD} )
 @Retention( java.lang.annotation.RetentionPolicy.RUNTIME )
-public @interface ApplicationName
+public @interface Credential
 {
 }

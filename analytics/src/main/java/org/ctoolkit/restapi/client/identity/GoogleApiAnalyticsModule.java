@@ -26,7 +26,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiCredentialFactory;
+import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +43,8 @@ import java.util.Set;
 public class GoogleApiAnalyticsModule
         extends AbstractModule
 {
+    public static final String API_PREFIX = "analytics";
+
     private static final Logger logger = LoggerFactory.getLogger( GoogleApiAnalyticsModule.class );
 
     @Override
@@ -52,29 +54,29 @@ public class GoogleApiAnalyticsModule
 
     @Provides
     @Singleton
-    Analytics provideAnalytics( GoogleApiCredentialFactory factory )
+    Analytics provideAnalytics( GoogleApiProxyFactory factory )
     {
         Set<String> scopes = AnalyticsScopes.all();
         Analytics.Builder builder;
 
         try
         {
-            HttpRequestInitializer credential = factory.authorize( scopes, null );
+            HttpRequestInitializer credential = factory.authorize( scopes, null, API_PREFIX );
             builder = new Analytics.Builder( factory.getHttpTransport(), factory.getJsonFactory(), credential );
-            builder.setApplicationName( factory.getApplicationName() );
+            builder.setApplicationName( factory.getApplicationName( API_PREFIX ) );
         }
         catch ( GeneralSecurityException e )
         {
             logger.error( "Failed. Scopes: " + scopes.toString()
-                    + " Application name: " + factory.getApplicationName()
-                    + " Service account: " + factory.getServiceAccountEmail(), e );
+                    + " Application name: " + factory.getApplicationName( API_PREFIX )
+                    + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
             throw new UnauthorizedException( e.getMessage() );
         }
         catch ( IOException e )
         {
             logger.error( "Failed. Scopes: " + scopes.toString()
-                    + " Application name: " + factory.getApplicationName()
-                    + " Service account: " + factory.getServiceAccountEmail(), e );
+                    + " Application name: " + factory.getApplicationName( API_PREFIX )
+                    + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
 
             throw new RemoteServerErrorException( HttpStatusCodes.STATUS_CODE_SERVER_ERROR, e.getMessage() );
         }

@@ -19,7 +19,7 @@
 package org.ctoolkit.restapi.client.appengine.adapter;
 
 import org.ctoolkit.restapi.client.Identifier;
-import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
 
@@ -27,6 +27,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
 
@@ -35,7 +37,7 @@ import java.util.Map;
  */
 public class FooGetAdaptee
         extends AbstractGoogleClientAdaptee<FakeClient, RemoteFoo>
-        implements GetExecutorAdaptee<RemoteFoo>
+        implements DownloadExecutorAdaptee<RemoteFoo>
 {
     @Inject
     public FooGetAdaptee( FakeClient client )
@@ -57,5 +59,25 @@ public class FooGetAdaptee
             throws IOException
     {
         return new RemoteFoo();
+    }
+
+    @Override
+    public URL prepareDownloadUrl( @Nonnull Identifier identifier, @Nullable String s, @Nullable Map<String, Object> map, @Nullable Locale locale )
+    {
+        try
+        {
+            String spec = "https://github.com/turnonline/ctoolkit-rest-facade-impl/blob/master/pom.xml";
+            return new URL( spec );
+        }
+        catch ( MalformedURLException ignored )
+        {
+        }
+        return null;
+    }
+
+    @Override
+    public String getApiPrefix()
+    {
+        return null;
     }
 }

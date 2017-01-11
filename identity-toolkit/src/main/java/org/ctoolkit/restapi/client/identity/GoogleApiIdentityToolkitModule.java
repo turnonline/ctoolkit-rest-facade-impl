@@ -30,7 +30,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiCredentialFactory;
+import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.identity.verifier.VerifierModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +51,8 @@ import java.util.HashSet;
 public class GoogleApiIdentityToolkitModule
         extends AbstractModule
 {
+    public static final String API_PREFIX = "identitytoolkit";
+
     private static final Logger logger = LoggerFactory.getLogger( GoogleApiIdentityToolkitModule.class );
 
     private static final String IDENTITY_SCOPE = "https://www.googleapis.com/auth/identitytoolkit";
@@ -63,7 +65,7 @@ public class GoogleApiIdentityToolkitModule
 
     @Provides
     @Singleton
-    IdentityToolkit provideIdentityToolkit( GoogleApiCredentialFactory factory )
+    IdentityToolkit provideIdentityToolkit( GoogleApiProxyFactory factory )
     {
         HashSet<String> set = new HashSet<>();
         set.add( IDENTITY_SCOPE );
@@ -74,23 +76,23 @@ public class GoogleApiIdentityToolkitModule
 
         try
         {
-            HttpRequestInitializer credential = factory.authorize( scopes, null );
+            HttpRequestInitializer credential = factory.authorize( scopes, null, API_PREFIX );
             builder = new IdentityToolkit.Builder( factory.getHttpTransport(), factory.getJsonFactory(), credential );
-            builder.setApplicationName( factory.getApplicationName() );
+            builder.setApplicationName( factory.getApplicationName( API_PREFIX ) );
         }
         catch ( GeneralSecurityException e )
         {
             logger.error( "Failed. Scopes: " + scopes.toString()
-                    + " Application name: " + factory.getApplicationName()
-                    + " Service account: " + factory.getServiceAccountEmail(), e );
+                    + " Application name: " + factory.getApplicationName( API_PREFIX )
+                    + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
 
             throw new UnauthorizedException( e.getMessage() );
         }
         catch ( IOException e )
         {
             logger.error( "Failed. Scopes: " + scopes.toString()
-                    + " Application name: " + factory.getApplicationName()
-                    + " Service account: " + factory.getServiceAccountEmail(), e );
+                    + " Application name: " + factory.getApplicationName( API_PREFIX )
+                    + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
 
             throw new RemoteServerErrorException( HttpStatusCodes.STATUS_CODE_SERVER_ERROR, e.getMessage() );
         }
@@ -100,12 +102,12 @@ public class GoogleApiIdentityToolkitModule
 
     @Provides
     @Singleton
-    JsonTokenHelper provideJsonTokenHelper( GoogleApiCredentialFactory factory, RpcHelper rpcHelper )
+    JsonTokenHelper provideJsonTokenHelper( GoogleApiProxyFactory factory, RpcHelper rpcHelper )
     {
-        String projectId = factory.getProjectId();
+        String projectId = factory.getProjectId( API_PREFIX );
         if ( Strings.isNullOrEmpty( projectId ) )
         {
-            throw new IllegalArgumentException( "ProjectId (audience) must be provided, cannot be empty!" );
+            throw new IllegalArgumentException( "Project ID (audience) must be provided, cannot be empty!" );
         }
 
         return new JsonTokenHelper( rpcHelper, projectId );
@@ -113,11 +115,11 @@ public class GoogleApiIdentityToolkitModule
 
     @Provides
     @Singleton
-    RpcHelper provideRpcHelper( GoogleApiCredentialFactory factory, Injector injector )
+    RpcHelper provideRpcHelper( GoogleApiProxyFactory factory, Injector injector )
     {
         HttpSender sender = injector.getInstance( HttpSender.class );
-        InputStream stream = factory.getServiceAccountPrivateKeyP12Stream();
-        String serviceAccount = factory.getServiceAccountEmail();
+        InputStream stream = factory.getServiceAccountPrivateKeyP12Stream( API_PREFIX );
+        String serviceAccount = factory.getServiceAccountEmail( API_PREFIX );
 
         return new RpcHelper( sender, IdentityToolkit.DEFAULT_BASE_URL, serviceAccount, stream );
     }

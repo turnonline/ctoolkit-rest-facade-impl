@@ -18,6 +18,8 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.Request;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
 
@@ -44,6 +46,8 @@ public class PatchRequest<T>
     private final PatchExecutorAdaptee adaptee;
 
     private final Object remoteRequest;
+
+    private RequestCredential credential;
 
     PatchRequest( @Nonnull Class<T> responseType,
                   @Nonnull Object identifier,
@@ -86,6 +90,17 @@ public class PatchRequest<T>
     @Override
     public T execute( Map<String, Object> parameters, Locale locale )
     {
+        if ( credential != null )
+        {
+            parameters = credential.populate( parameters );
+        }
         return adapter.callbackExecutePatch( adaptee, remoteRequest, responseType, identifier, parameters, locale );
+    }
+
+    @Override
+    public Request<T> config( RequestCredential credential )
+    {
+        this.credential = credential;
+        return this;
     }
 }

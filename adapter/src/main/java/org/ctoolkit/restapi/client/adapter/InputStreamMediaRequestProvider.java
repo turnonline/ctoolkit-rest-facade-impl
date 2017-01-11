@@ -18,9 +18,8 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
-import com.google.api.client.http.AbstractInputStreamContent;
-import org.ctoolkit.restapi.client.MediaRequest;
-import org.ctoolkit.restapi.client.UploadMediaRequest;
+import org.ctoolkit.restapi.client.SingleUploadMediaRequest;
+import org.ctoolkit.restapi.client.UploadMediaRequestProvider;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -29,12 +28,12 @@ import java.io.InputStream;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The concrete implementation that works with {@link AbstractInputStreamContent}.
+ * The concrete upload media request provider implementation that works with {@link InputStream}.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class InputStreamMediaRequest<T>
-        implements MediaRequest<T>
+public class InputStreamMediaRequestProvider<T>
+        implements UploadMediaRequestProvider<T>
 {
     private final ResourceFacadeAdapter adapter;
 
@@ -46,38 +45,38 @@ public class InputStreamMediaRequest<T>
      * @param adapter  the adapter to callback execute method
      * @param resource the resource instance to associate with media content
      */
-    InputStreamMediaRequest( @Nonnull ResourceFacadeAdapter adapter, @Nonnull T resource )
+    InputStreamMediaRequestProvider( @Nonnull ResourceFacadeAdapter adapter, @Nonnull T resource )
     {
         this.adapter = checkNotNull( adapter );
         this.resource = checkNotNull( resource );
     }
 
     @Override
-    public UploadMediaRequest<T> upload( File file, String type )
+    public SingleUploadMediaRequest<T> upload( File file, String type )
     {
         return upload( new InputStreamMediaProvider( file, type ) );
     }
 
     @Override
-    public UploadMediaRequest<T> upload( InputStream inputStream, String type )
+    public SingleUploadMediaRequest<T> upload( InputStream inputStream, String type )
     {
         return upload( new InputStreamMediaProvider( inputStream, type ) );
     }
 
     @Override
-    public UploadMediaRequest<T> upload( byte[] media, String type )
+    public SingleUploadMediaRequest<T> upload( byte[] media, String type )
     {
         return upload( new InputStreamMediaProvider( media, type ) );
     }
 
     @Override
-    public UploadMediaRequest<T> upload( byte[] array, int offset, int length, String type )
+    public SingleUploadMediaRequest<T> upload( byte[] array, int offset, int length, String type )
     {
         return upload( new InputStreamMediaProvider( array, offset, length, type ) );
     }
 
-    private UploadMediaRequest<T> upload( InputStreamMediaProvider provider )
+    private SingleUploadMediaRequest<T> upload( InputStreamMediaProvider provider )
     {
-        return new InputStreamUploadMediaRequest<>( adapter, resource, provider );
+        return new InputStreamUploadRequest<>( adapter, resource, provider );
     }
 }

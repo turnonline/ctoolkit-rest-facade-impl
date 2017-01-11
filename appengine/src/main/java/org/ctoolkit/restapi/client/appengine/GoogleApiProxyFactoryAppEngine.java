@@ -23,40 +23,42 @@ import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.common.eventbus.EventBus;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiCredentialFactory;
+import org.ctoolkit.restapi.client.googleapis.Credential;
+import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * The AppEngine specific factory to build credential instance.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-class GoogleApiCredentialFactoryAppEngine
-        extends GoogleApiCredentialFactory
+class GoogleApiProxyFactoryAppEngine
+        extends GoogleApiProxyFactory
 {
     /**
      * Create factory instance.
      */
     @Inject
-    protected GoogleApiCredentialFactoryAppEngine( Builder builder, EventBus eventBus )
+    protected GoogleApiProxyFactoryAppEngine( @Credential Map<String, String> properties, EventBus eventBus )
     {
-        super( builder, eventBus );
+        super( properties, eventBus );
     }
 
     @Override
-    public HttpRequestInitializer authorize( Collection<String> scopes, String userAccount )
+    public HttpRequestInitializer authorize( Collection<String> scopes, String userAccount, final String prefix )
             throws GeneralSecurityException, IOException
     {
         HttpRequestInitializer credential;
 
-        if ( super.isDevelopmentEnvironment )
+        if ( super.isCredentialOn( prefix ) )
         {
             // for local development (outside of the AppEngine) call standard authorization
-            credential = super.authorize( scopes, userAccount );
+            credential = super.authorize( scopes, userAccount, prefix );
         }
         else
         {
@@ -73,7 +75,7 @@ class GoogleApiCredentialFactoryAppEngine
                 public void initialize( HttpRequest request ) throws IOException
                 {
                     super.initialize( request );
-                    request.setNumberOfRetries( numberOfRetries );
+                    request.setNumberOfRetries( getNumberOfRetries( prefix ) );
                 }
             };
         }

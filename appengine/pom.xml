@@ -22,13 +22,13 @@
     <parent>
         <groupId>org.ctoolkit.restapi</groupId>
         <artifactId>ctoolkit-rest-facade-impl</artifactId>
-        <version>0.16-SNAPSHOT</version>
+        <version>0.19-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ctoolkit-rest-facade-appengine</artifactId>
-    <version>0.16-SNAPSHOT</version>
+    <version>0.19-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Uniform REST Client Facade API AppEngine Impl</name>
     <description>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>org.ctoolkit.restapi</groupId>
             <artifactId>ctoolkit-rest-facade-adapter</artifactId>
-            <version>0.16-SNAPSHOT</version>
+            <version>0.19-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -53,6 +53,10 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-servlet</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

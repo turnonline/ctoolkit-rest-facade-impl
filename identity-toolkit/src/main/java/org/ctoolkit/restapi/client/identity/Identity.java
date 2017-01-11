@@ -18,6 +18,8 @@
 
 package org.ctoolkit.restapi.client.identity;
 
+import org.ctoolkit.restapi.client.adapter.Constants;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -32,7 +34,7 @@ public class Identity
     /**
      * The identity toolkit default token cookie name.
      */
-    public static final String GTOKEN = "gtoken";
+    public static final String GTOKEN = Constants.IDENTITY_GTOKEN;
 
     private static final long serialVersionUID = 4181935959696889561L;
 

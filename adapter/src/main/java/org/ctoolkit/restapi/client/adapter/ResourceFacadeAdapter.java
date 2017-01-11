@@ -18,24 +18,34 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import com.google.api.client.googleapis.media.MediaHttpDownloader;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpStatusCodes;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 import org.ctoolkit.restapi.client.ClientErrorException;
+import org.ctoolkit.restapi.client.DownloadMediaRequestProvider;
 import org.ctoolkit.restapi.client.HttpFailureException;
 import org.ctoolkit.restapi.client.Identifier;
-import org.ctoolkit.restapi.client.MediaRequest;
 import org.ctoolkit.restapi.client.NotFoundException;
 import org.ctoolkit.restapi.client.Patch;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
+import org.ctoolkit.restapi.client.RequestCredential;
+import org.ctoolkit.restapi.client.RequestTimeoutException;
 import org.ctoolkit.restapi.client.ResourceFacade;
 import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.UnauthorizedException;
+import org.ctoolkit.restapi.client.UploadMediaRequestProvider;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
@@ -44,6 +54,7 @@ import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.PatchAdaptee;
 import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
+import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +62,13 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -79,14 +96,146 @@ public class ResourceFacadeAdapter
 
     private final ResourceProviderInjector injector;
 
+    private final GoogleApiProxyFactory apiFactory;
+
     @Inject
     public ResourceFacadeAdapter( MapperFacade mapper,
                                   MapperFactory factory,
-                                  ResourceProviderInjector injector )
+                                  ResourceProviderInjector injector,
+                                  GoogleApiProxyFactory apiFactory )
     {
         this.mapper = mapper;
         this.factory = factory;
         this.injector = injector;
+        this.apiFactory = apiFactory;
+    }
+
+    /**
+     * Executes download. Call to remote endpoint.
+     *
+     * @param downloader the http downloader to interact with
+     * @param adaptee    the download adaptee configured for given resource
+     * @param resource   the type of resource to download as a media
+     * @param identifier the unique identifier of content to download
+     * @param output     the output stream where desired content will be downloaded to.
+     * @param type       the content type or {@code null} to expect default
+     * @param params     the optional resource params
+     * @param locale     the language the client has configured to prefer in results if applicable
+     * @return Void
+     */
+    Void executeDownload( @Nonnull MediaHttpDownloader downloader,
+                          @Nonnull DownloadExecutorAdaptee adaptee,
+                          @Nonnull Class resource,
+                          @Nonnull Identifier identifier,
+                          @Nonnull OutputStream output,
+                          @Nullable String type,
+                          @Nullable Map<String, Object> params,
+                          @Nullable Locale locale )
+    {
+        checkNotNull( downloader );
+        checkNotNull( adaptee );
+        checkNotNull( resource );
+        checkNotNull( identifier );
+        checkNotNull( output );
+
+        //noinspection MismatchedQueryAndUpdateOfCollection
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( params, false );
+
+        URL path = adaptee.prepareDownloadUrl( identifier, type, params, locale );
+        if ( path == null )
+        {
+            String msg = "URL to download a resource content cannot be null. Identifier: ";
+            throw new IllegalArgumentException( msg + identifier + " Resource: " + resource.getName() );
+        }
+
+        HttpHeaders headers = null;
+        if ( locale != null )
+        {
+            headers = createHttpHeaders();
+            String languageTag = new java.util.Locale( locale.getLanguage(), locale.getCountry() ).toLanguageTag();
+            headers.put( com.google.common.net.HttpHeaders.ACCEPT_LANGUAGE, languageTag );
+        }
+
+        if ( !Strings.isNullOrEmpty( type ) )
+        {
+            if ( headers == null )
+            {
+                headers = createHttpHeaders();
+            }
+            headers.setContentType( type );
+        }
+
+        String apiKey = credential.getApiKey();
+        if ( !Strings.isNullOrEmpty( apiKey ) )
+        {
+            if ( headers == null )
+            {
+                headers = createHttpHeaders();
+            }
+            headers.setAuthorization( apiKey );
+        }
+
+        try
+        {
+            downloader.download( new GenericUrl( path ), headers, output );
+        }
+        catch ( IOException e )
+        {
+            // Update exception handling is being used. We need to return exception if resource is not found.
+            throw prepareUpdateException( e, resource, identifier );
+        }
+        return null;
+    }
+
+    @VisibleForTesting
+    HttpHeaders createHttpHeaders()
+    {
+        return new HttpHeaders();
+    }
+
+    /**
+     * Prepares the configured download request
+     *
+     * @param resource   the type of resource to download as a media
+     * @param identifier the unique identifier of content to download
+     * @param output     the output stream where desired content will be downloaded to.
+     * @param type       the content type or {@code null} to expect default
+     * @return the configured download request
+     */
+    DownloadRequest prepareDownloadRequest( @Nonnull Class resource,
+                                            @Nonnull Identifier identifier,
+                                            @Nonnull OutputStream output,
+                                            @Nullable String type )
+    {
+        checkNotNull( resource );
+        checkNotNull( identifier );
+        checkNotNull( output );
+
+        DownloadExecutorAdaptee adaptee = adaptee( DownloadExecutorAdaptee.class, resource );
+        String apiPrefix = adaptee.getApiPrefix();
+        MediaHttpDownloader downloader;
+
+        try
+        {
+            HttpRequestInitializer requestConfig = apiFactory.newRequestConfig( apiPrefix );
+            downloader = new MediaHttpDownloader( apiFactory.getHttpTransport(), requestConfig );
+        }
+        catch ( GeneralSecurityException e )
+        {
+            logger.error( "Application name: " + apiFactory.getApplicationName( apiPrefix )
+                    + " Endpoint URL: " + apiFactory.getEndpointUrl( apiPrefix ), e );
+            throw new UnauthorizedException( e.getMessage() );
+        }
+        catch ( IOException e )
+        {
+            logger.error( "Application name: " + apiFactory.getApplicationName( apiPrefix )
+                    + " Endpoint URL: " + apiFactory.getEndpointUrl( apiPrefix ), e );
+
+            throw new RemoteServerErrorException( HttpStatusCodes.STATUS_CODE_SERVER_ERROR, e.getMessage() );
+        }
+
+        return new DownloadRequest( this, adaptee, downloader, resource, identifier, output, type );
     }
 
     @Override
@@ -117,10 +266,17 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    public <T> MediaRequest<T> media( @Nonnull T resource )
+    public <T> UploadMediaRequestProvider<T> media( @Nonnull T resource )
     {
         checkNotNull( resource );
-        return new InputStreamMediaRequest<>( this, resource );
+        return new InputStreamMediaRequestProvider<>( this, resource );
+    }
+
+    @Override
+    public <T> DownloadMediaRequestProvider media( @Nonnull Class<T> resource )
+    {
+        checkNotNull( resource );
+        return new OutputStreamMediaRequestProvider( this, resource );
     }
 
     <R> R callbackNewInstance( @Nonnull NewExecutorAdaptee adaptee,
@@ -669,13 +825,14 @@ public class ResourceFacadeAdapter
                                 @Nonnull Object remoteRequest,
                                 @Nonnull Class resource,
                                 @Nonnull Object identifier,
+                                @Nullable Map<String, Object> parameters,
                                 @Nullable Locale locale )
     {
         checkNotNull( identifier );
 
         try
         {
-            adaptee.executeDelete( remoteRequest, locale );
+            adaptee.executeDelete( remoteRequest, parameters, locale );
         }
         catch ( IOException e )
         {
@@ -700,7 +857,7 @@ public class ResourceFacadeAdapter
                                                boolean update )
     {
         int statusCode = -1;
-        String statusMessage = null;
+        String statusMessage;
 
         RuntimeException toBeThrown;
 
@@ -708,6 +865,25 @@ public class ResourceFacadeAdapter
         {
             statusCode = ( ( HttpResponseException ) e ).getStatusCode();
             statusMessage = ( ( HttpResponseException ) e ).getStatusMessage();
+        }
+        else if ( e instanceof SocketTimeoutException )
+        {
+            statusCode = 408;
+            statusMessage = e.getMessage();
+        }
+        else if ( e instanceof UnknownHostException )
+        {
+            statusCode = HttpStatusCodes.STATUS_CODE_SERVICE_UNAVAILABLE;
+            statusMessage = "Unknown host: " + e.getMessage();
+        }
+        else if ( e instanceof SSLHandshakeException )
+        {
+            statusCode = HttpStatusCodes.STATUS_CODE_UNAUTHORIZED;
+            statusMessage = e.getMessage();
+        }
+        else
+        {
+            statusMessage = e.getMessage();
         }
 
         logger.warn( "Resource " + resource.getName() + ", identifier: " + identifier, e );
@@ -731,6 +907,10 @@ public class ResourceFacadeAdapter
         else if ( HttpStatusCodes.STATUS_CODE_NOT_FOUND == statusCode )
         {
             toBeThrown = new NotFoundException( statusMessage );
+        }
+        else if ( 408 == statusCode )
+        {
+            toBeThrown = new RequestTimeoutException( statusMessage );
         }
         else if ( 409 == statusCode )
         {

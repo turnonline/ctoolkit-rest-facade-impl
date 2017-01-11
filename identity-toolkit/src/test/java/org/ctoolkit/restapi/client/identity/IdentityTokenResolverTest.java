@@ -18,9 +18,9 @@
 
 package org.ctoolkit.restapi.client.identity;
 
+import mockit.Expectations;
 import mockit.Injectable;
 import mockit.Mocked;
-import mockit.NonStrictExpectations;
 import mockit.Tested;
 import mockit.Verifications;
 import org.ctoolkit.restapi.client.TokenVerifier;
@@ -61,7 +61,7 @@ public class IdentityTokenResolverTest
     {
         new GetToken( request, cookie );
 
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 tokenVerifier.verifyAndGet( GetToken.TOKEN );
@@ -81,7 +81,7 @@ public class IdentityTokenResolverTest
     {
         new GetToken( request, cookie );
 
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 tokenVerifier.verifyAndGet( anyString );
@@ -99,7 +99,7 @@ public class IdentityTokenResolverTest
     {
         new GetToken( request, cookie );
 
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 tokenVerifier.verifyAndGet( GetToken.TOKEN );
@@ -127,7 +127,7 @@ public class IdentityTokenResolverTest
     {
         new GetToken( request, cookie );
 
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 tokenVerifier.verifyAndGet( GetToken.TOKEN );
@@ -147,7 +147,7 @@ public class IdentityTokenResolverTest
     {
         new GetToken( request, cookie );
 
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 tokenVerifier.verifyAndGet( anyString );
@@ -165,7 +165,7 @@ public class IdentityTokenResolverTest
     {
         new GetToken( request, cookie );
 
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 tokenVerifier.verifyAndGet( GetToken.TOKEN );
@@ -183,11 +183,12 @@ public class IdentityTokenResolverTest
     @Test
     public void verifyAndGetInputTokenNull( @Mocked final Identity identity ) throws Exception
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 tokenVerifier.verifyAndGet( GetToken.TOKEN );
                 result = identity;
+                times = 0;
             }
         };
 
@@ -197,7 +198,7 @@ public class IdentityTokenResolverTest
     @Test
     public void verifyAndGetInputTokenExpired( @Mocked final Identity identity ) throws Exception
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 tokenVerifier.verifyAndGet( GetToken.TOKEN );
@@ -214,7 +215,7 @@ public class IdentityTokenResolverTest
     @Test
     public void verifyAndGetInputTokenNotValid() throws Exception
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 tokenVerifier.verifyAndGet( GetToken.TOKEN );
@@ -228,7 +229,7 @@ public class IdentityTokenResolverTest
     @Test
     public void verifyAndGetInputToken( @Mocked final Identity identity ) throws Exception
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 tokenVerifier.verifyAndGet( GetToken.TOKEN );
@@ -247,7 +248,7 @@ public class IdentityTokenResolverTest
     public void deleteNoCookie( @Mocked final HttpServletRequest request,
                                 @Mocked final HttpServletResponse response ) throws Exception
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 request.getCookies();
@@ -290,7 +291,7 @@ public class IdentityTokenResolverTest
     }
 
     private static class GetToken
-            extends NonStrictExpectations
+            extends Expectations
     {
         final static String TOKEN = "tokenvalue";
 
@@ -298,12 +299,15 @@ public class IdentityTokenResolverTest
         {
             request.getCookies();
             result = new Cookie[]{cookie};
+            minTimes = 0;
 
             cookie.getName();
             result = Identity.GTOKEN;
+            minTimes = 0;
 
             cookie.getValue();
             result = TOKEN;
+            minTimes = 0;
         }
     }
 }

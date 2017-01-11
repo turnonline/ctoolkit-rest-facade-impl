@@ -18,55 +18,78 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import com.google.api.client.googleapis.media.MediaHttpDownloader;
+import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.SingleRequest;
-import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.OutputStream;
 import java.util.Locale;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The DELETE request implementation that delegates callback to related adapter.
+ * The download request that will delegate a call to remote endpoint.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class DeleteRequest
+public class DownloadRequest
         implements SingleRequest<Void>
 {
-    private final Class resource;
-
-    private final Object identifier;
-
     private final ResourceFacadeAdapter adapter;
 
-    private final DeleteExecutorAdaptee adaptee;
+    private final DownloadExecutorAdaptee adaptee;
 
-    private final Object remoteRequest;
+    private final MediaHttpDownloader downloader;
+
+    private final Class resource;
+
+    private final Identifier identifier;
+
+    private final OutputStream output;
+
+    private final String type;
 
     private RequestCredential credential;
 
-    DeleteRequest( @Nonnull Class resource,
-                   @Nonnull Object identifier,
-                   @Nonnull ResourceFacadeAdapter adapter,
-                   @Nonnull DeleteExecutorAdaptee adaptee,
-                   @Nonnull Object remoteRequest )
+    /**
+     * Constructor.
+     *
+     * @param adapter    the resource facade adapter instance
+     * @param adaptee    the download adaptee configured for given resource
+     * @param downloader the http downloader to interact with
+     * @param resource   the type of resource to download as a media
+     * @param identifier the unique identifier of content to download
+     * @param output     the output stream where desired content will be downloaded to.
+     * @param type       the content type or {@code null} to expect default
+     */
+    DownloadRequest( @Nonnull ResourceFacadeAdapter adapter,
+                     @Nonnull DownloadExecutorAdaptee adaptee,
+                     @Nonnull MediaHttpDownloader downloader,
+                     @Nonnull Class resource,
+                     @Nonnull Identifier identifier,
+                     @Nonnull OutputStream output,
+                     @Nullable String type )
     {
-        this.resource = checkNotNull( resource );
-        this.identifier = checkNotNull( identifier );
         this.adapter = checkNotNull( adapter );
         this.adaptee = checkNotNull( adaptee );
-        this.remoteRequest = checkNotNull( remoteRequest );
+        this.downloader = checkNotNull( downloader );
+        this.resource = checkNotNull( resource );
+        this.identifier = checkNotNull( identifier );
+        this.output = checkNotNull( output );
+        this.type = type;
     }
 
     @Override
     @SuppressWarnings( "unchecked" )
     public <Q> Q query( Class<Q> type )
     {
-        return ( Q ) remoteRequest;
+        return ( Q ) downloader;
     }
 
     @Override
@@ -88,13 +111,13 @@ public class DeleteRequest
     }
 
     @Override
-    public Void execute( Map<String, Object> parameters, Locale locale )
+    public Void execute( Map<String, Object> params, Locale locale )
     {
         if ( credential != null )
         {
-            parameters = credential.populate( parameters );
+            params = credential.populate( params );
         }
-        return adapter.callbackExecuteDelete( adaptee, remoteRequest, resource, identifier, parameters, locale );
+        return adapter.executeDownload( downloader, adaptee, resource, identifier, output, type, params, locale );
     }
 
     @Override
