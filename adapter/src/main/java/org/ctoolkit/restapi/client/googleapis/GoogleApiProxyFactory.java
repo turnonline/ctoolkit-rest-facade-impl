@@ -62,6 +62,7 @@ import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_API_KEY;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_APPLICATION_NAME;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_CLIENT_ID;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_CREDENTIAL_ON;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_DISABLE_GZIP_CONTENT;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_ENDPOINT_URL;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_FILE_NAME;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_FILE_NAME_JSON_STREAM;
@@ -148,6 +149,38 @@ public abstract class GoogleApiProxyFactory
     public String getClientId( @Nullable String prefix )
     {
         return getStringValue( prefix, PROPERTY_CLIENT_ID );
+    }
+
+    /**
+     * Returns value set by {@link ApiCredential#setDisableGZipContent(boolean)} (boolean)}
+     * or defined by property file.
+     * If specific credential wouldn't not be found, default will be returned.
+     *
+     * @param prefix the prefix used to identify specific credential or null for default
+     * @return true to disable GZip compression. Otherwise HTTP content will be compressed.
+     */
+    public final boolean isDisableGZipContent( @Nullable String prefix )
+    {
+        if ( Strings.isNullOrEmpty( prefix ) )
+        {
+            prefix = DEFAULT_CREDENTIAL_PREFIX;
+        }
+
+        String fullProperty = CREDENTIAL_ATTR + prefix + "." + PROPERTY_DISABLE_GZIP_CONTENT;
+        String value = credential.get( fullProperty );
+
+        if ( value == null )
+        {
+            fullProperty = CREDENTIAL_ATTR + DEFAULT_CREDENTIAL_PREFIX + "." + PROPERTY_DISABLE_GZIP_CONTENT;
+            value = credential.get( fullProperty );
+        }
+
+        if ( value == null )
+        {
+            return false;
+        }
+
+        return Boolean.valueOf( value );
     }
 
     /**
@@ -438,6 +471,29 @@ public abstract class GoogleApiProxyFactory
         return new RequestConfig( prefix );
     }
 
+    private PrivateKey privateKeyFromPkcs8( String privateKeyPem ) throws IOException
+    {
+        Reader reader = new StringReader( privateKeyPem );
+        PemReader.Section section = PemReader.readFirstSectionAndClose( reader, "PRIVATE KEY" );
+        if ( section == null )
+        {
+            throw new IOException( "Invalid PKCS8 data." );
+        }
+
+        byte[] bytes = section.getBase64DecodedBytes();
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec( bytes );
+
+        try
+        {
+            KeyFactory keyFactory = SecurityUtils.getRsaKeyFactory();
+            return keyFactory.generatePrivate( keySpec );
+        }
+        catch ( NoSuchAlgorithmException | InvalidKeySpecException e )
+        {
+            throw new IOException( "Unexpected exception reading PKCS data", e );
+        }
+    }
+
     private class RequestConfig
             implements HttpRequestInitializer
     {
@@ -504,29 +560,6 @@ public abstract class GoogleApiProxyFactory
             setServiceAccountId( clientEmail );
             setServiceAccountPrivateKey( privateKey );
             setServiceAccountPrivateKeyId( privateKeyId );
-        }
-    }
-
-    private PrivateKey privateKeyFromPkcs8( String privateKeyPem ) throws IOException
-    {
-        Reader reader = new StringReader( privateKeyPem );
-        PemReader.Section section = PemReader.readFirstSectionAndClose( reader, "PRIVATE KEY" );
-        if ( section == null )
-        {
-            throw new IOException( "Invalid PKCS8 data." );
-        }
-
-        byte[] bytes = section.getBase64DecodedBytes();
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec( bytes );
-
-        try
-        {
-            KeyFactory keyFactory = SecurityUtils.getRsaKeyFactory();
-            return keyFactory.generatePrivate( keySpec );
-        }
-        catch ( NoSuchAlgorithmException | InvalidKeySpecException e )
-        {
-            throw new IOException( "Unexpected exception reading PKCS data", e );
         }
     }
 }
