@@ -22,5 +22,8 @@ public class ResourcesMapper
         factory.classMap( ImportJobInfo.class, org.ctoolkit.api.migration.model.ImportJobInfo.class ).byDefault().register();
         factory.classMap( ExportJobInfo.class, org.ctoolkit.api.migration.model.ExportJobInfo.class ).byDefault().register();
         factory.classMap( ChangeJobInfo.class, org.ctoolkit.api.migration.model.ChangeJobInfo.class ).byDefault().register();
+
+        factory.classMap( KindMetaData.class, org.ctoolkit.api.migration.model.KindMetaData.class ).byDefault().register();
+        factory.classMap( PropertyMetaData.class, org.ctoolkit.api.migration.model.PropertyMetaData.class ).byDefault().register();
     }
 }

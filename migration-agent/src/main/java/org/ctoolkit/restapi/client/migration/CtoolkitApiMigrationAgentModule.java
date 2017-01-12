@@ -15,6 +15,8 @@ import org.ctoolkit.api.migration.model.ExportJobInfo;
 import org.ctoolkit.api.migration.model.ImportBatch;
 import org.ctoolkit.api.migration.model.ImportItem;
 import org.ctoolkit.api.migration.model.ImportJobInfo;
+import org.ctoolkit.api.migration.model.KindMetaData;
+import org.ctoolkit.api.migration.model.PropertyMetaData;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
@@ -29,6 +31,8 @@ import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonExportJobInfoAda
 import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonImportBatchAdaptee;
 import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonImportInfoJobAdaptee;
 import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonImportItemAdaptee;
+import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonKindMetaDataAdaptee;
+import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonPropertyMetaDataAdaptee;
 import org.ctoolkit.restapi.client.migration.model.ResourcesMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -203,6 +207,16 @@ public class CtoolkitApiMigrationAgentModule
         bind( new TypeLiteral<DeleteExecutorAdaptee<ExportJobInfo>>()
         {
         } ).to( GenericJsonExportJobInfoAdaptee.class ).in( Singleton.class );
+
+        // KindMetaData
+        bind( new TypeLiteral<ListExecutorAdaptee<KindMetaData>>()
+        {
+        } ).to( GenericJsonKindMetaDataAdaptee.class ).in( Singleton.class );
+
+        // PropertyMetaData
+        bind( new TypeLiteral<ListExecutorAdaptee<PropertyMetaData>>()
+        {
+        } ).to( GenericJsonPropertyMetaDataAdaptee.class ).in( Singleton.class );
     }
 
     @Provides

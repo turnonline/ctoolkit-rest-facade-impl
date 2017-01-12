@@ -11,10 +11,24 @@ public class ExportBatch
     public static class ExportItem
             extends BatchItem
     {
+        private String entityToExport;
+
+        public String getEntityToExport()
+        {
+            return entityToExport;
+        }
+
+        public void setEntityToExport( String entityToExport )
+        {
+            this.entityToExport = entityToExport;
+        }
+
         @Override
         public String toString()
         {
-            return "ExportItem{} " + super.toString();
+            return "ExportItem{" +
+                    "entityToExport='" + entityToExport + '\'' +
+                    "} " + super.toString();
         }
     }
 
