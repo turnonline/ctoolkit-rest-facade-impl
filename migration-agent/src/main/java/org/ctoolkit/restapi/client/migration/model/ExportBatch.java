@@ -32,6 +32,19 @@ public class ExportBatch
         }
     }
 
+    public ExportItem getItem( String entityToExport )
+    {
+        for ( ExportItem item : getItems() )
+        {
+            if ( item.getEntityToExport().equals( entityToExport ) )
+            {
+                return item;
+            }
+        }
+
+        return null;
+    }
+
     @Override
     public String toString()
     {

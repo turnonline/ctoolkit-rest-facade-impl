@@ -94,6 +94,23 @@ public class BatchItem
     }
 
     @Override
+    public boolean equals( Object o )
+    {
+        if ( this == o ) return true;
+        if ( !( o instanceof BatchItem ) ) return false;
+
+        BatchItem batchItem = ( BatchItem ) o;
+
+        return key != null ? key.equals( batchItem.key ) : batchItem.key == null;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return key != null ? key.hashCode() : 0;
+    }
+
+    @Override
     public String toString()
     {
         return "Item{" +

@@ -17,8 +17,6 @@ public class Batch<I extends BatchItem, J extends JobInfo>
 
     private String mapReduceJobId;
 
-    private String token;
-
     private Date createDate;
 
     private Date updateDate;
@@ -55,16 +53,6 @@ public class Batch<I extends BatchItem, J extends JobInfo>
     public void setMapReduceJobId( String mapReduceJobId )
     {
         this.mapReduceJobId = mapReduceJobId;
-    }
-
-    public String getToken()
-    {
-        return token;
-    }
-
-    public void setToken( String token )
-    {
-        this.token = token;
     }
 
     public Date getCreateDate()
@@ -110,11 +98,10 @@ public class Batch<I extends BatchItem, J extends JobInfo>
     @Override
     public String toString()
     {
-        return "Change{" +
+        return "Batch{" +
                 "key='" + key + '\'' +
                 ", name=" + name +
                 ", mapReduceJobId='" + mapReduceJobId + '\'' +
-                ", token='" + token + '\'' +
                 ", createDate=" + createDate +
                 ", updateDate=" + updateDate +
                 ", jobInfo=" + jobInfo +
