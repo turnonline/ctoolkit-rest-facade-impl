@@ -17,7 +17,8 @@
   ~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.ctoolkit.maven</groupId>
@@ -170,7 +171,7 @@
     <properties>
         <ctoolkit-library-bom.version>1</ctoolkit-library-bom.version>
         <appengine.version>1.9.48</appengine.version>
-        <ctoolkit-rest-facade-api.version>0.13</ctoolkit-rest-facade-api.version>
+        <ctoolkit-rest-facade-api.version>0.14-20170201.050020-1</ctoolkit-rest-facade-api.version>
         <google-api-services-analytics.version>v3-rev123-1.21.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev11-1.21.0</google-api-services-drive.version>
         <google-api-services-identitytoolkit.version>v3-rev203-1.21.0</google-api-services-identitytoolkit.version>
