@@ -18,7 +18,6 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
-import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.RetrievalRequest;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
@@ -112,14 +111,14 @@ public class ListRequest<T>
     }
 
     @Override
-    public Request<List<T>> config( RequestCredential credential )
+    public ListRequest<T> config( RequestCredential credential )
     {
         this.credential = credential;
         return this;
     }
 
     @Override
-    public void setFirstResult( int start )
+    public ListRequest<T> start( int start )
     {
         if ( start < 0 )
         {
@@ -128,10 +127,11 @@ public class ListRequest<T>
         }
 
         this.start = start;
+        return this;
     }
 
     @Override
-    public void setMaxResults( int length )
+    public ListRequest<T> length( int length )
     {
         if ( length < 0 )
         {
@@ -139,5 +139,6 @@ public class ListRequest<T>
             throw new IllegalArgumentException( msg );
         }
         this.length = length;
+        return this;
     }
 }

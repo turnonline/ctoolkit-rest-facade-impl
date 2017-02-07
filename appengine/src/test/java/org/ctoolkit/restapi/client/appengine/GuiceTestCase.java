@@ -73,8 +73,10 @@ public class GuiceTestCase
         ApiCredential credential = new ApiCredential();
         credential.setProjectId( "appid-103" );
         credential.setClientId( "4top4.apps.googleusercontent.com" );
+        credential.setDisableGZipContent( false );
         credential.setServiceAccountEmail( "service.account@cloud.com" );
         credential.setFileName( "/org/ctoolkit/restapi/private-key.p12" );
+        credential.setFileNameJsonStream( "/org/ctoolkit/restapi/private-key.json" );
         credential.setApiKey( "AIzaSz" );
         credential.setEndpointUrl( "http://localhost:8990/_ah/api/" );
         credential.setCredentialOn( true );

@@ -57,12 +57,20 @@ public class AdapterAppEngineTest
     String clientId;
 
     @Inject
+    @Named( "credential.default.disableGZipContent" )
+    String disableGZipContent;
+
+    @Inject
     @Named( "credential.default.serviceAccountEmail" )
     String serviceAccountEmail;
 
     @Inject
     @Named( "credential.default.fileName" )
     String fileName;
+
+    @Inject
+    @Named( "credential.default.fileNameJsonStream" )
+    String fileNameJsonStream;
 
     @Inject
     @Named( "credential.default.apiKey" )
@@ -169,6 +177,9 @@ public class AdapterAppEngineTest
         String clientId = builder.getClientId( null );
         assertEquals( clientId, this.clientId );
 
+        boolean disableGZipContent = builder.isDisableGZipContent( null );
+        assertEquals( disableGZipContent, Boolean.valueOf( this.disableGZipContent ).booleanValue() );
+
         String serviceEmail = builder.getServiceAccountEmail( null );
         assertEquals( serviceEmail, this.serviceAccountEmail );
 
@@ -178,6 +189,9 @@ public class AdapterAppEngineTest
 
         String fileName = builder.getFileName( null );
         assertEquals( fileName, this.fileName );
+
+        String fileNameJsonStream = builder.getFileNameJsonStream( null );
+        assertEquals( fileNameJsonStream, this.fileNameJsonStream );
 
         String apiKey = builder.getApiKey( null );
         assertEquals( apiKey, this.apiKey );
@@ -206,6 +220,9 @@ public class AdapterAppEngineTest
         String clientId = builder.getClientId( prefix );
         assertEquals( clientId, "clientId.apps.googleusercontent.com" );
 
+        boolean disableGZipContent = builder.isDisableGZipContent( prefix );
+        assertEquals( disableGZipContent, true );
+
         String serviceEmail = builder.getServiceAccountEmail( prefix );
         assertEquals( serviceEmail, "service.account@googleusercontent.com" );
 
@@ -213,7 +230,10 @@ public class AdapterAppEngineTest
         assertEquals( applicationName, "puf-muf" );
 
         String fileName = builder.getFileName( prefix );
-        assertEquals( fileName, "/org/ctoolkit/restapi/key.json" );
+        assertEquals( fileName, "/org/ctoolkit/restapi/key.p12" );
+
+        String fileNameJsonStream = builder.getFileNameJsonStream( prefix );
+        assertEquals( fileNameJsonStream, "/org/ctoolkit/restapi/key.json" );
 
         String apiKey = builder.getApiKey( prefix );
         assertEquals( apiKey, "AIzaSzXYbn" );
@@ -242,6 +262,9 @@ public class AdapterAppEngineTest
         String clientId = builder.getClientId( prefix );
         assertEquals( clientId, this.clientId );
 
+        boolean disableGZipContent = builder.isDisableGZipContent( prefix );
+        assertEquals( disableGZipContent, Boolean.valueOf( this.disableGZipContent ).booleanValue() );
+
         String serviceEmail = builder.getServiceAccountEmail( prefix );
         assertEquals( serviceEmail, this.serviceAccountEmail );
 
@@ -250,6 +273,9 @@ public class AdapterAppEngineTest
 
         String fileName = builder.getFileName( prefix );
         assertEquals( fileName, this.fileName );
+
+        String fileNameJsonStream = builder.getFileNameJsonStream( prefix );
+        assertEquals( fileNameJsonStream, this.fileNameJsonStream );
 
         String apiKey = builder.getApiKey( prefix );
         assertEquals( apiKey, this.apiKey );
