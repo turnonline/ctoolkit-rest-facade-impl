@@ -16,6 +16,7 @@ import org.ctoolkit.api.migration.model.ImportBatch;
 import org.ctoolkit.api.migration.model.ImportItem;
 import org.ctoolkit.api.migration.model.ImportJobInfo;
 import org.ctoolkit.api.migration.model.KindMetaData;
+import org.ctoolkit.api.migration.model.MetadataAudit;
 import org.ctoolkit.api.migration.model.PropertyMetaData;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
@@ -32,6 +33,7 @@ import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonImportBatchAdapt
 import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonImportInfoJobAdaptee;
 import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonImportItemAdaptee;
 import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonKindMetaDataAdaptee;
+import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonMetadataAuditAdaptee;
 import org.ctoolkit.restapi.client.migration.adaptee.GenericJsonPropertyMetaDataAdaptee;
 import org.ctoolkit.restapi.client.migration.model.ResourcesMapper;
 import org.slf4j.Logger;
@@ -217,6 +219,11 @@ public class CtoolkitApiMigrationAgentModule
         bind( new TypeLiteral<ListExecutorAdaptee<PropertyMetaData>>()
         {
         } ).to( GenericJsonPropertyMetaDataAdaptee.class ).in( Singleton.class );
+
+        // MetadataAudit
+        bind( new TypeLiteral<ListExecutorAdaptee<MetadataAudit>>()
+        {
+        } ).to( GenericJsonMetadataAuditAdaptee.class ).in( Singleton.class );
     }
 
     @Provides
