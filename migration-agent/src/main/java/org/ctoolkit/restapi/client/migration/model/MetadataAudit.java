@@ -1,11 +1,13 @@
 package org.ctoolkit.restapi.client.migration.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author <a href="mailto:pohorelec@comvai.com">Jozef Pohorelec</a>
  */
 public class MetadataAudit
+        implements Serializable
 {
     private String key;
 
@@ -22,6 +24,10 @@ public class MetadataAudit
     private Operation operation;
 
     private String ownerId;
+
+    private String userPhotoUrl;
+
+    private String userDisplayName;
 
     public enum Action
     {
@@ -126,6 +132,26 @@ public class MetadataAudit
         this.ownerId = ownerId;
     }
 
+    public String getUserPhotoUrl()
+    {
+        return userPhotoUrl;
+    }
+
+    public void setUserPhotoUrl( String userPhotoUrl )
+    {
+        this.userPhotoUrl = userPhotoUrl;
+    }
+
+    public String getUserDisplayName()
+    {
+        return userDisplayName;
+    }
+
+    public void setUserDisplayName( String userDisplayName )
+    {
+        this.userDisplayName = userDisplayName;
+    }
+
     @Override
     public String toString()
     {
@@ -138,6 +164,8 @@ public class MetadataAudit
                 ", action=" + action +
                 ", operation=" + operation +
                 ", ownerId='" + ownerId + '\'' +
+                ", userPhotoUrl='" + userPhotoUrl + '\'' +
+                ", userDisplayName='" + userDisplayName + '\'' +
                 '}';
     }
 }

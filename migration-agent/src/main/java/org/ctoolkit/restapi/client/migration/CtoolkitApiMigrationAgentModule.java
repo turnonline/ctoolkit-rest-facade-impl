@@ -39,8 +39,13 @@ import org.ctoolkit.restapi.client.migration.model.ResourcesMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.GeneralSecurityException;
 import java.util.Set;
 
@@ -55,6 +60,7 @@ public class CtoolkitApiMigrationAgentModule
     public static final String API_PREFIX = "migrationAgent";
 
     private static final Logger logger = LoggerFactory.getLogger( CtoolkitApiMigrationAgentModule.class );
+    public static final String COOKIE_AGENT = "_agent";
 
     @Override
     protected void configure()
@@ -227,14 +233,13 @@ public class CtoolkitApiMigrationAgentModule
     }
 
     @Provides
-    @Singleton
-    CtoolkitAgent provideCtoolkitmigration(GoogleApiProxyFactory factory )
+    CtoolkitAgent provideCtoolkitmigration( GoogleApiProxyFactory factory, Provider<HttpServletRequest> provider )
     {
         HttpTransport httpTransport;
         HttpRequestInitializer credential;
         Set<String> scopes = CtoolkitAgentScopes.all();
 
-        String applicationName = factory.getApplicationName(API_PREFIX);
+        String applicationName = factory.getApplicationName( API_PREFIX );
 
         try
         {
@@ -245,14 +250,54 @@ public class CtoolkitApiMigrationAgentModule
         {
             logger.error( "Scopes: " + scopes.toString()
                     + " Application name: " + applicationName
-                    + " Service account: " + factory.getServiceAccountEmail(API_PREFIX), e );
+                    + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
 
             throw new IllegalArgumentException( "Error occurred during providing ctoolkit migration REST API" );
         }
 
+        HttpServletRequest request = provider.get();
+
+        // get agent from request attribute
+        String agent = ( String ) request.getAttribute( COOKIE_AGENT );
+
+        // if null fallback to cookie
+        if ( agent == null )
+        {
+            agent = getAgentCookie( request.getCookies() );
+        }
+
+        // if null use configuration value
+        if ( agent == null )
+        {
+            agent = factory.getEndpointUrl( API_PREFIX );
+        }
+
         return new CtoolkitAgent.Builder( httpTransport, factory.getJsonFactory(), credential )
                 .setApplicationName( applicationName )
-                .setRootUrl( factory.getEndpointUrl(API_PREFIX) )
+                .setRootUrl( agent )
                 .build();
+    }
+
+    private String getAgentCookie( Cookie[] cookies )
+    {
+        if ( cookies != null )
+        {
+            for ( Cookie cookie : cookies )
+            {
+                if ( cookie.getName().equals( COOKIE_AGENT ) )
+                {
+                    try
+                    {
+                        return URLDecoder.decode( cookie.getValue(), "UTF-8" ) + "/_ah/api/";
+                    }
+                    catch ( UnsupportedEncodingException e )
+                    {
+                        return null;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }
