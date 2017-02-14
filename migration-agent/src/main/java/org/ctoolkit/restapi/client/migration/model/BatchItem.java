@@ -15,7 +15,11 @@ public class BatchItem
 
     private String data;
 
+    private String fileName;
+
     private DataType dataType = DataType.JSON;
+
+    private long dataLength;
 
     private JobState state;
 
@@ -53,6 +57,16 @@ public class BatchItem
         this.data = data;
     }
 
+    public String getFileName()
+    {
+        return fileName;
+    }
+
+    public void setFileName( String fileName )
+    {
+        this.fileName = fileName;
+    }
+
     public DataType getDataType()
     {
         return dataType;
@@ -61,6 +75,16 @@ public class BatchItem
     public void setDataType( DataType dataType )
     {
         this.dataType = dataType;
+    }
+
+    public long getDataLength()
+    {
+        return dataLength;
+    }
+
+    public void setDataLength( long dataLength )
+    {
+        this.dataLength = dataLength;
     }
 
     public JobState getState()
@@ -113,10 +137,12 @@ public class BatchItem
     @Override
     public String toString()
     {
-        return "Item{" +
+        return "BatchItem{" +
                 "key='" + key + '\'' +
-                ", name=" + name +
+                ", name='" + name + '\'' +
+                ", fileName='" + fileName + '\'' +
                 ", dataType=" + dataType +
+                ", dataLength=" + dataLength +
                 ", state=" + state +
                 ", createDate=" + createDate +
                 ", updateDate=" + updateDate +
