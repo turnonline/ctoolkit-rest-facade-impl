@@ -84,7 +84,7 @@ public class GenericJsonImportInfoJobAdaptee
             throws IOException
     {
         checkNotNull( resource );
-        return client().get().importBatch().job().start( resource.getId() );
+        return client().get().importBatch().job().start( resource.getId(), new ImportBatch() );
     }
 
     @Override
