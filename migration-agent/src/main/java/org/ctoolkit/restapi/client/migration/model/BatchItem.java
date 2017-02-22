@@ -27,6 +27,8 @@ public class BatchItem
 
     private Date updateDate;
 
+    private String error;
+
     public String getKey()
     {
         return key;
@@ -115,6 +117,16 @@ public class BatchItem
     public void setUpdateDate( Date updateDate )
     {
         this.updateDate = updateDate;
+    }
+
+    public String getError()
+    {
+        return error;
+    }
+
+    public void setError( String error )
+    {
+        this.error = error;
     }
 
     @Override
