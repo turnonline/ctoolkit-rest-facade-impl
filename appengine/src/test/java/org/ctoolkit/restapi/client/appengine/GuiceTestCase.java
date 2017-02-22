@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,10 +26,13 @@ import com.google.guiceberry.GuiceBerryModule;
 import com.google.guiceberry.testng.TestNgGuiceBerry;
 import com.google.inject.name.Names;
 import org.ctoolkit.restapi.client.ApiCredential;
+import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 import org.ctoolkit.test.appengine.ServiceConfigModule;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
+import javax.annotation.Nullable;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -69,6 +72,8 @@ public class GuiceTestCase
         // setting the SystemProperty.Environment.Value.Development
         System.setProperty( "com.google.appengine.runtime.environment", "Development" );
 
+        bind( AuthKeyProvider.class ).to( MyAuthKeyProvider.class ).in( Singleton.class );
+
         // default credential configuration
         ApiCredential credential = new ApiCredential();
         credential.setProjectId( "appid-103" );
@@ -100,5 +105,21 @@ public class GuiceTestCase
         install( new FacadeAppEngineModule() );
         install( new GuiceBerryModule() );
         install( new AdapterAppEngineModule() );
+    }
+
+    static class MyAuthKeyProvider
+            implements AuthKeyProvider
+    {
+        @Override
+        public InputStream get( @Nullable String prefix )
+        {
+            return null;
+        }
+
+        @Override
+        public boolean isConfigured( @Nullable String prefix )
+        {
+            return false;
+        }
     }
 }

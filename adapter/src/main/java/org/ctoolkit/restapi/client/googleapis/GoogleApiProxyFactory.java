@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,6 +34,7 @@ import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import org.ctoolkit.restapi.client.ApiCredential;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
+import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,6 +55,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.ctoolkit.restapi.client.ApiCredential.CREDENTIAL_ATTR;
 import static org.ctoolkit.restapi.client.ApiCredential.DEFAULT_CREDENTIAL_PREFIX;
 import static org.ctoolkit.restapi.client.ApiCredential.DEFAULT_NUMBER_OF_RETRIES;
@@ -91,12 +93,20 @@ public abstract class GoogleApiProxyFactory
     private JsonFactory jsonFactory;
 
     /**
+     * Optional authentication key provider (client responsibility).
+     */
+    private AuthKeyProvider keyProvider;
+
+    /**
      * Create factory instance.
      */
-    protected GoogleApiProxyFactory( @Nonnull Map<String, String> credential, @Nonnull EventBus eventBus )
+    protected GoogleApiProxyFactory( @Nonnull Map<String, String> credential,
+                                     @Nonnull EventBus eventBus,
+                                     @Nullable AuthKeyProvider keyProvider )
     {
         this.credential = credential;
         this.eventBus = eventBus;
+        this.keyProvider = keyProvider;
     }
 
     /**
@@ -277,22 +287,7 @@ public abstract class GoogleApiProxyFactory
      */
     public int getNumberOfRetries( @Nullable String prefix )
     {
-        if ( Strings.isNullOrEmpty( prefix ) )
-        {
-            prefix = DEFAULT_CREDENTIAL_PREFIX;
-        }
-
-        String property = PROPERTY_NUMBER_OF_RETRIES;
-        String value = credential.get( CREDENTIAL_ATTR + prefix + "." + property );
-        if ( value == null )
-        {
-            value = credential.get( CREDENTIAL_ATTR + DEFAULT_CREDENTIAL_PREFIX + "." + property );
-        }
-        if ( value == null )
-        {
-            value = DEFAULT_NUMBER_OF_RETRIES;
-        }
-        return Integer.valueOf( value );
+        return getInteger( PROPERTY_NUMBER_OF_RETRIES, DEFAULT_NUMBER_OF_RETRIES, prefix );
     }
 
     /**
@@ -305,12 +300,27 @@ public abstract class GoogleApiProxyFactory
      */
     public int getReadTimeout( @Nullable String prefix )
     {
+        return getInteger( PROPERTY_READ_TIMEOUT, DEFAULT_READ_TIMEOUT, prefix );
+    }
+
+    /**
+     * Returns the integer value for given property.
+     *
+     * @param property     the name of the property to retrieve
+     * @param defaultValue the default value if no value will be found
+     * @param prefix       the prefix used to identify specific credential or null for default
+     * @return the integer value
+     */
+    private int getInteger( @Nonnull String property, @Nonnull String defaultValue, @Nullable String prefix )
+    {
+        checkNotNull( property );
+        checkNotNull( defaultValue );
+
         if ( Strings.isNullOrEmpty( prefix ) )
         {
             prefix = DEFAULT_CREDENTIAL_PREFIX;
         }
 
-        String property = PROPERTY_READ_TIMEOUT;
         String value = credential.get( CREDENTIAL_ATTR + prefix + "." + property );
         if ( value == null )
         {
@@ -318,7 +328,7 @@ public abstract class GoogleApiProxyFactory
         }
         if ( value == null )
         {
-            value = DEFAULT_READ_TIMEOUT;
+            value = defaultValue;
         }
         return Integer.valueOf( value );
     }
@@ -438,6 +448,12 @@ public abstract class GoogleApiProxyFactory
 
     public boolean isJsonConfiguration( String prefix )
     {
+        if ( keyProvider != null && keyProvider.isConfigured( prefix ) )
+        {
+            // if defined authentication key takes precedence
+            return true;
+        }
+
         try
         {
             return getFileNameJsonStream( prefix ) != null;
@@ -454,10 +470,26 @@ public abstract class GoogleApiProxyFactory
         return GoogleApiProxyFactory.class.getResource( fileName );
     }
 
+    /**
+     * Returns the Google APIs service account key as JSON.
+     *
+     * @param prefix the prefix used to identify specific credential
+     * @return the service account key as JSON
+     */
     public InputStream getServiceAccountJsonStream( String prefix )
     {
-        String fileName = getFileNameJsonStream( prefix );
-        return GoogleApiProxyFactory.class.getResourceAsStream( fileName );
+        InputStream stream;
+
+        if ( keyProvider != null && keyProvider.isConfigured( prefix ) )
+        {
+            stream = keyProvider.get( prefix );
+        }
+        else
+        {
+            String fileName = getFileNameJsonStream( prefix );
+            stream = GoogleApiProxyFactory.class.getResourceAsStream( fileName );
+        }
+        return stream;
     }
 
     public InputStream getServiceAccountPrivateKeyP12Stream( String prefix )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,7 @@ package org.ctoolkit.restapi.client.googleapis;
 import com.google.common.eventbus.EventBus;
 import mockit.Injectable;
 import mockit.Tested;
+import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 import org.testng.annotations.Test;
 
 import java.util.Map;
@@ -43,6 +44,9 @@ public class GoogleApiProxyFactoryTest
 
     @Injectable
     private Map<String, String> credential;
+
+    @Injectable
+    private AuthKeyProvider keyProvider;
 
     @Test( expectedExceptions = MissingResourceException.class )
     public void getProjectIdMissingConfig()

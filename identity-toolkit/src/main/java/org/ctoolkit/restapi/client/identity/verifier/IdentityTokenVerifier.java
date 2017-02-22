@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -38,14 +38,14 @@ import javax.inject.Inject;
 class IdentityTokenVerifier
         implements TokenVerifier<Identity>
 {
-    public static final Logger logger = LoggerFactory.getLogger( IdentityTokenVerifier.class );
+    private static final Logger logger = LoggerFactory.getLogger( IdentityTokenVerifier.class );
 
-    private final JsonTokenHelper helper;
+    private final GtokenVerifier verifier;
 
     @Inject
-    public IdentityTokenVerifier( JsonTokenHelper helper )
+    public IdentityTokenVerifier( GtokenVerifier verifier )
     {
-        this.helper = helper;
+        this.verifier = verifier;
     }
 
     @Override
@@ -55,7 +55,7 @@ class IdentityTokenVerifier
         JsonToken jsonToken;
         try
         {
-            jsonToken = helper.verifyAndDeserialize( token );
+            jsonToken = verifier.verifyAndDeserialize( token );
         }
         catch ( Exception e )
         {
