@@ -25,6 +25,7 @@ import com.google.common.eventbus.EventBus;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
 import org.ctoolkit.restapi.client.googleapis.Credential;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
+import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -44,9 +45,11 @@ class GoogleApiProxyFactoryAppEngine
      * Create factory instance.
      */
     @Inject
-    protected GoogleApiProxyFactoryAppEngine( @Credential Map<String, String> properties, EventBus eventBus )
+    protected GoogleApiProxyFactoryAppEngine( @Credential Map<String, String> properties,
+                                              EventBus eventBus,
+                                              FacadeApiInit facadeInit )
     {
-        super( properties, eventBus );
+        super( properties, eventBus, facadeInit.keyProvider );
     }
 
     @Override
@@ -81,5 +84,11 @@ class GoogleApiProxyFactoryAppEngine
         }
 
         return credential;
+    }
+
+    static class FacadeApiInit
+    {
+        @com.google.inject.Inject( optional = true )
+        AuthKeyProvider keyProvider = null;
     }
 }

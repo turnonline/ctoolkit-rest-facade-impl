@@ -21,6 +21,7 @@ package org.ctoolkit.restapi.client.googleapis;
 import com.google.common.eventbus.EventBus;
 import mockit.Injectable;
 import mockit.Tested;
+import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 import org.testng.annotations.Test;
 
 import java.util.Map;
@@ -43,6 +44,9 @@ public class GoogleApiProxyFactoryTest
 
     @Injectable
     private Map<String, String> credential;
+
+    @Injectable
+    private AuthKeyProvider keyProvider;
 
     @Test( expectedExceptions = MissingResourceException.class )
     public void getProjectIdMissingConfig()

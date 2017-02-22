@@ -190,6 +190,8 @@ public class AdapterAppEngineTest
         String fileName = builder.getFileName( null );
         assertEquals( fileName, this.fileName );
 
+        assertTrue( builder.isJsonConfiguration( null ) );
+
         String fileNameJsonStream = builder.getFileNameJsonStream( null );
         assertEquals( fileNameJsonStream, this.fileNameJsonStream );
 
@@ -232,6 +234,8 @@ public class AdapterAppEngineTest
         String fileName = builder.getFileName( prefix );
         assertEquals( fileName, "/org/ctoolkit/restapi/key.p12" );
 
+        assertTrue( builder.isJsonConfiguration( prefix ) );
+
         String fileNameJsonStream = builder.getFileNameJsonStream( prefix );
         assertEquals( fileNameJsonStream, "/org/ctoolkit/restapi/key.json" );
 
@@ -273,6 +277,8 @@ public class AdapterAppEngineTest
 
         String fileName = builder.getFileName( prefix );
         assertEquals( fileName, this.fileName );
+
+        assertTrue( builder.isJsonConfiguration( prefix ) );
 
         String fileNameJsonStream = builder.getFileNameJsonStream( prefix );
         assertEquals( fileNameJsonStream, this.fileNameJsonStream );
