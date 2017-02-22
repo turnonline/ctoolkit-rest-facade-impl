@@ -22,16 +22,12 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpStatusCodes;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.identitytoolkit.IdentityToolkit;
-import com.google.identitytoolkit.HttpSender;
-import com.google.identitytoolkit.JsonTokenHelper;
-import com.google.identitytoolkit.RpcHelper;
 import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
 import com.google.inject.Provides;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
-import org.ctoolkit.restapi.client.identity.verifier.VerifierModule;
+import org.ctoolkit.restapi.client.identity.verifier.IdentityVerifierModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,13 +56,45 @@ public class GoogleApiIdentityToolkitModule
     @Override
     protected void configure()
     {
-        install( new VerifierModule() );
+        install( new IdentityVerifierModule() );
     }
 
     @Provides
     @Singleton
     IdentityToolkit provideIdentityToolkit( GoogleApiProxyFactory factory )
     {
+        InputStream stream = null;
+        String fileNamePath = factory.getFileName( API_PREFIX );
+        if ( fileNamePath != null )
+        {
+            stream = factory.getServiceAccountPrivateKeyP12Stream( API_PREFIX );
+        }
+
+        if ( stream == null )
+        {
+            String message;
+            if ( fileNamePath == null )
+            {
+                message = "The private key (path to p12) 'credential.default.fileName' is mandatory to instantiate "
+                        + IdentityToolkit.class.getSimpleName();
+            }
+            else
+            {
+                message = "Configured path to private key p12 is incorrect, no file has been found: " + fileNamePath;
+            }
+
+            throw new IllegalArgumentException( message );
+        }
+
+        String serviceAccount = factory.getServiceAccountEmail( API_PREFIX );
+        if ( Strings.isNullOrEmpty( serviceAccount ) )
+        {
+            String message = "The service account email 'credential.default.serviceAccountEmail'" +
+                    " is mandatory to instantiate " + IdentityToolkit.class.getSimpleName();
+
+            throw new IllegalArgumentException( message );
+        }
+
         HashSet<String> set = new HashSet<>();
         set.add( IDENTITY_SCOPE );
         Collections.unmodifiableSet( set );
@@ -98,29 +126,5 @@ public class GoogleApiIdentityToolkitModule
         }
 
         return builder.build();
-    }
-
-    @Provides
-    @Singleton
-    JsonTokenHelper provideJsonTokenHelper( GoogleApiProxyFactory factory, RpcHelper rpcHelper )
-    {
-        String projectId = factory.getProjectId( API_PREFIX );
-        if ( Strings.isNullOrEmpty( projectId ) )
-        {
-            throw new IllegalArgumentException( "Project ID (audience) must be provided, cannot be empty!" );
-        }
-
-        return new JsonTokenHelper( rpcHelper, projectId );
-    }
-
-    @Provides
-    @Singleton
-    RpcHelper provideRpcHelper( GoogleApiProxyFactory factory, Injector injector )
-    {
-        HttpSender sender = injector.getInstance( HttpSender.class );
-        InputStream stream = factory.getServiceAccountPrivateKeyP12Stream( API_PREFIX );
-        String serviceAccount = factory.getServiceAccountEmail( API_PREFIX );
-
-        return new RpcHelper( sender, IdentityToolkit.DEFAULT_BASE_URL, serviceAccount, stream );
     }
 }
