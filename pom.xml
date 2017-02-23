@@ -57,11 +57,11 @@
     <modules>
         <module>adapter</module>
         <module>appengine</module>
+        <module>agent</module>
         <module>analytics</module>
         <module>drive</module>
         <module>identity-toolkit</module>
         <module>maps</module>
-        <module>migration-agent</module>
     </modules>
 
     <build>
