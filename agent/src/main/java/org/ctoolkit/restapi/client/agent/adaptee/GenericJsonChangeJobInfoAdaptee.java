@@ -18,10 +18,10 @@
 
 package org.ctoolkit.restapi.client.agent.adaptee;
 
-import org.ctoolkit.api.agent.CtoolkitAgent;
 import org.ctoolkit.api.agent.model.ChangeJobInfo;
 import org.ctoolkit.api.agent.model.ImportBatch;
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
@@ -45,7 +45,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonChangeJobInfoAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CtoolkitAgent>, ChangeJobInfo>
+        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, ChangeJobInfo>
         implements
         GetExecutorAdaptee<ChangeJobInfo>,
         InsertExecutorAdaptee<ChangeJobInfo>,
@@ -53,7 +53,7 @@ public class GenericJsonChangeJobInfoAdaptee
         DeleteExecutorAdaptee<ChangeJobInfo>
 {
     @Inject
-    public GenericJsonChangeJobInfoAdaptee( Provider<CtoolkitAgent> ctoolkitAgent )
+    public GenericJsonChangeJobInfoAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -69,12 +69,17 @@ public class GenericJsonChangeJobInfoAdaptee
 
     @Override
     public ChangeJobInfo executeGet( @Nonnull Object request,
-                                   @Nullable Map<String, Object> parameters,
-                                   @Nullable Locale locale )
+                                     @Nullable Map<String, Object> parameters,
+                                     @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return ( ( CustomizedCtoolkitAgent.ChangeBatch.Job.Progress ) request ).execute( credential );
     }
 
     @Override
@@ -89,12 +94,17 @@ public class GenericJsonChangeJobInfoAdaptee
 
     @Override
     public ChangeJobInfo executeInsert( @Nonnull Object request,
-                                      @Nullable Map<String, Object> parameters,
-                                      @Nullable Locale locale )
+                                        @Nullable Map<String, Object> parameters,
+                                        @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return ( ( CustomizedCtoolkitAgent.ChangeBatch.Job.Start ) request ).execute( credential );
     }
 
     @Override
@@ -111,12 +121,17 @@ public class GenericJsonChangeJobInfoAdaptee
 
     @Override
     public ChangeJobInfo executeUpdate( @Nonnull Object request,
-                                      @Nullable Map<String, Object> parameters,
-                                      @Nullable Locale locale )
+                                        @Nullable Map<String, Object> parameters,
+                                        @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return ( ( CustomizedCtoolkitAgent.ChangeBatch.Job.Cancel ) request ).execute( credential );
     }
 
     @Override
@@ -127,8 +142,14 @@ public class GenericJsonChangeJobInfoAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object o, @Nullable Map<String, Object> parameters, @Nullable Locale locale ) throws IOException
+    public void executeDelete( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+            throws IOException
     {
-        execute( o );
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
+        ( ( CustomizedCtoolkitAgent.ChangeBatch.Job.Delete ) request ).execute( credential );
     }
 }

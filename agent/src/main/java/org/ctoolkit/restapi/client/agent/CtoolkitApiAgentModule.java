@@ -19,6 +19,7 @@
 package org.ctoolkit.restapi.client.agent;
 
 import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpStatusCodes;
 import com.google.api.client.http.HttpTransport;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -36,11 +37,14 @@ import org.ctoolkit.api.agent.model.ImportJobInfo;
 import org.ctoolkit.api.agent.model.KindMetaData;
 import org.ctoolkit.api.agent.model.MetadataAudit;
 import org.ctoolkit.api.agent.model.PropertyMetaData;
+import org.ctoolkit.restapi.client.RemoteServerErrorException;
+import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
+import org.ctoolkit.restapi.client.agent.adaptee.CustomizedCtoolkitAgent;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeBatchAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeItemAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeJobInfoAdaptee;
@@ -57,13 +61,8 @@ import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.security.GeneralSecurityException;
 import java.util.Set;
 
@@ -76,8 +75,6 @@ public class CtoolkitApiAgentModule
         extends AbstractModule
 {
     public static final String API_PREFIX = "ctoolkit-agent";
-
-    public static final String COOKIE_AGENT = "_agent";
 
     private static final Logger logger = LoggerFactory.getLogger( CtoolkitApiAgentModule.class );
 
@@ -252,71 +249,42 @@ public class CtoolkitApiAgentModule
     }
 
     @Provides
-    CtoolkitAgent provideCtoolkitAgent( GoogleApiProxyFactory factory, Provider<HttpServletRequest> provider )
+    @Singleton
+    CustomizedCtoolkitAgent provideCtoolkitAgent( GoogleApiProxyFactory factory )
     {
-        HttpTransport httpTransport;
-        HttpRequestInitializer credential;
         Set<String> scopes = CtoolkitAgentScopes.all();
+        CustomizedCtoolkitAgent.Builder builder;
 
         String applicationName = factory.getApplicationName( API_PREFIX );
+        String endpointUrl = factory.getEndpointUrl( API_PREFIX );
 
         try
         {
-            httpTransport = factory.getHttpTransport();
-            credential = factory.authorize( scopes, null, API_PREFIX );
+            HttpTransport httpTransport = factory.getHttpTransport();
+            HttpRequestInitializer initializer = factory.authorize( scopes, null, API_PREFIX );
+
+            builder = new CustomizedCtoolkitAgent.Builder( httpTransport, factory.getJsonFactory(), initializer );
+            builder.setApplicationName( applicationName )
+                    .setRootUrl( endpointUrl )
+                    .setServicePath( CtoolkitAgent.DEFAULT_SERVICE_PATH );
         }
-        catch ( GeneralSecurityException | IOException e )
+        catch ( GeneralSecurityException e )
         {
             logger.error( "Scopes: " + scopes.toString()
                     + " Application name: " + applicationName
-                    + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
+                    + " Endpoint URL: " + endpointUrl, e );
 
-            throw new IllegalArgumentException( "Error occurred during providing CtoolkiT Agent Client" );
+            throw new UnauthorizedException( e.getMessage() );
         }
-
-        HttpServletRequest request = provider.get();
-
-        // get agent from request attribute
-        String agent = ( String ) request.getAttribute( COOKIE_AGENT );
-
-        // if null fallback to cookie
-        if ( agent == null )
+        catch ( IOException e )
         {
-            agent = getAgentCookie( request.getCookies() );
+            logger.error( "Failed. Scopes: " + scopes.toString()
+                    + " Application name: " + applicationName
+                    + " Endpoint URL: " + endpointUrl, e );
+
+            throw new RemoteServerErrorException( HttpStatusCodes.STATUS_CODE_SERVER_ERROR, e.getMessage() );
         }
 
-        // if null use configuration value
-        if ( agent == null )
-        {
-            agent = factory.getEndpointUrl( API_PREFIX );
-        }
-
-        return new CtoolkitAgent.Builder( httpTransport, factory.getJsonFactory(), credential )
-                .setApplicationName( applicationName )
-                .setRootUrl( agent )
-                .build();
-    }
-
-    private String getAgentCookie( Cookie[] cookies )
-    {
-        if ( cookies != null )
-        {
-            for ( Cookie cookie : cookies )
-            {
-                if ( cookie.getName().equals( COOKIE_AGENT ) )
-                {
-                    try
-                    {
-                        return URLDecoder.decode( cookie.getValue(), "UTF-8" ) + "/_ah/api/";
-                    }
-                    catch ( UnsupportedEncodingException e )
-                    {
-                        return null;
-                    }
-                }
-            }
-        }
-
-        return null;
+        return builder.build();
     }
 }

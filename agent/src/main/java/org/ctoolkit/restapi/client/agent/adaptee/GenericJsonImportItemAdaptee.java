@@ -18,9 +18,9 @@
 
 package org.ctoolkit.restapi.client.agent.adaptee;
 
-import org.ctoolkit.api.agent.CtoolkitAgent;
 import org.ctoolkit.api.agent.model.ImportItem;
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
@@ -44,7 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonImportItemAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CtoolkitAgent>, ImportItem>
+        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, ImportItem>
         implements
         GetExecutorAdaptee<ImportItem>,
         InsertExecutorAdaptee<ImportItem>,
@@ -52,7 +52,7 @@ public class GenericJsonImportItemAdaptee
         DeleteExecutorAdaptee<ImportItem>
 {
     @Inject
-    public GenericJsonImportItemAdaptee( Provider<CtoolkitAgent> ctoolkitAgent )
+    public GenericJsonImportItemAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -68,12 +68,17 @@ public class GenericJsonImportItemAdaptee
 
     @Override
     public ImportItem executeGet( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale )
+                                  @Nullable Map<String, Object> parameters,
+                                  @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Get ) request ).execute( credential );
     }
 
     @Override
@@ -90,12 +95,17 @@ public class GenericJsonImportItemAdaptee
 
     @Override
     public ImportItem executeInsert( @Nonnull Object request,
-                                  @Nullable Map<String, Object> parameters,
-                                  @Nullable Locale locale )
+                                     @Nullable Map<String, Object> parameters,
+                                     @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Insert ) request ).execute( credential );
     }
 
     @Override
@@ -107,17 +117,23 @@ public class GenericJsonImportItemAdaptee
         checkNotNull( resource );
         checkNotNull( identifier );
 
-        return client().get().importBatch().item().update( identifier.getString(), identifier.getChild().getString(), resource );
+        return client().get().importBatch().item().update( identifier.getString(), identifier.getChild().getString(),
+                resource );
     }
 
     @Override
     public ImportItem executeUpdate( @Nonnull Object request,
-                                  @Nullable Map<String, Object> parameters,
-                                  @Nullable Locale locale )
+                                     @Nullable Map<String, Object> parameters,
+                                     @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Update ) request ).execute( credential );
     }
 
     @Override
@@ -128,8 +144,15 @@ public class GenericJsonImportItemAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object o, @Nullable Map<String, Object> parameters, @Nullable Locale locale ) throws IOException
+    public void executeDelete( @Nonnull Object request,
+                               @Nullable Map<String, Object> parameters,
+                               @Nullable Locale locale ) throws IOException
     {
-        execute( o );
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
+        ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Delete ) request ).execute( credential );
     }
 }

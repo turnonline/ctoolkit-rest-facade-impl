@@ -18,11 +18,9 @@
 
 package org.ctoolkit.restapi.client.agent.adaptee;
 
-import org.ctoolkit.api.agent.CtoolkitAgent;
-import org.ctoolkit.api.agent.CtoolkitAgentRequest;
 import org.ctoolkit.api.agent.model.MetadataAudit;
-import org.ctoolkit.api.agent.model.MetadataAuditCollection;
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 
@@ -35,22 +33,23 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * The MetadataAudit as {@link MetadataAudit} concrete adaptee implementation.
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonMetadataAuditAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CtoolkitAgent>, MetadataAudit>
+        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, MetadataAudit>
         implements ListExecutorAdaptee<MetadataAudit>
 
 {
     @Inject
-    public GenericJsonMetadataAuditAdaptee( Provider<CtoolkitAgent> ctoolkitAgent )
+    public GenericJsonMetadataAuditAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
-
 
     @Override
     public Object prepareList( @Nullable Identifier parentKey ) throws IOException
@@ -60,12 +59,19 @@ public class GenericJsonMetadataAuditAdaptee
 
     @Override
     @SuppressWarnings( "unchecked" )
-    public List<MetadataAudit> executeList( @Nonnull Object o, @Nullable Map<String, Object> parameters, @Nullable Locale locale, int start, int length )
+    public List<MetadataAudit> executeList( @Nonnull Object request,
+                                            @Nullable Map<String, Object> parameters,
+                                            @Nullable Locale locale,
+                                            int start,
+                                            int length )
             throws IOException
     {
-        CtoolkitAgentRequest<MetadataAuditCollection> request = ( CtoolkitAgentRequest<MetadataAuditCollection> ) o;
+        checkNotNull( request );
 
-        fill( request, parameters, locale );
-        return request.execute().getItems();
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
+        fill( get( request ), parameters, locale );
+        return ( ( CustomizedCtoolkitAgent.Audit.List ) request ).execute( credential ).getItems();
     }
 }

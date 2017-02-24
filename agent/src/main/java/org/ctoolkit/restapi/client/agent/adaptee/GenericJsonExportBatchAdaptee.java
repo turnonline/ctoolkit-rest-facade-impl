@@ -18,12 +18,10 @@
 
 package org.ctoolkit.restapi.client.agent.adaptee;
 
-import org.ctoolkit.api.agent.CtoolkitAgent;
-import org.ctoolkit.api.agent.CtoolkitAgentRequest;
 import org.ctoolkit.api.agent.model.ExportBatch;
-import org.ctoolkit.api.agent.model.ExportBatchCollection;
 import org.ctoolkit.api.agent.model.ImportBatch;
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
@@ -49,7 +47,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonExportBatchAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CtoolkitAgent>, ExportBatch>
+        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, ExportBatch>
         implements
         GetExecutorAdaptee<ExportBatch>,
         InsertExecutorAdaptee<ExportBatch>,
@@ -58,7 +56,7 @@ public class GenericJsonExportBatchAdaptee
         DeleteExecutorAdaptee<ExportBatch>
 {
     @Inject
-    public GenericJsonExportBatchAdaptee( Provider<CtoolkitAgent> ctoolkitAgent )
+    public GenericJsonExportBatchAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -74,12 +72,17 @@ public class GenericJsonExportBatchAdaptee
 
     @Override
     public ExportBatch executeGet( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale )
+                                   @Nullable Map<String, Object> parameters,
+                                   @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return ( ( CustomizedCtoolkitAgent.ExportBatch.Get ) request ).execute( credential );
     }
 
     @Override
@@ -94,12 +97,17 @@ public class GenericJsonExportBatchAdaptee
 
     @Override
     public ExportBatch executeInsert( @Nonnull Object request,
-                                  @Nullable Map<String, Object> parameters,
-                                  @Nullable Locale locale )
+                                      @Nullable Map<String, Object> parameters,
+                                      @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return ( ( CustomizedCtoolkitAgent.ExportBatch.Insert ) request ).execute( credential );
     }
 
     @Override
@@ -116,12 +124,17 @@ public class GenericJsonExportBatchAdaptee
 
     @Override
     public ExportBatch executeUpdate( @Nonnull Object request,
-                                  @Nullable Map<String, Object> parameters,
-                                  @Nullable Locale locale )
+                                      @Nullable Map<String, Object> parameters,
+                                      @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return ( ( CustomizedCtoolkitAgent.ExportBatch.Update ) request ).execute( credential );
     }
 
     @Override
@@ -132,9 +145,15 @@ public class GenericJsonExportBatchAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object o, @Nullable Map<String, Object> parameters, @Nullable Locale locale ) throws IOException
+    public void executeDelete( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+            throws IOException
     {
-        execute( o );
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
+        ( ( CustomizedCtoolkitAgent.ExportBatch.Delete ) request ).execute( credential );
     }
 
     @Override
@@ -145,12 +164,20 @@ public class GenericJsonExportBatchAdaptee
 
     @Override
     @SuppressWarnings( "unchecked" )
-    public List<ExportBatch> executeList( @Nonnull Object o, @Nullable Map<String, Object> map, @Nullable Locale locale, int i, int i1 )
+    public List<ExportBatch> executeList( @Nonnull Object request,
+                                          @Nullable Map<String, Object> parameters,
+                                          @Nullable Locale locale,
+                                          int start,
+                                          int length )
             throws IOException
     {
-        CtoolkitAgentRequest<ExportBatchCollection> request = ( CtoolkitAgentRequest<ExportBatchCollection> ) o;
+        checkNotNull( request );
 
-        fill( request, map, locale );
-        return request.execute().getItems();
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
+
+        fill( get( request ), parameters, locale );
+        return ( ( CustomizedCtoolkitAgent.ExportBatch.List ) request ).execute( credential ).getItems();
     }
 }

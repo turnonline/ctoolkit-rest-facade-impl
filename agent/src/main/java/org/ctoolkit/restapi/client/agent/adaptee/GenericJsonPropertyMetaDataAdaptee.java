@@ -18,11 +18,9 @@
 
 package org.ctoolkit.restapi.client.agent.adaptee;
 
-import org.ctoolkit.api.agent.CtoolkitAgent;
-import org.ctoolkit.api.agent.CtoolkitAgentRequest;
 import org.ctoolkit.api.agent.model.PropertyMetaData;
-import org.ctoolkit.api.agent.model.PropertyMetaDataCollection;
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 
@@ -35,15 +33,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonPropertyMetaDataAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CtoolkitAgent>, PropertyMetaData>
+        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, PropertyMetaData>
         implements ListExecutorAdaptee<PropertyMetaData>
 {
     @Inject
-    public GenericJsonPropertyMetaDataAdaptee( Provider<CtoolkitAgent> client )
+    public GenericJsonPropertyMetaDataAdaptee( Provider<CustomizedCtoolkitAgent> client )
     {
         super( client );
     }
@@ -51,17 +51,25 @@ public class GenericJsonPropertyMetaDataAdaptee
     @Override
     public Object prepareList( @Nullable Identifier parentKey ) throws IOException
     {
+        checkNotNull( parentKey );
         return client().get().metadata().kind().property().list( parentKey.getString() );
     }
 
     @Override
     @SuppressWarnings( "unchecked" )
-    public List<PropertyMetaData> executeList( @Nonnull Object o, @Nullable Map<String, Object> map, @Nullable Locale locale, int start, int length )
+    public List<PropertyMetaData> executeList( @Nonnull Object request,
+                                               @Nullable Map<String, Object> parameters,
+                                               @Nullable Locale locale,
+                                               int start,
+                                               int length )
             throws IOException
     {
-        CtoolkitAgentRequest<PropertyMetaDataCollection> request = ( CtoolkitAgentRequest<PropertyMetaDataCollection> ) o;
+        checkNotNull( request );
 
-        fill( request, map, locale );
-        return request.execute().getItems();
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
+        fill( get( request ), parameters, locale );
+        return ( ( CustomizedCtoolkitAgent.Metadata.Kind.Property.List ) request ).execute( credential ).getItems();
     }
 }

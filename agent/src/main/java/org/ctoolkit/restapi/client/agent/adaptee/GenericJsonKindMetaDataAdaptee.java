@@ -18,11 +18,9 @@
 
 package org.ctoolkit.restapi.client.agent.adaptee;
 
-import org.ctoolkit.api.agent.CtoolkitAgent;
-import org.ctoolkit.api.agent.CtoolkitAgentRequest;
 import org.ctoolkit.api.agent.model.KindMetaData;
-import org.ctoolkit.api.agent.model.KindMetaDataCollection;
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 
@@ -35,15 +33,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonKindMetaDataAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CtoolkitAgent>, KindMetaData>
+        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, KindMetaData>
         implements ListExecutorAdaptee<KindMetaData>
 {
     @Inject
-    public GenericJsonKindMetaDataAdaptee( Provider<CtoolkitAgent> client )
+    public GenericJsonKindMetaDataAdaptee( Provider<CustomizedCtoolkitAgent> client )
     {
         super( client );
     }
@@ -56,12 +56,19 @@ public class GenericJsonKindMetaDataAdaptee
 
     @Override
     @SuppressWarnings( "unchecked" )
-    public List<KindMetaData> executeList( @Nonnull Object o, @Nullable Map<String, Object> map, @Nullable Locale locale, int start, int length )
+    public List<KindMetaData> executeList( @Nonnull Object request,
+                                           @Nullable Map<String, Object> parameters,
+                                           @Nullable Locale locale,
+                                           int start,
+                                           int length )
             throws IOException
     {
-        CtoolkitAgentRequest<KindMetaDataCollection> request = ( CtoolkitAgentRequest<KindMetaDataCollection> ) o;
+        checkNotNull( request );
 
-        fill( request, map, locale );
-        return request.execute().getItems();
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
+        fill( get( request ), parameters, locale );
+        return ( ( CustomizedCtoolkitAgent.Metadata.Kind.List ) request ).execute( credential ).getItems();
     }
 }

@@ -18,10 +18,10 @@
 
 package org.ctoolkit.restapi.client.agent.adaptee;
 
-import org.ctoolkit.api.agent.CtoolkitAgent;
 import org.ctoolkit.api.agent.model.ChangeItem;
 import org.ctoolkit.api.agent.model.ImportItem;
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
@@ -45,7 +45,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonChangeItemAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CtoolkitAgent>, ChangeItem>
+        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, ChangeItem>
         implements
         GetExecutorAdaptee<ChangeItem>,
         InsertExecutorAdaptee<ChangeItem>,
@@ -53,7 +53,7 @@ public class GenericJsonChangeItemAdaptee
         DeleteExecutorAdaptee<ChangeItem>
 {
     @Inject
-    public GenericJsonChangeItemAdaptee( Provider<CtoolkitAgent> ctoolkitAgent )
+    public GenericJsonChangeItemAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -69,12 +69,17 @@ public class GenericJsonChangeItemAdaptee
 
     @Override
     public ChangeItem executeGet( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale )
+                                  @Nullable Map<String, Object> parameters,
+                                  @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return ( ( CustomizedCtoolkitAgent.ChangeBatch.Item.Get ) request ).execute( credential );
     }
 
     @Override
@@ -91,12 +96,17 @@ public class GenericJsonChangeItemAdaptee
 
     @Override
     public ChangeItem executeInsert( @Nonnull Object request,
-                                  @Nullable Map<String, Object> parameters,
-                                  @Nullable Locale locale )
+                                     @Nullable Map<String, Object> parameters,
+                                     @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return ( ( CustomizedCtoolkitAgent.ChangeBatch.Item.Insert ) request ).execute( credential );
     }
 
     @Override
@@ -113,12 +123,17 @@ public class GenericJsonChangeItemAdaptee
 
     @Override
     public ChangeItem executeUpdate( @Nonnull Object request,
-                                  @Nullable Map<String, Object> parameters,
-                                  @Nullable Locale locale )
+                                     @Nullable Map<String, Object> parameters,
+                                     @Nullable Locale locale )
             throws IOException
     {
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return ( ( CustomizedCtoolkitAgent.ChangeBatch.Item.Update ) request ).execute( credential );
     }
 
     @Override
@@ -129,8 +144,14 @@ public class GenericJsonChangeItemAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object o, @Nullable Map<String, Object> parameters, @Nullable Locale locale ) throws IOException
+    public void executeDelete( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+            throws IOException
     {
-        execute( o );
+        checkNotNull( request );
+
+        RequestCredential credential = new RequestCredential();
+        credential.fillInFrom( parameters, true );
+
+        ( ( CustomizedCtoolkitAgent.ChangeBatch.Item.Delete ) request ).execute( credential );
     }
 }
