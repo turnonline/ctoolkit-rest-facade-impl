@@ -128,7 +128,7 @@ public class CustomizedCtoolkitAgent
         }
         if ( !Strings.isNullOrEmpty( apiKey ) )
         {
-            request.getRequestHeaders().put( Constants.OBO_TOKEN, apiKey );
+            request.getRequestHeaders().put( Constants.IDENTITY_GTOKEN, apiKey );
         }
         request.setDisableGZipContent( disableGZipContent );
     }
