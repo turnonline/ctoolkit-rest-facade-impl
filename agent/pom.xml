@@ -39,7 +39,7 @@
         <dependency>
             <groupId>org.ctoolkit.api</groupId>
             <artifactId>agent</artifactId>
-            <version>v1-1.22.0-20170223.152843-3</version>
+            <version>v1-1.22.0-20170303.224730-6</version>
         </dependency>
 
         <dependency>

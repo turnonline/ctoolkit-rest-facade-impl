@@ -62,9 +62,12 @@ public class GenericJsonChangeItemAdaptee
     public Object prepareGet( @Nonnull Identifier identifier )
             throws IOException
     {
-        checkNotNull( identifier );
+        checkNotNull( identifier, "Parent identifier cannot be null" );
+        checkNotNull( identifier.getChild(), "Item identifier cannot be null" );
 
-        return client().get().changeBatch().item().get( identifier.getString(), identifier.getChild().getString() );
+        String metadataId = identifier.getString();
+        String id = identifier.getChild().getString();
+        return client().get().changeBatch().item().get( metadataId, id );
     }
 
     @Override
@@ -89,7 +92,7 @@ public class GenericJsonChangeItemAdaptee
             throws IOException
     {
         checkNotNull( resource );
-        checkNotNull( parentKey );
+        checkNotNull( parentKey, "Parent identifier cannot be null" );
 
         return client().get().changeBatch().item().insert( parentKey.getString(), resource );
     }
@@ -116,9 +119,12 @@ public class GenericJsonChangeItemAdaptee
             throws IOException
     {
         checkNotNull( resource );
-        checkNotNull( identifier );
+        checkNotNull( identifier, "Parent identifier cannot be null" );
+        checkNotNull( identifier.getChild(), "Item identifier cannot be null" );
 
-        return client().get().changeBatch().item().update( identifier.getString(), identifier.getChild().getString(), resource );
+        String metadataId = identifier.getString();
+        String id = identifier.getChild().getString();
+        return client().get().changeBatch().item().update( metadataId, id, resource );
     }
 
     @Override
@@ -139,8 +145,12 @@ public class GenericJsonChangeItemAdaptee
     @Override
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
-        checkNotNull( identifier );
-        return client().get().changeBatch().item().delete( identifier.getString(), identifier.getChild().getString() );
+        checkNotNull( identifier, "Parent identifier cannot be null" );
+        checkNotNull( identifier.getChild(), "Item identifier cannot be null" );
+
+        String metadataId = identifier.getString();
+        String id = identifier.getChild().getString();
+        return client().get().changeBatch().item().delete( metadataId, id );
     }
 
     @Override

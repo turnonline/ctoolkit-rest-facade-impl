@@ -64,7 +64,7 @@ public class GenericJsonImportBatchAdaptee
     public Object prepareGet( @Nonnull Identifier identifier )
             throws IOException
     {
-        checkNotNull( identifier );
+        checkNotNull( identifier, "Identifier cannot be null" );
 
         return client().get().importBatch().get( identifier.getString() );
     }
@@ -116,7 +116,7 @@ public class GenericJsonImportBatchAdaptee
             throws IOException
     {
         checkNotNull( resource );
-        checkNotNull( identifier );
+        checkNotNull( identifier, "Identifier cannot be null" );
 
         return client().get().importBatch().update( identifier.getString(), resource );
     }
@@ -139,7 +139,7 @@ public class GenericJsonImportBatchAdaptee
     @Override
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
-        checkNotNull( identifier );
+        checkNotNull( identifier, "Identifier cannot be null" );
         return client().get().importBatch().delete( identifier.getString() );
     }
 

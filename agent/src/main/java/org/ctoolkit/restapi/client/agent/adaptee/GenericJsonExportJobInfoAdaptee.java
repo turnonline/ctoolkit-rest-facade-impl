@@ -62,7 +62,7 @@ public class GenericJsonExportJobInfoAdaptee
     public Object prepareGet( @Nonnull Identifier identifier )
             throws IOException
     {
-        checkNotNull( identifier );
+        checkNotNull( identifier, "Identifier cannot be null" );
 
         return client().get().exportBatch().job().progress( identifier.getString() );
     }
@@ -89,7 +89,9 @@ public class GenericJsonExportJobInfoAdaptee
             throws IOException
     {
         checkNotNull( resource );
-        return client().get().exportBatch().job().start( resource.getId() );
+        checkNotNull( parentKey, "Parent identifier cannot be null" );
+
+        return client().get().exportBatch().job().start( parentKey.getString(), resource );
     }
 
     @Override
@@ -114,9 +116,9 @@ public class GenericJsonExportJobInfoAdaptee
             throws IOException
     {
         checkNotNull( resource );
-        checkNotNull( identifier );
+        checkNotNull( identifier, "Parent identifier cannot be null" );
 
-        return client().get().exportBatch().job().cancel( identifier.getString() );
+        return client().get().exportBatch().job().cancel( identifier.getString(), resource );
     }
 
     @Override
@@ -137,7 +139,7 @@ public class GenericJsonExportJobInfoAdaptee
     @Override
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
-        checkNotNull( identifier );
+        checkNotNull( identifier, "Identifier cannot be null" );
         return client().get().exportBatch().job().delete( identifier.getString() );
     }
 

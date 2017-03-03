@@ -684,9 +684,9 @@ public class CustomizedCtoolkitAgent
         public class Job
                 extends CtoolkitAgent.ChangeBatch.Job
         {
-            public Cancel cancel( String id ) throws IOException
+            public Cancel cancel( String id, ChangeJobInfo job ) throws IOException
             {
-                Cancel result = new Cancel( id );
+                Cancel result = new Cancel( id, job );
                 initialize( result );
                 return result;
             }
@@ -705,9 +705,9 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Start start( String id ) throws IOException
+            public Start start( String id, ChangeJobInfo job ) throws IOException
             {
-                Start result = new Start( id );
+                Start result = new Start( id, job );
                 initialize( result );
                 return result;
             }
@@ -717,9 +717,9 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Cancel( String id )
+                Cancel( String id, ChangeJobInfo job )
                 {
-                    super( id );
+                    super( id, job );
                 }
 
                 public ChangeJobInfo execute( RequestCredential credential ) throws IOException
@@ -822,9 +822,9 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Start( String id )
+                Start( String id, ChangeJobInfo job )
                 {
-                    super( id );
+                    super( id, job );
                 }
 
                 public ChangeJobInfo execute( RequestCredential credential ) throws IOException
@@ -1346,9 +1346,9 @@ public class CustomizedCtoolkitAgent
         public class Job
                 extends CtoolkitAgent.ExportBatch.Job
         {
-            public Cancel cancel( String id ) throws IOException
+            public Cancel cancel( String id, ExportJobInfo job ) throws IOException
             {
-                Cancel result = new Cancel( id );
+                Cancel result = new Cancel( id, job );
                 initialize( result );
                 return result;
             }
@@ -1367,9 +1367,9 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Start start( String id ) throws IOException
+            public Start start( String id, ExportJobInfo job ) throws IOException
             {
-                Start result = new Start( id );
+                Start result = new Start( id, job );
                 initialize( result );
                 return result;
             }
@@ -1379,9 +1379,9 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Cancel( String id )
+                Cancel( String id, ExportJobInfo job )
                 {
-                    super( id );
+                    super( id, job );
                 }
 
                 public ExportJobInfo execute( RequestCredential credential ) throws IOException
@@ -1484,9 +1484,9 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Start( String id )
+                Start( String id, ExportJobInfo job )
                 {
-                    super( id );
+                    super( id, job );
                 }
 
                 public ExportJobInfo execute( RequestCredential credential ) throws IOException
@@ -2050,9 +2050,9 @@ public class CustomizedCtoolkitAgent
         public class Job
                 extends CtoolkitAgent.ImportBatch.Job
         {
-            public Cancel cancel( String id ) throws IOException
+            public Cancel cancel( String id, ImportJobInfo job ) throws IOException
             {
-                Cancel result = new Cancel( id );
+                Cancel result = new Cancel( id, job );
                 initialize( result );
                 return result;
             }
@@ -2071,10 +2071,10 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Start start( String id, org.ctoolkit.api.agent.model.ImportBatch content )
+            public Start start( String id, ImportJobInfo job )
                     throws IOException
             {
-                Start result = new Start( id, content );
+                Start result = new Start( id, job );
                 initialize( result );
                 return result;
             }
@@ -2084,9 +2084,9 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Cancel( String id )
+                Cancel( String id, ImportJobInfo job )
                 {
-                    super( id );
+                    super( id, job );
                 }
 
                 public ImportJobInfo execute( RequestCredential credential ) throws IOException
@@ -2189,9 +2189,9 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Start( String id, org.ctoolkit.api.agent.model.ImportBatch content )
+                Start( String id, ImportJobInfo job )
                 {
-                    super( id, content );
+                    super( id, job );
                 }
 
                 public ImportJobInfo execute( RequestCredential credential ) throws IOException

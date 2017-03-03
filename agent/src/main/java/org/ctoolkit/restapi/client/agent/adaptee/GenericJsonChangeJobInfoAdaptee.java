@@ -62,7 +62,7 @@ public class GenericJsonChangeJobInfoAdaptee
     public Object prepareGet( @Nonnull Identifier identifier )
             throws IOException
     {
-        checkNotNull( identifier );
+        checkNotNull( identifier, "Identifier cannot be null" );
 
         return client().get().changeBatch().job().progress( identifier.getString() );
     }
@@ -89,7 +89,9 @@ public class GenericJsonChangeJobInfoAdaptee
             throws IOException
     {
         checkNotNull( resource );
-        return client().get().changeBatch().job().start( resource.getId() );
+        checkNotNull( parentKey, "Parent identifier cannot be null" );
+
+        return client().get().changeBatch().job().start( parentKey.getString(), resource );
     }
 
     @Override
@@ -114,9 +116,9 @@ public class GenericJsonChangeJobInfoAdaptee
             throws IOException
     {
         checkNotNull( resource );
-        checkNotNull( identifier );
+        checkNotNull( identifier, "Parent identifier cannot be null" );
 
-        return client().get().changeBatch().job().cancel( identifier.getString() );
+        return client().get().changeBatch().job().cancel( identifier.getString(), resource );
     }
 
     @Override
@@ -137,7 +139,7 @@ public class GenericJsonChangeJobInfoAdaptee
     @Override
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
-        checkNotNull( identifier );
+        checkNotNull( identifier, "Identifier cannot be null" );
         return client().get().changeBatch().job().delete( identifier.getString() );
     }
 
