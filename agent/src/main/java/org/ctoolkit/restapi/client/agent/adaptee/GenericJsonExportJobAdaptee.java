@@ -18,7 +18,7 @@
 
 package org.ctoolkit.restapi.client.agent.adaptee;
 
-import org.ctoolkit.api.agent.model.ExportJobInfo;
+import org.ctoolkit.api.agent.model.ExportJob;
 import org.ctoolkit.api.agent.model.ImportBatch;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.RequestCredential;
@@ -44,16 +44,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
-public class GenericJsonExportJobInfoAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, ExportJobInfo>
+public class GenericJsonExportJobAdaptee
+        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, ExportJob>
         implements
-        GetExecutorAdaptee<ExportJobInfo>,
-        InsertExecutorAdaptee<ExportJobInfo>,
-        UpdateExecutorAdaptee<ExportJobInfo>,
-        DeleteExecutorAdaptee<ExportJobInfo>
+        GetExecutorAdaptee<ExportJob>,
+        InsertExecutorAdaptee<ExportJob>,
+        UpdateExecutorAdaptee<ExportJob>,
+        DeleteExecutorAdaptee<ExportJob>
 {
     @Inject
-    public GenericJsonExportJobInfoAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
+    public GenericJsonExportJobAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -68,9 +68,9 @@ public class GenericJsonExportJobInfoAdaptee
     }
 
     @Override
-    public ExportJobInfo executeGet( @Nonnull Object request,
-                                     @Nullable Map<String, Object> parameters,
-                                     @Nullable Locale locale )
+    public ExportJob executeGet( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -83,7 +83,7 @@ public class GenericJsonExportJobInfoAdaptee
     }
 
     @Override
-    public Object prepareInsert( @Nonnull ExportJobInfo resource,
+    public Object prepareInsert( @Nonnull ExportJob resource,
                                  @Nullable Identifier parentKey,
                                  @Nullable MediaProvider<?> provider )
             throws IOException
@@ -95,9 +95,9 @@ public class GenericJsonExportJobInfoAdaptee
     }
 
     @Override
-    public ExportJobInfo executeInsert( @Nonnull Object request,
-                                        @Nullable Map<String, Object> parameters,
-                                        @Nullable Locale locale )
+    public ExportJob executeInsert( @Nonnull Object request,
+                                    @Nullable Map<String, Object> parameters,
+                                    @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -110,7 +110,7 @@ public class GenericJsonExportJobInfoAdaptee
     }
 
     @Override
-    public Object prepareUpdate( @Nonnull ExportJobInfo resource,
+    public Object prepareUpdate( @Nonnull ExportJob resource,
                                  @Nonnull Identifier identifier,
                                  @Nullable MediaProvider<?> provider )
             throws IOException
@@ -122,9 +122,9 @@ public class GenericJsonExportJobInfoAdaptee
     }
 
     @Override
-    public ExportJobInfo executeUpdate( @Nonnull Object request,
-                                        @Nullable Map<String, Object> parameters,
-                                        @Nullable Locale locale )
+    public ExportJob executeUpdate( @Nonnull Object request,
+                                    @Nullable Map<String, Object> parameters,
+                                    @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );

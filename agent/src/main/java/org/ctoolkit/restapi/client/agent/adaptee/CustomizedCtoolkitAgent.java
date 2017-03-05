@@ -28,13 +28,13 @@ import org.ctoolkit.api.agent.CtoolkitAgent;
 import org.ctoolkit.api.agent.CtoolkitAgentRequest;
 import org.ctoolkit.api.agent.model.ChangeBatchCollection;
 import org.ctoolkit.api.agent.model.ChangeItem;
-import org.ctoolkit.api.agent.model.ChangeJobInfo;
+import org.ctoolkit.api.agent.model.ChangeJob;
 import org.ctoolkit.api.agent.model.ExportBatchCollection;
 import org.ctoolkit.api.agent.model.ExportItem;
-import org.ctoolkit.api.agent.model.ExportJobInfo;
+import org.ctoolkit.api.agent.model.ExportJob;
 import org.ctoolkit.api.agent.model.ImportBatchCollection;
 import org.ctoolkit.api.agent.model.ImportItem;
-import org.ctoolkit.api.agent.model.ImportJobInfo;
+import org.ctoolkit.api.agent.model.ImportJob;
 import org.ctoolkit.api.agent.model.KindMetaDataCollection;
 import org.ctoolkit.api.agent.model.MetadataAuditCollection;
 import org.ctoolkit.api.agent.model.PropertyMetaDataCollection;
@@ -684,7 +684,7 @@ public class CustomizedCtoolkitAgent
         public class Job
                 extends CtoolkitAgent.ChangeBatch.Job
         {
-            public Cancel cancel( String id, ChangeJobInfo job ) throws IOException
+            public Cancel cancel( String id, ChangeJob job ) throws IOException
             {
                 Cancel result = new Cancel( id, job );
                 initialize( result );
@@ -705,7 +705,7 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Start start( String id, ChangeJobInfo job ) throws IOException
+            public Start start( String id, ChangeJob job ) throws IOException
             {
                 Start result = new Start( id, job );
                 initialize( result );
@@ -717,12 +717,12 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Cancel( String id, ChangeJobInfo job )
+                Cancel( String id, ChangeJob job )
                 {
                     super( id, job );
                 }
 
-                public ChangeJobInfo execute( RequestCredential credential ) throws IOException
+                public ChangeJob execute( RequestCredential credential ) throws IOException
                 {
                     this.credential = checkNotNull( credential );
                     setRequestApiKey( this, credential );
@@ -792,7 +792,7 @@ public class CustomizedCtoolkitAgent
                     super( id );
                 }
 
-                public ChangeJobInfo execute( RequestCredential credential ) throws IOException
+                public ChangeJob execute( RequestCredential credential ) throws IOException
                 {
                     this.credential = checkNotNull( credential );
                     setRequestApiKey( this, credential );
@@ -822,12 +822,12 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Start( String id, ChangeJobInfo job )
+                Start( String id, ChangeJob job )
                 {
                     super( id, job );
                 }
 
-                public ChangeJobInfo execute( RequestCredential credential ) throws IOException
+                public ChangeJob execute( RequestCredential credential ) throws IOException
                 {
                     this.credential = checkNotNull( credential );
                     setRequestApiKey( this, credential );
@@ -1346,7 +1346,7 @@ public class CustomizedCtoolkitAgent
         public class Job
                 extends CtoolkitAgent.ExportBatch.Job
         {
-            public Cancel cancel( String id, ExportJobInfo job ) throws IOException
+            public Cancel cancel( String id, ExportJob job ) throws IOException
             {
                 Cancel result = new Cancel( id, job );
                 initialize( result );
@@ -1367,7 +1367,7 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Start start( String id, ExportJobInfo job ) throws IOException
+            public Start start( String id, ExportJob job ) throws IOException
             {
                 Start result = new Start( id, job );
                 initialize( result );
@@ -1379,12 +1379,12 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Cancel( String id, ExportJobInfo job )
+                Cancel( String id, ExportJob job )
                 {
                     super( id, job );
                 }
 
-                public ExportJobInfo execute( RequestCredential credential ) throws IOException
+                public ExportJob execute( RequestCredential credential ) throws IOException
                 {
                     this.credential = checkNotNull( credential );
                     setRequestApiKey( this, credential );
@@ -1454,7 +1454,7 @@ public class CustomizedCtoolkitAgent
                     super( id );
                 }
 
-                public ExportJobInfo execute( RequestCredential credential ) throws IOException
+                public ExportJob execute( RequestCredential credential ) throws IOException
                 {
                     this.credential = checkNotNull( credential );
                     setRequestApiKey( this, credential );
@@ -1484,12 +1484,12 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Start( String id, ExportJobInfo job )
+                Start( String id, ExportJob job )
                 {
                     super( id, job );
                 }
 
-                public ExportJobInfo execute( RequestCredential credential ) throws IOException
+                public ExportJob execute( RequestCredential credential ) throws IOException
                 {
                     this.credential = checkNotNull( credential );
                     setRequestApiKey( this, credential );
@@ -2050,7 +2050,7 @@ public class CustomizedCtoolkitAgent
         public class Job
                 extends CtoolkitAgent.ImportBatch.Job
         {
-            public Cancel cancel( String id, ImportJobInfo job ) throws IOException
+            public Cancel cancel( String id, ImportJob job ) throws IOException
             {
                 Cancel result = new Cancel( id, job );
                 initialize( result );
@@ -2071,7 +2071,7 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Start start( String id, ImportJobInfo job )
+            public Start start( String id, ImportJob job )
                     throws IOException
             {
                 Start result = new Start( id, job );
@@ -2084,12 +2084,12 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Cancel( String id, ImportJobInfo job )
+                Cancel( String id, ImportJob job )
                 {
                     super( id, job );
                 }
 
-                public ImportJobInfo execute( RequestCredential credential ) throws IOException
+                public ImportJob execute( RequestCredential credential ) throws IOException
                 {
                     this.credential = checkNotNull( credential );
                     setRequestApiKey( this, credential );
@@ -2159,7 +2159,7 @@ public class CustomizedCtoolkitAgent
                     super( id );
                 }
 
-                public ImportJobInfo execute( RequestCredential credential ) throws IOException
+                public ImportJob execute( RequestCredential credential ) throws IOException
                 {
                     this.credential = checkNotNull( credential );
                     setRequestApiKey( this, credential );
@@ -2189,12 +2189,12 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Start( String id, ImportJobInfo job )
+                Start( String id, ImportJob job )
                 {
                     super( id, job );
                 }
 
-                public ImportJobInfo execute( RequestCredential credential ) throws IOException
+                public ImportJob execute( RequestCredential credential ) throws IOException
                 {
                     this.credential = checkNotNull( credential );
                     setRequestApiKey( this, credential );

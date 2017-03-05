@@ -18,8 +18,8 @@
 
 package org.ctoolkit.restapi.client.agent.adaptee;
 
-import org.ctoolkit.api.agent.model.ChangeJobInfo;
 import org.ctoolkit.api.agent.model.ImportBatch;
+import org.ctoolkit.api.agent.model.ImportJob;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
@@ -44,16 +44,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
-public class GenericJsonChangeJobInfoAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, ChangeJobInfo>
+public class GenericJsonImportJobAdaptee
+        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, ImportJob>
         implements
-        GetExecutorAdaptee<ChangeJobInfo>,
-        InsertExecutorAdaptee<ChangeJobInfo>,
-        UpdateExecutorAdaptee<ChangeJobInfo>,
-        DeleteExecutorAdaptee<ChangeJobInfo>
+        GetExecutorAdaptee<ImportJob>,
+        InsertExecutorAdaptee<ImportJob>,
+        UpdateExecutorAdaptee<ImportJob>,
+        DeleteExecutorAdaptee<ImportJob>
 {
     @Inject
-    public GenericJsonChangeJobInfoAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
+    public GenericJsonImportJobAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -64,13 +64,13 @@ public class GenericJsonChangeJobInfoAdaptee
     {
         checkNotNull( identifier, "Identifier cannot be null" );
 
-        return client().get().changeBatch().job().progress( identifier.getString() );
+        return client().get().importBatch().job().progress( identifier.getString() );
     }
 
     @Override
-    public ChangeJobInfo executeGet( @Nonnull Object request,
-                                     @Nullable Map<String, Object> parameters,
-                                     @Nullable Locale locale )
+    public ImportJob executeGet( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -79,11 +79,11 @@ public class GenericJsonChangeJobInfoAdaptee
         credential.fillInFrom( parameters, true );
 
         fill( get( request ), parameters, locale );
-        return ( ( CustomizedCtoolkitAgent.ChangeBatch.Job.Progress ) request ).execute( credential );
+        return ( ( CustomizedCtoolkitAgent.ImportBatch.Job.Progress ) request ).execute( credential );
     }
 
     @Override
-    public Object prepareInsert( @Nonnull ChangeJobInfo resource,
+    public Object prepareInsert( @Nonnull ImportJob resource,
                                  @Nullable Identifier parentKey,
                                  @Nullable MediaProvider<?> provider )
             throws IOException
@@ -91,13 +91,13 @@ public class GenericJsonChangeJobInfoAdaptee
         checkNotNull( resource );
         checkNotNull( parentKey, "Parent identifier cannot be null" );
 
-        return client().get().changeBatch().job().start( parentKey.getString(), resource );
+        return client().get().importBatch().job().start( parentKey.getString(), resource );
     }
 
     @Override
-    public ChangeJobInfo executeInsert( @Nonnull Object request,
-                                        @Nullable Map<String, Object> parameters,
-                                        @Nullable Locale locale )
+    public ImportJob executeInsert( @Nonnull Object request,
+                                    @Nullable Map<String, Object> parameters,
+                                    @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -106,11 +106,11 @@ public class GenericJsonChangeJobInfoAdaptee
         credential.fillInFrom( parameters, true );
 
         fill( get( request ), parameters, locale );
-        return ( ( CustomizedCtoolkitAgent.ChangeBatch.Job.Start ) request ).execute( credential );
+        return ( ( CustomizedCtoolkitAgent.ImportBatch.Job.Start ) request ).execute( credential );
     }
 
     @Override
-    public Object prepareUpdate( @Nonnull ChangeJobInfo resource,
+    public Object prepareUpdate( @Nonnull ImportJob resource,
                                  @Nonnull Identifier identifier,
                                  @Nullable MediaProvider<?> provider )
             throws IOException
@@ -118,13 +118,13 @@ public class GenericJsonChangeJobInfoAdaptee
         checkNotNull( resource );
         checkNotNull( identifier, "Parent identifier cannot be null" );
 
-        return client().get().changeBatch().job().cancel( identifier.getString(), resource );
+        return client().get().importBatch().job().cancel( identifier.getString(), resource );
     }
 
     @Override
-    public ChangeJobInfo executeUpdate( @Nonnull Object request,
-                                        @Nullable Map<String, Object> parameters,
-                                        @Nullable Locale locale )
+    public ImportJob executeUpdate( @Nonnull Object request,
+                                    @Nullable Map<String, Object> parameters,
+                                    @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -133,25 +133,26 @@ public class GenericJsonChangeJobInfoAdaptee
         credential.fillInFrom( parameters, true );
 
         fill( get( request ), parameters, locale );
-        return ( ( CustomizedCtoolkitAgent.ChangeBatch.Job.Cancel ) request ).execute( credential );
+        return ( ( CustomizedCtoolkitAgent.ImportBatch.Job.Cancel ) request ).execute( credential );
     }
 
     @Override
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
         checkNotNull( identifier, "Identifier cannot be null" );
-        return client().get().changeBatch().job().delete( identifier.getString() );
+        return client().get().importBatch().job().delete( identifier.getString() );
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
-            throws IOException
+    public void executeDelete( @Nonnull Object request,
+                               @Nullable Map<String, Object> parameters,
+                               @Nullable Locale locale ) throws IOException
     {
         checkNotNull( request );
 
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        ( ( CustomizedCtoolkitAgent.ChangeBatch.Job.Delete ) request ).execute( credential );
+        ( ( CustomizedCtoolkitAgent.ImportBatch.Job.Delete ) request ).execute( credential );
     }
 }

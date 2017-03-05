@@ -28,12 +28,12 @@ import org.ctoolkit.api.agent.CtoolkitAgent;
 import org.ctoolkit.api.agent.CtoolkitAgentScopes;
 import org.ctoolkit.api.agent.model.ChangeBatch;
 import org.ctoolkit.api.agent.model.ChangeItem;
-import org.ctoolkit.api.agent.model.ChangeJobInfo;
+import org.ctoolkit.api.agent.model.ChangeJob;
 import org.ctoolkit.api.agent.model.ExportBatch;
-import org.ctoolkit.api.agent.model.ExportJobInfo;
+import org.ctoolkit.api.agent.model.ExportJob;
 import org.ctoolkit.api.agent.model.ImportBatch;
 import org.ctoolkit.api.agent.model.ImportItem;
-import org.ctoolkit.api.agent.model.ImportJobInfo;
+import org.ctoolkit.api.agent.model.ImportJob;
 import org.ctoolkit.api.agent.model.KindMetaData;
 import org.ctoolkit.api.agent.model.MetadataAudit;
 import org.ctoolkit.api.agent.model.PropertyMetaData;
@@ -47,12 +47,12 @@ import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.CustomizedCtoolkitAgent;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeBatchAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeItemAdaptee;
-import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeJobInfoAdaptee;
+import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeJobAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportBatchAdaptee;
-import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportJobInfoAdaptee;
+import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportJobAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonImportBatchAdaptee;
-import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonImportInfoJobAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonImportItemAdaptee;
+import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonImportJobAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonKindMetaDataAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMetadataAuditAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonPropertyMetaDataAdaptee;
@@ -123,21 +123,21 @@ public class CtoolkitApiAgentModule
         } ).to( GenericJsonImportItemAdaptee.class ).in( Singleton.class );
 
         // ImportJobInfo
-        bind( new TypeLiteral<GetExecutorAdaptee<ImportJobInfo>>()
+        bind( new TypeLiteral<GetExecutorAdaptee<ImportJob>>()
         {
-        } ).to( GenericJsonImportInfoJobAdaptee.class ).in( Singleton.class );
+        } ).to( GenericJsonImportJobAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<InsertExecutorAdaptee<ImportJobInfo>>()
+        bind( new TypeLiteral<InsertExecutorAdaptee<ImportJob>>()
         {
-        } ).to( GenericJsonImportInfoJobAdaptee.class ).in( Singleton.class );
+        } ).to( GenericJsonImportJobAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<UpdateExecutorAdaptee<ImportJobInfo>>()
+        bind( new TypeLiteral<UpdateExecutorAdaptee<ImportJob>>()
         {
-        } ).to( GenericJsonImportInfoJobAdaptee.class ).in( Singleton.class );
+        } ).to( GenericJsonImportJobAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<DeleteExecutorAdaptee<ImportJobInfo>>()
+        bind( new TypeLiteral<DeleteExecutorAdaptee<ImportJob>>()
         {
-        } ).to( GenericJsonImportInfoJobAdaptee.class ).in( Singleton.class );
+        } ).to( GenericJsonImportJobAdaptee.class ).in( Singleton.class );
 
         // ChangeBatch
         bind( new TypeLiteral<GetExecutorAdaptee<ChangeBatch>>()
@@ -178,21 +178,21 @@ public class CtoolkitApiAgentModule
         } ).to( GenericJsonChangeItemAdaptee.class ).in( Singleton.class );
 
         // ChangeJobInfo
-        bind( new TypeLiteral<GetExecutorAdaptee<ChangeJobInfo>>()
+        bind( new TypeLiteral<GetExecutorAdaptee<ChangeJob>>()
         {
-        } ).to( GenericJsonChangeJobInfoAdaptee.class ).in( Singleton.class );
+        } ).to( GenericJsonChangeJobAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<InsertExecutorAdaptee<ChangeJobInfo>>()
+        bind( new TypeLiteral<InsertExecutorAdaptee<ChangeJob>>()
         {
-        } ).to( GenericJsonChangeJobInfoAdaptee.class ).in( Singleton.class );
+        } ).to( GenericJsonChangeJobAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<UpdateExecutorAdaptee<ChangeJobInfo>>()
+        bind( new TypeLiteral<UpdateExecutorAdaptee<ChangeJob>>()
         {
-        } ).to( GenericJsonChangeJobInfoAdaptee.class ).in( Singleton.class );
+        } ).to( GenericJsonChangeJobAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<DeleteExecutorAdaptee<ChangeJobInfo>>()
+        bind( new TypeLiteral<DeleteExecutorAdaptee<ChangeJob>>()
         {
-        } ).to( GenericJsonChangeJobInfoAdaptee.class ).in( Singleton.class );
+        } ).to( GenericJsonChangeJobAdaptee.class ).in( Singleton.class );
 
         // ExportBatch
         bind( new TypeLiteral<GetExecutorAdaptee<ExportBatch>>()
@@ -216,21 +216,21 @@ public class CtoolkitApiAgentModule
         } ).to( GenericJsonExportBatchAdaptee.class ).in( Singleton.class );
 
         // ExportJobInfo
-        bind( new TypeLiteral<GetExecutorAdaptee<ExportJobInfo>>()
+        bind( new TypeLiteral<GetExecutorAdaptee<ExportJob>>()
         {
-        } ).to( GenericJsonExportJobInfoAdaptee.class ).in( Singleton.class );
+        } ).to( GenericJsonExportJobAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<InsertExecutorAdaptee<ExportJobInfo>>()
+        bind( new TypeLiteral<InsertExecutorAdaptee<ExportJob>>()
         {
-        } ).to( GenericJsonExportJobInfoAdaptee.class ).in( Singleton.class );
+        } ).to( GenericJsonExportJobAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<UpdateExecutorAdaptee<ExportJobInfo>>()
+        bind( new TypeLiteral<UpdateExecutorAdaptee<ExportJob>>()
         {
-        } ).to( GenericJsonExportJobInfoAdaptee.class ).in( Singleton.class );
+        } ).to( GenericJsonExportJobAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<DeleteExecutorAdaptee<ExportJobInfo>>()
+        bind( new TypeLiteral<DeleteExecutorAdaptee<ExportJob>>()
         {
-        } ).to( GenericJsonExportJobInfoAdaptee.class ).in( Singleton.class );
+        } ).to( GenericJsonExportJobAdaptee.class ).in( Singleton.class );
 
         // KindMetaData
         bind( new TypeLiteral<ListExecutorAdaptee<KindMetaData>>()
