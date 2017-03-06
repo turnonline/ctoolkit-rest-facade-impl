@@ -30,6 +30,7 @@ import org.ctoolkit.api.agent.model.ChangeBatch;
 import org.ctoolkit.api.agent.model.ChangeItem;
 import org.ctoolkit.api.agent.model.ChangeJob;
 import org.ctoolkit.api.agent.model.ExportBatch;
+import org.ctoolkit.api.agent.model.ExportItem;
 import org.ctoolkit.api.agent.model.ExportJob;
 import org.ctoolkit.api.agent.model.ImportBatch;
 import org.ctoolkit.api.agent.model.ImportItem;
@@ -49,6 +50,7 @@ import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeBatchAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeItemAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeJobAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportBatchAdaptee;
+import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportItemAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportJobAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonImportBatchAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonImportItemAdaptee;
@@ -214,6 +216,23 @@ public class CtoolkitApiAgentModule
         bind( new TypeLiteral<DeleteExecutorAdaptee<ExportBatch>>()
         {
         } ).to( GenericJsonExportBatchAdaptee.class ).in( Singleton.class );
+
+        // ExportItem
+        bind( new TypeLiteral<GetExecutorAdaptee<ExportItem>>()
+        {
+        } ).to( GenericJsonExportItemAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<InsertExecutorAdaptee<ExportItem>>()
+        {
+        } ).to( GenericJsonExportItemAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<UpdateExecutorAdaptee<ExportItem>>()
+        {
+        } ).to( GenericJsonExportItemAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<DeleteExecutorAdaptee<ExportItem>>()
+        {
+        } ).to( GenericJsonExportItemAdaptee.class ).in( Singleton.class );
 
         // ExportJobInfo
         bind( new TypeLiteral<GetExecutorAdaptee<ExportJob>>()

@@ -38,6 +38,7 @@ public class ResourcesMapper
         factory.classMap( ChangeBatch.class, org.ctoolkit.api.agent.model.ChangeBatch.class ).byDefault().register();
 
         factory.classMap( ImportBatch.ImportItem.class, org.ctoolkit.api.agent.model.ImportItem.class ).byDefault().register();
+        factory.classMap( ExportBatch.ExportItem.class, org.ctoolkit.api.agent.model.ExportItem.class ).byDefault().register();
         factory.classMap( ChangeBatch.ChangeItem.class, org.ctoolkit.api.agent.model.ChangeItem.class ).byDefault().register();
 
         factory.classMap( ImportJobInfo.class, org.ctoolkit.api.agent.model.ImportJob.class ).byDefault().register();
