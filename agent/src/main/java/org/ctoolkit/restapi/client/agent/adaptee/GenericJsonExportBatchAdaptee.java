@@ -33,7 +33,6 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Provider;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -47,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonExportBatchAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, ExportBatch>
+        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent, ExportBatch>
         implements
         GetExecutorAdaptee<ExportBatch>,
         InsertExecutorAdaptee<ExportBatch>,
@@ -56,7 +55,7 @@ public class GenericJsonExportBatchAdaptee
         DeleteExecutorAdaptee<ExportBatch>
 {
     @Inject
-    public GenericJsonExportBatchAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
+    public GenericJsonExportBatchAdaptee( CustomizedCtoolkitAgent ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -67,7 +66,7 @@ public class GenericJsonExportBatchAdaptee
     {
         checkNotNull( identifier, "Identifier cannot be null" );
 
-        return client().get().exportBatch().get( identifier.getString() );
+        return client().exportBatch().get( identifier.getString() );
     }
 
     @Override
@@ -92,7 +91,7 @@ public class GenericJsonExportBatchAdaptee
             throws IOException
     {
         checkNotNull( resource );
-        return client().get().exportBatch().insert( resource );
+        return client().exportBatch().insert( resource );
     }
 
     @Override
@@ -119,7 +118,7 @@ public class GenericJsonExportBatchAdaptee
         checkNotNull( resource );
         checkNotNull( identifier, "Identifier cannot be null" );
 
-        return client().get().exportBatch().update( identifier.getString(), resource );
+        return client().exportBatch().update( identifier.getString(), resource );
     }
 
     @Override
@@ -141,7 +140,7 @@ public class GenericJsonExportBatchAdaptee
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
         checkNotNull( identifier, "Identifier cannot be null" );
-        return client().get().exportBatch().delete( identifier.getString() );
+        return client().exportBatch().delete( identifier.getString() );
     }
 
     @Override
@@ -159,7 +158,7 @@ public class GenericJsonExportBatchAdaptee
     @Override
     public Object prepareList( @Nullable Identifier identifier ) throws IOException
     {
-        return client().get().exportBatch().list();
+        return client().exportBatch().list();
     }
 
     @Override

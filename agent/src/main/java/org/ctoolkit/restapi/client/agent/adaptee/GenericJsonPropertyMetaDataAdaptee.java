@@ -27,7 +27,6 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Provider;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -39,11 +38,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonPropertyMetaDataAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, PropertyMetaData>
+        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent, PropertyMetaData>
         implements ListExecutorAdaptee<PropertyMetaData>
 {
     @Inject
-    public GenericJsonPropertyMetaDataAdaptee( Provider<CustomizedCtoolkitAgent> client )
+    public GenericJsonPropertyMetaDataAdaptee( CustomizedCtoolkitAgent client )
     {
         super( client );
     }
@@ -52,7 +51,7 @@ public class GenericJsonPropertyMetaDataAdaptee
     public Object prepareList( @Nullable Identifier parentKey ) throws IOException
     {
         checkNotNull( parentKey );
-        return client().get().metadata().kind().property().list( parentKey.getString() );
+        return client().metadata().kind().property().list( parentKey.getString() );
     }
 
     @Override

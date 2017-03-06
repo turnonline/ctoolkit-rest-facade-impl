@@ -32,7 +32,6 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -45,7 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonChangeItemAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, ChangeItem>
+        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent, ChangeItem>
         implements
         GetExecutorAdaptee<ChangeItem>,
         InsertExecutorAdaptee<ChangeItem>,
@@ -53,7 +52,7 @@ public class GenericJsonChangeItemAdaptee
         DeleteExecutorAdaptee<ChangeItem>
 {
     @Inject
-    public GenericJsonChangeItemAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
+    public GenericJsonChangeItemAdaptee( CustomizedCtoolkitAgent ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -67,7 +66,7 @@ public class GenericJsonChangeItemAdaptee
 
         String metadataId = identifier.getString();
         String id = identifier.getChild().getString();
-        return client().get().changeBatch().item().get( metadataId, id );
+        return client().changeBatch().item().get( metadataId, id );
     }
 
     @Override
@@ -94,7 +93,7 @@ public class GenericJsonChangeItemAdaptee
         checkNotNull( resource );
         checkNotNull( parentKey, "Parent identifier cannot be null" );
 
-        return client().get().changeBatch().item().insert( parentKey.getString(), resource );
+        return client().changeBatch().item().insert( parentKey.getString(), resource );
     }
 
     @Override
@@ -124,7 +123,7 @@ public class GenericJsonChangeItemAdaptee
 
         String metadataId = identifier.getString();
         String id = identifier.getChild().getString();
-        return client().get().changeBatch().item().update( metadataId, id, resource );
+        return client().changeBatch().item().update( metadataId, id, resource );
     }
 
     @Override
@@ -150,7 +149,7 @@ public class GenericJsonChangeItemAdaptee
 
         String metadataId = identifier.getString();
         String id = identifier.getChild().getString();
-        return client().get().changeBatch().item().delete( metadataId, id );
+        return client().changeBatch().item().delete( metadataId, id );
     }
 
     @Override

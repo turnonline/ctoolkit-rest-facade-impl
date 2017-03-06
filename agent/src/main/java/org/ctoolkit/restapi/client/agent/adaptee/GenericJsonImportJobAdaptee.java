@@ -32,7 +32,6 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -45,7 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonImportJobAdaptee
-        extends AbstractGoogleClientAdaptee<Provider<CustomizedCtoolkitAgent>, ImportJob>
+        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent, ImportJob>
         implements
         GetExecutorAdaptee<ImportJob>,
         InsertExecutorAdaptee<ImportJob>,
@@ -53,7 +52,7 @@ public class GenericJsonImportJobAdaptee
         DeleteExecutorAdaptee<ImportJob>
 {
     @Inject
-    public GenericJsonImportJobAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
+    public GenericJsonImportJobAdaptee( CustomizedCtoolkitAgent ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -64,7 +63,7 @@ public class GenericJsonImportJobAdaptee
     {
         checkNotNull( identifier, "Identifier cannot be null" );
 
-        return client().get().importBatch().job().progress( identifier.getString() );
+        return client().importBatch().job().progress( identifier.getString() );
     }
 
     @Override
@@ -91,7 +90,7 @@ public class GenericJsonImportJobAdaptee
         checkNotNull( resource );
         checkNotNull( parentKey, "Parent identifier cannot be null" );
 
-        return client().get().importBatch().job().start( parentKey.getString(), resource );
+        return client().importBatch().job().start( parentKey.getString(), resource );
     }
 
     @Override
@@ -118,7 +117,7 @@ public class GenericJsonImportJobAdaptee
         checkNotNull( resource );
         checkNotNull( identifier, "Parent identifier cannot be null" );
 
-        return client().get().importBatch().job().cancel( identifier.getString(), resource );
+        return client().importBatch().job().cancel( identifier.getString(), resource );
     }
 
     @Override
@@ -140,7 +139,7 @@ public class GenericJsonImportJobAdaptee
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
         checkNotNull( identifier, "Identifier cannot be null" );
-        return client().get().importBatch().job().delete( identifier.getString() );
+        return client().importBatch().job().delete( identifier.getString() );
     }
 
     @Override
