@@ -108,6 +108,6 @@ public class GoogleApiProxyFactoryTest
     public void isCredentialOnMissingConfig()
     {
         boolean credentialOn = tested.isCredentialOn( null );
-        assertEquals( credentialOn, true );
+        assertEquals( credentialOn, false );
     }
 }

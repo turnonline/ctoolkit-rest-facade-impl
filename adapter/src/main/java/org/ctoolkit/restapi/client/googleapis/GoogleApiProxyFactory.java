@@ -171,26 +171,7 @@ public abstract class GoogleApiProxyFactory
      */
     public final boolean isDisableGZipContent( @Nullable String prefix )
     {
-        if ( Strings.isNullOrEmpty( prefix ) )
-        {
-            prefix = DEFAULT_CREDENTIAL_PREFIX;
-        }
-
-        String fullProperty = CREDENTIAL_ATTR + prefix + "." + PROPERTY_DISABLE_GZIP_CONTENT;
-        String value = credential.get( fullProperty );
-
-        if ( value == null )
-        {
-            fullProperty = CREDENTIAL_ATTR + DEFAULT_CREDENTIAL_PREFIX + "." + PROPERTY_DISABLE_GZIP_CONTENT;
-            value = credential.get( fullProperty );
-        }
-
-        if ( value == null )
-        {
-            return false;
-        }
-
-        return Boolean.valueOf( value );
+        return getBoolean( PROPERTY_DISABLE_GZIP_CONTENT, prefix );
     }
 
     /**
@@ -343,23 +324,35 @@ public abstract class GoogleApiProxyFactory
      */
     public final boolean isCredentialOn( @Nullable String prefix )
     {
+        return getBoolean( PROPERTY_CREDENTIAL_ON, prefix );
+    }
+
+    /**
+     * Returns the boolean value for given property.
+     *
+     * @param property the name of the property to retrieve
+     * @param prefix   the prefix used to identify specific credential or null for default
+     * @return the boolean value
+     */
+    private boolean getBoolean( @Nonnull String property, @Nullable String prefix )
+    {
         if ( Strings.isNullOrEmpty( prefix ) )
         {
             prefix = DEFAULT_CREDENTIAL_PREFIX;
         }
 
-        String fullProperty = CREDENTIAL_ATTR + prefix + "." + PROPERTY_CREDENTIAL_ON;
+        String fullProperty = CREDENTIAL_ATTR + prefix + "." + property;
         String value = credential.get( fullProperty );
 
         if ( value == null )
         {
-            fullProperty = CREDENTIAL_ATTR + DEFAULT_CREDENTIAL_PREFIX + "." + PROPERTY_CREDENTIAL_ON;
+            fullProperty = CREDENTIAL_ATTR + DEFAULT_CREDENTIAL_PREFIX + "." + property;
             value = credential.get( fullProperty );
         }
 
         if ( value == null )
         {
-            return true;
+            return false;
         }
 
         return Boolean.valueOf( value );
