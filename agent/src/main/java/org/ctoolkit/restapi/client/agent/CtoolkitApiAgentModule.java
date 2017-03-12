@@ -24,8 +24,8 @@ import com.google.api.client.http.HttpTransport;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
-import org.ctoolkit.api.agent.CtoolkitAgent;
-import org.ctoolkit.api.agent.CtoolkitAgentScopes;
+import org.ctoolkit.api.agent.Agent;
+import org.ctoolkit.api.agent.AgentScopes;
 import org.ctoolkit.api.agent.model.ChangeBatch;
 import org.ctoolkit.api.agent.model.ChangeItem;
 import org.ctoolkit.api.agent.model.ChangeJob;
@@ -271,7 +271,7 @@ public class CtoolkitApiAgentModule
     @Singleton
     CustomizedCtoolkitAgent provideCtoolkitAgent( GoogleApiProxyFactory factory )
     {
-        Set<String> scopes = CtoolkitAgentScopes.all();
+        Set<String> scopes = AgentScopes.all();
         CustomizedCtoolkitAgent.Builder builder;
 
         String applicationName = factory.getApplicationName( API_PREFIX );
@@ -285,7 +285,7 @@ public class CtoolkitApiAgentModule
             builder = new CustomizedCtoolkitAgent.Builder( httpTransport, factory.getJsonFactory(), initializer );
             builder.setApplicationName( applicationName )
                     .setRootUrl( endpointUrl )
-                    .setServicePath( CtoolkitAgent.DEFAULT_SERVICE_PATH );
+                    .setServicePath( Agent.DEFAULT_SERVICE_PATH );
         }
         catch ( GeneralSecurityException e )
         {

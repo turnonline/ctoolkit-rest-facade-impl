@@ -24,8 +24,8 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.UriTemplate;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
-import org.ctoolkit.api.agent.CtoolkitAgent;
-import org.ctoolkit.api.agent.CtoolkitAgentRequest;
+import org.ctoolkit.api.agent.Agent;
+import org.ctoolkit.api.agent.AgentRequest;
 import org.ctoolkit.api.agent.model.ChangeBatchCollection;
 import org.ctoolkit.api.agent.model.ChangeItem;
 import org.ctoolkit.api.agent.model.ChangeJob;
@@ -46,17 +46,17 @@ import java.io.IOException;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The extended {@link CtoolkitAgent} overriding default functionality. The purpose is to be able change the root URL
+ * The extended {@link Agent} overriding default functionality. The purpose is to be able change the root URL
  * per request call.
- * See {@link CustomizedCtoolkitAgent#buildCustomizedRequestUrl(RequestCredential, String, String, CtoolkitAgentRequest)}.
+ * See {@link CustomizedCtoolkitAgent#buildCustomizedRequestUrl(RequestCredential, String, String, AgentRequest)}.
  * <p>
- * In the original generated class we have changed the visibility of the {@link CtoolkitAgent.Builder}
- * and related constructor {@link CtoolkitAgent#CtoolkitAgent(CtoolkitAgent.Builder) }
+ * In the original generated class we have changed the visibility of the {@link Agent.Builder}
+ * and related constructor {@link Agent#Agent(Agent.Builder) }
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class CustomizedCtoolkitAgent
-        extends CtoolkitAgent
+        extends Agent
 {
     CustomizedCtoolkitAgent( Builder builder )
     {
@@ -91,7 +91,7 @@ public class CustomizedCtoolkitAgent
     private GenericUrl buildCustomizedRequestUrl( RequestCredential credential,
                                                   String servicePath,
                                                   String uriTemplate,
-                                                  CtoolkitAgentRequest request )
+                                                  AgentRequest request )
     {
         String rootUrl = credential.getEndpointUrl();
         if ( Strings.isNullOrEmpty( rootUrl ) )
@@ -111,7 +111,7 @@ public class CustomizedCtoolkitAgent
         return new GenericUrl( UriTemplate.expand( url, uriTemplate, request, true ) );
     }
 
-    private void setRequestApiKey( CtoolkitAgentRequest request, RequestCredential credential )
+    private void setRequestApiKey( AgentRequest request, RequestCredential credential )
     {
         checkNotNull( request );
         String apiKey = credential.getApiKey();
@@ -134,7 +134,7 @@ public class CustomizedCtoolkitAgent
     }
 
     public static class Builder
-            extends CtoolkitAgent.Builder
+            extends Agent.Builder
     {
 
         public Builder( HttpTransport transport,
@@ -152,7 +152,7 @@ public class CustomizedCtoolkitAgent
     }
 
     public class Audit
-            extends CtoolkitAgent.Audit
+            extends Agent.Audit
     {
         public List list() throws IOException
         {
@@ -162,7 +162,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class List
-                extends CtoolkitAgent.Audit.List
+                extends Agent.Audit.List
         {
             private RequestCredential credential;
 
@@ -198,7 +198,7 @@ public class CustomizedCtoolkitAgent
     }
 
     public class ChangeBatch
-            extends CtoolkitAgent.ChangeBatch
+            extends Agent.ChangeBatch
     {
         public Delete delete( String id ) throws IOException
         {
@@ -228,14 +228,6 @@ public class CustomizedCtoolkitAgent
             return result;
         }
 
-        public Patch patch( String id, org.ctoolkit.api.agent.model.ChangeBatch content )
-                throws IOException
-        {
-            Patch result = new Patch( id, content );
-            initialize( result );
-            return result;
-        }
-
         public Update update( String id, org.ctoolkit.api.agent.model.ChangeBatch content )
                 throws IOException
         {
@@ -255,7 +247,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class Delete
-                extends CtoolkitAgent.ChangeBatch.Delete
+                extends Agent.ChangeBatch.Delete
         {
             private RequestCredential credential;
 
@@ -290,7 +282,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class Get
-                extends CtoolkitAgent.ChangeBatch.Get
+                extends Agent.ChangeBatch.Get
         {
             private RequestCredential credential;
 
@@ -325,7 +317,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class Insert
-                extends CtoolkitAgent.ChangeBatch.Insert
+                extends Agent.ChangeBatch.Insert
         {
             private RequestCredential credential;
 
@@ -360,7 +352,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class List
-                extends CtoolkitAgent.ChangeBatch.List
+                extends Agent.ChangeBatch.List
         {
             private RequestCredential credential;
 
@@ -394,43 +386,9 @@ public class CustomizedCtoolkitAgent
             }
         }
 
-        class Patch
-                extends CtoolkitAgent.ChangeBatch.Patch
-        {
-            private RequestCredential credential;
-
-            Patch( String id, org.ctoolkit.api.agent.model.ChangeBatch content )
-            {
-                super( id, content );
-            }
-
-            public org.ctoolkit.api.agent.model.ChangeBatch execute( RequestCredential credential ) throws IOException
-            {
-                this.credential = checkNotNull( credential );
-                setRequestApiKey( this, credential );
-                return super.execute();
-            }
-
-            @Override
-            public GenericUrl buildHttpRequestUrl()
-            {
-                String servicePath = this.getAbstractGoogleClient().getServicePath();
-                String uriTemplate = this.getUriTemplate();
-                GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
-
-                if ( url == null )
-                {
-                    return super.buildHttpRequestUrl();
-                }
-                else
-                {
-                    return url;
-                }
-            }
-        }
 
         class Update
-                extends CtoolkitAgent.ChangeBatch.Update
+                extends Agent.ChangeBatch.Update
         {
             private RequestCredential credential;
 
@@ -465,7 +423,7 @@ public class CustomizedCtoolkitAgent
         }
 
         public class Item
-                extends CtoolkitAgent.ChangeBatch.Item
+                extends Agent.ChangeBatch.Item
         {
             public Delete delete( String metadataId, String id ) throws IOException
             {
@@ -489,14 +447,6 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Patch patch( String metadataId, String id, ChangeItem content )
-                    throws IOException
-            {
-                Patch result = new Patch( metadataId, id, content );
-                initialize( result );
-                return result;
-            }
-
             public Update update( String metadataId, String id, ChangeItem content )
                     throws IOException
             {
@@ -506,7 +456,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Delete
-                    extends CtoolkitAgent.ChangeBatch.Item.Delete
+                    extends Agent.ChangeBatch.Item.Delete
             {
                 private RequestCredential credential;
 
@@ -541,7 +491,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Get
-                    extends CtoolkitAgent.ChangeBatch.Item.Get
+                    extends Agent.ChangeBatch.Item.Get
             {
                 private RequestCredential credential;
 
@@ -576,7 +526,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Insert
-                    extends CtoolkitAgent.ChangeBatch.Item.Insert
+                    extends Agent.ChangeBatch.Item.Insert
             {
                 private RequestCredential credential;
 
@@ -610,43 +560,9 @@ public class CustomizedCtoolkitAgent
                 }
             }
 
-            class Patch
-                    extends CtoolkitAgent.ChangeBatch.Item.Patch
-            {
-                private RequestCredential credential;
-
-                Patch( String metadataId, String id, ChangeItem content )
-                {
-                    super( metadataId, id, content );
-                }
-
-                public ChangeItem execute( RequestCredential credential ) throws IOException
-                {
-                    this.credential = checkNotNull( credential );
-                    setRequestApiKey( this, credential );
-                    return super.execute();
-                }
-
-                @Override
-                public GenericUrl buildHttpRequestUrl()
-                {
-                    String servicePath = this.getAbstractGoogleClient().getServicePath();
-                    String uriTemplate = this.getUriTemplate();
-                    GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
-
-                    if ( url == null )
-                    {
-                        return super.buildHttpRequestUrl();
-                    }
-                    else
-                    {
-                        return url;
-                    }
-                }
-            }
 
             class Update
-                    extends CtoolkitAgent.ChangeBatch.Item.Update
+                    extends Agent.ChangeBatch.Item.Update
             {
                 private RequestCredential credential;
 
@@ -682,7 +598,7 @@ public class CustomizedCtoolkitAgent
         }
 
         public class Job
-                extends CtoolkitAgent.ChangeBatch.Job
+                extends Agent.ChangeBatch.Job
         {
             public Cancel cancel( String id, ChangeJob job ) throws IOException
             {
@@ -713,7 +629,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Cancel
-                    extends CtoolkitAgent.ChangeBatch.Job.Cancel
+                    extends Agent.ChangeBatch.Job.Cancel
             {
                 private RequestCredential credential;
 
@@ -748,7 +664,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Delete
-                    extends CtoolkitAgent.ChangeBatch.Job.Delete
+                    extends Agent.ChangeBatch.Job.Delete
             {
                 private RequestCredential credential;
 
@@ -783,7 +699,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Progress
-                    extends CtoolkitAgent.ChangeBatch.Job.Progress
+                    extends Agent.ChangeBatch.Job.Progress
             {
                 private RequestCredential credential;
 
@@ -818,7 +734,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Start
-                    extends CtoolkitAgent.ChangeBatch.Job.Start
+                    extends Agent.ChangeBatch.Job.Start
             {
                 private RequestCredential credential;
 
@@ -855,7 +771,7 @@ public class CustomizedCtoolkitAgent
     }
 
     public class ExportBatch
-            extends CtoolkitAgent.ExportBatch
+            extends Agent.ExportBatch
     {
         public Delete delete( String id ) throws IOException
         {
@@ -885,14 +801,6 @@ public class CustomizedCtoolkitAgent
             return result;
         }
 
-        public Patch patch( String id, org.ctoolkit.api.agent.model.ExportBatch content )
-                throws IOException
-        {
-            Patch result = new Patch( id, content );
-            initialize( result );
-            return result;
-        }
-
         public Update update( String id, org.ctoolkit.api.agent.model.ExportBatch content )
                 throws IOException
         {
@@ -917,7 +825,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class Delete
-                extends CtoolkitAgent.ExportBatch.Delete
+                extends Agent.ExportBatch.Delete
         {
             private RequestCredential credential;
 
@@ -952,7 +860,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class Get
-                extends CtoolkitAgent.ExportBatch.Get
+                extends Agent.ExportBatch.Get
         {
             private RequestCredential credential;
 
@@ -987,7 +895,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class Insert
-                extends CtoolkitAgent.ExportBatch.Insert
+                extends Agent.ExportBatch.Insert
         {
             private RequestCredential credential;
 
@@ -1022,7 +930,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class List
-                extends CtoolkitAgent.ExportBatch.List
+                extends Agent.ExportBatch.List
         {
             private RequestCredential credential;
 
@@ -1056,43 +964,8 @@ public class CustomizedCtoolkitAgent
             }
         }
 
-        class Patch
-                extends CtoolkitAgent.ExportBatch.Patch
-        {
-            private RequestCredential credential;
-
-            Patch( String id, org.ctoolkit.api.agent.model.ExportBatch content )
-            {
-                super( id, content );
-            }
-
-            public org.ctoolkit.api.agent.model.ExportBatch execute( RequestCredential credential ) throws IOException
-            {
-                this.credential = checkNotNull( credential );
-                setRequestApiKey( this, credential );
-                return super.execute();
-            }
-
-            @Override
-            public GenericUrl buildHttpRequestUrl()
-            {
-                String servicePath = this.getAbstractGoogleClient().getServicePath();
-                String uriTemplate = this.getUriTemplate();
-                GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
-
-                if ( url == null )
-                {
-                    return super.buildHttpRequestUrl();
-                }
-                else
-                {
-                    return url;
-                }
-            }
-        }
-
         class Update
-                extends CtoolkitAgent.ExportBatch.Update
+                extends Agent.ExportBatch.Update
         {
             private RequestCredential credential;
 
@@ -1127,7 +1000,7 @@ public class CustomizedCtoolkitAgent
         }
 
         public class Item
-                extends CtoolkitAgent.ExportBatch.Item
+                extends Agent.ExportBatch.Item
         {
             public Delete delete( String metadataId, String id ) throws IOException
             {
@@ -1151,14 +1024,6 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Patch patch( String metadataId, String id, ExportItem content )
-                    throws IOException
-            {
-                Patch result = new Patch( metadataId, id, content );
-                initialize( result );
-                return result;
-            }
-
             public Update update( String metadataId, String id, ExportItem content )
                     throws IOException
             {
@@ -1168,7 +1033,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Delete
-                    extends CtoolkitAgent.ExportBatch.Item.Delete
+                    extends Agent.ExportBatch.Item.Delete
             {
                 private RequestCredential credential;
 
@@ -1203,7 +1068,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Get
-                    extends CtoolkitAgent.ExportBatch.Item.Get
+                    extends Agent.ExportBatch.Item.Get
             {
                 private RequestCredential credential;
 
@@ -1238,7 +1103,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Insert
-                    extends CtoolkitAgent.ExportBatch.Item.Insert
+                    extends Agent.ExportBatch.Item.Insert
             {
                 private RequestCredential credential;
 
@@ -1272,43 +1137,8 @@ public class CustomizedCtoolkitAgent
                 }
             }
 
-            class Patch
-                    extends CtoolkitAgent.ExportBatch.Item.Patch
-            {
-                private RequestCredential credential;
-
-                Patch( String metadataId, String id, ExportItem content )
-                {
-                    super( metadataId, id, content );
-                }
-
-                public ExportItem execute( RequestCredential credential ) throws IOException
-                {
-                    this.credential = checkNotNull( credential );
-                    setRequestApiKey( this, credential );
-                    return super.execute();
-                }
-
-                @Override
-                public GenericUrl buildHttpRequestUrl()
-                {
-                    String servicePath = this.getAbstractGoogleClient().getServicePath();
-                    String uriTemplate = this.getUriTemplate();
-                    GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
-
-                    if ( url == null )
-                    {
-                        return super.buildHttpRequestUrl();
-                    }
-                    else
-                    {
-                        return url;
-                    }
-                }
-            }
-
             class Update
-                    extends CtoolkitAgent.ExportBatch.Item.Update
+                    extends Agent.ExportBatch.Item.Update
             {
                 private RequestCredential credential;
 
@@ -1344,7 +1174,7 @@ public class CustomizedCtoolkitAgent
         }
 
         public class Job
-                extends CtoolkitAgent.ExportBatch.Job
+                extends Agent.ExportBatch.Job
         {
             public Cancel cancel( String id, ExportJob job ) throws IOException
             {
@@ -1375,7 +1205,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Cancel
-                    extends CtoolkitAgent.ExportBatch.Job.Cancel
+                    extends Agent.ExportBatch.Job.Cancel
             {
                 private RequestCredential credential;
 
@@ -1410,7 +1240,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Delete
-                    extends CtoolkitAgent.ExportBatch.Job.Delete
+                    extends Agent.ExportBatch.Job.Delete
             {
                 private RequestCredential credential;
 
@@ -1445,7 +1275,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Progress
-                    extends CtoolkitAgent.ExportBatch.Job.Progress
+                    extends Agent.ExportBatch.Job.Progress
             {
                 private RequestCredential credential;
 
@@ -1480,7 +1310,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Start
-                    extends CtoolkitAgent.ExportBatch.Job.Start
+                    extends Agent.ExportBatch.Job.Start
             {
                 private RequestCredential credential;
 
@@ -1516,7 +1346,7 @@ public class CustomizedCtoolkitAgent
         }
 
         public class Migrate
-                extends CtoolkitAgent.ExportBatch.Migrate
+                extends Agent.ExportBatch.Migrate
         {
             public Insert insert( String id ) throws IOException
             {
@@ -1526,7 +1356,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Insert
-                    extends CtoolkitAgent.ExportBatch.Migrate.Insert
+                    extends Agent.ExportBatch.Migrate.Insert
             {
                 private RequestCredential credential;
 
@@ -1564,7 +1394,7 @@ public class CustomizedCtoolkitAgent
     }
 
     public class ImportBatch
-            extends CtoolkitAgent.ImportBatch
+            extends Agent.ImportBatch
     {
         public Delete delete( String id ) throws IOException
         {
@@ -1594,14 +1424,6 @@ public class CustomizedCtoolkitAgent
             return result;
         }
 
-        public Patch patch( String id, org.ctoolkit.api.agent.model.ImportBatch content )
-                throws IOException
-        {
-            Patch result = new Patch( id, content );
-            initialize( result );
-            return result;
-        }
-
         public Update update( String id, org.ctoolkit.api.agent.model.ImportBatch content )
                 throws IOException
         {
@@ -1621,7 +1443,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class Delete
-                extends CtoolkitAgent.ImportBatch.Delete
+                extends Agent.ImportBatch.Delete
         {
             private RequestCredential credential;
 
@@ -1656,7 +1478,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class Get
-                extends CtoolkitAgent.ImportBatch.Get
+                extends Agent.ImportBatch.Get
         {
             private RequestCredential credential;
 
@@ -1691,7 +1513,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class Insert
-                extends CtoolkitAgent.ImportBatch.Insert
+                extends Agent.ImportBatch.Insert
         {
             private RequestCredential credential;
 
@@ -1726,7 +1548,7 @@ public class CustomizedCtoolkitAgent
         }
 
         class List
-                extends CtoolkitAgent.ImportBatch.List
+                extends Agent.ImportBatch.List
         {
             private RequestCredential credential;
 
@@ -1760,43 +1582,8 @@ public class CustomizedCtoolkitAgent
             }
         }
 
-        class Patch
-                extends CtoolkitAgent.ImportBatch.Patch
-        {
-            private RequestCredential credential;
-
-            Patch( String id, org.ctoolkit.api.agent.model.ImportBatch content )
-            {
-                super( id, content );
-            }
-
-            public org.ctoolkit.api.agent.model.ImportBatch execute( RequestCredential credential ) throws IOException
-            {
-                this.credential = checkNotNull( credential );
-                setRequestApiKey( this, credential );
-                return super.execute();
-            }
-
-            @Override
-            public GenericUrl buildHttpRequestUrl()
-            {
-                String servicePath = this.getAbstractGoogleClient().getServicePath();
-                String uriTemplate = this.getUriTemplate();
-                GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
-
-                if ( url == null )
-                {
-                    return super.buildHttpRequestUrl();
-                }
-                else
-                {
-                    return url;
-                }
-            }
-        }
-
         class Update
-                extends CtoolkitAgent.ImportBatch.Update
+                extends Agent.ImportBatch.Update
         {
             private RequestCredential credential;
 
@@ -1831,7 +1618,7 @@ public class CustomizedCtoolkitAgent
         }
 
         public class Item
-                extends CtoolkitAgent.ImportBatch.Item
+                extends Agent.ImportBatch.Item
         {
             public Delete delete( String metadataId, String id ) throws IOException
             {
@@ -1855,14 +1642,6 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Patch patch( String metadataId, String id, ImportItem content )
-                    throws IOException
-            {
-                Patch result = new Patch( metadataId, id, content );
-                initialize( result );
-                return result;
-            }
-
             public Update update( String metadataId, String id, ImportItem content )
                     throws IOException
             {
@@ -1872,7 +1651,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Delete
-                    extends CtoolkitAgent.ImportBatch.Item.Delete
+                    extends Agent.ImportBatch.Item.Delete
             {
                 private RequestCredential credential;
 
@@ -1907,7 +1686,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Get
-                    extends CtoolkitAgent.ImportBatch.Item.Get
+                    extends Agent.ImportBatch.Item.Get
             {
                 private RequestCredential credential;
 
@@ -1942,7 +1721,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Insert
-                    extends CtoolkitAgent.ImportBatch.Item.Insert
+                    extends Agent.ImportBatch.Item.Insert
             {
                 private RequestCredential credential;
 
@@ -1976,43 +1755,8 @@ public class CustomizedCtoolkitAgent
                 }
             }
 
-            class Patch
-                    extends CtoolkitAgent.ImportBatch.Item.Patch
-            {
-                private RequestCredential credential;
-
-                Patch( String metadataId, String id, ImportItem content )
-                {
-                    super( metadataId, id, content );
-                }
-
-                public ImportItem execute( RequestCredential credential ) throws IOException
-                {
-                    this.credential = checkNotNull( credential );
-                    setRequestApiKey( this, credential );
-                    return super.execute();
-                }
-
-                @Override
-                public GenericUrl buildHttpRequestUrl()
-                {
-                    String servicePath = this.getAbstractGoogleClient().getServicePath();
-                    String uriTemplate = this.getUriTemplate();
-                    GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
-
-                    if ( url == null )
-                    {
-                        return super.buildHttpRequestUrl();
-                    }
-                    else
-                    {
-                        return url;
-                    }
-                }
-            }
-
             class Update
-                    extends CtoolkitAgent.ImportBatch.Item.Update
+                    extends Agent.ImportBatch.Item.Update
             {
                 private RequestCredential credential;
 
@@ -2048,7 +1792,7 @@ public class CustomizedCtoolkitAgent
         }
 
         public class Job
-                extends CtoolkitAgent.ImportBatch.Job
+                extends Agent.ImportBatch.Job
         {
             public Cancel cancel( String id, ImportJob job ) throws IOException
             {
@@ -2080,7 +1824,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Cancel
-                    extends CtoolkitAgent.ImportBatch.Job.Cancel
+                    extends Agent.ImportBatch.Job.Cancel
             {
                 private RequestCredential credential;
 
@@ -2115,7 +1859,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Delete
-                    extends CtoolkitAgent.ImportBatch.Job.Delete
+                    extends Agent.ImportBatch.Job.Delete
             {
                 private RequestCredential credential;
 
@@ -2150,7 +1894,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Progress
-                    extends CtoolkitAgent.ImportBatch.Job.Progress
+                    extends Agent.ImportBatch.Job.Progress
             {
                 private RequestCredential credential;
 
@@ -2185,7 +1929,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class Start
-                    extends CtoolkitAgent.ImportBatch.Job.Start
+                    extends Agent.ImportBatch.Job.Start
             {
                 private RequestCredential credential;
 
@@ -2222,7 +1966,7 @@ public class CustomizedCtoolkitAgent
     }
 
     public class Metadata
-            extends CtoolkitAgent.Metadata
+            extends Agent.Metadata
     {
         public Kind kind()
         {
@@ -2230,7 +1974,7 @@ public class CustomizedCtoolkitAgent
         }
 
         public class Kind
-                extends CtoolkitAgent.Metadata.Kind
+                extends Agent.Metadata.Kind
         {
             public List list() throws IOException
             {
@@ -2245,7 +1989,7 @@ public class CustomizedCtoolkitAgent
             }
 
             class List
-                    extends CtoolkitAgent.Metadata.Kind.List
+                    extends Agent.Metadata.Kind.List
             {
                 private RequestCredential credential;
 
@@ -2280,7 +2024,7 @@ public class CustomizedCtoolkitAgent
             }
 
             public class Property
-                    extends CtoolkitAgent.Metadata.Kind.Property
+                    extends Agent.Metadata.Kind.Property
             {
                 public List list( String kind ) throws IOException
                 {
@@ -2290,7 +2034,7 @@ public class CustomizedCtoolkitAgent
                 }
 
                 class List
-                        extends CtoolkitAgent.Metadata.Kind.Property.List
+                        extends Agent.Metadata.Kind.Property.List
                 {
                     private RequestCredential credential;
 

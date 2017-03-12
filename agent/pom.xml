@@ -38,10 +38,9 @@
     <dependencies>
         <dependency>
             <groupId>org.ctoolkit.api</groupId>
-            <artifactId>agent</artifactId>
-            <version>v1-1.22.0-20170305.093034-7</version>
+            <artifactId>ctoolkit-agent-gen-lib</artifactId>
+            <version>1.0</version>
         </dependency>
-
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
