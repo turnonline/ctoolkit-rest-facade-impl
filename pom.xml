@@ -62,6 +62,7 @@
         <module>drive</module>
         <module>identity-toolkit</module>
         <module>maps</module>
+        <module>pubsub</module>
     </modules>
 
     <build>
@@ -138,6 +139,11 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>com.google.apis</groupId>
+                <artifactId>google-api-services-pubsub</artifactId>
+                <version>${google-api-services-pubsub.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.appengine</groupId>
                 <artifactId>appengine-testing</artifactId>
                 <version>${appengine.version}</version>
@@ -173,13 +179,14 @@
     <properties>
         <ctoolkit-library-bom.version>4</ctoolkit-library-bom.version>
         <appengine.version>1.9.50</appengine.version>
-        <ctoolkit-rest-facade-api.version>0.15</ctoolkit-rest-facade-api.version>
+        <ctoolkit-rest-facade-api.version>0.16-20170529.085728-1</ctoolkit-rest-facade-api.version>
         <google-api-services-analytics.version>v3-rev134-1.22.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev58-1.22.0</google-api-services-drive.version>
         <google-api-services-identitytoolkit.version>v3-rev232-1.22.0</google-api-services-identitytoolkit.version>
         <google-maps-services.version>0.1.17</google-maps-services.version>
+        <google-api-services-pubsub.version>v1-rev356-1.22.0</google-api-services-pubsub.version>
         <gitkitclient.version>1.2.7</gitkitclient.version>
-        <jmockit.version>1.23</jmockit.version>
+        <jmockit.version>1.32</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
         <jmockit.setting>
             -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar
