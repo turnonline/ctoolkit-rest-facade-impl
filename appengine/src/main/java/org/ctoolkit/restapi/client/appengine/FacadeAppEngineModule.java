@@ -55,6 +55,7 @@ public class FacadeAppEngineModule
         bind( ResourceProviderInjector.class ).to( ResourceProviderGuiceInjector.class );
         bind( EventBus.class ).in( Singleton.class );
         bind( GoogleApiProxyFactory.class ).to( GoogleApiProxyFactoryAppEngine.class ).in( Singleton.class );
+        //TODO OboIdentityTokenSubscriber employment must be configurable
         bind( OboIdentityTokenSubscriber.class ).asEagerSingleton();
     }
 

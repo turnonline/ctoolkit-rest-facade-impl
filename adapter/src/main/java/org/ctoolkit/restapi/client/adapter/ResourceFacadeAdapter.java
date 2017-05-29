@@ -36,13 +36,15 @@ import org.ctoolkit.restapi.client.DownloadMediaRequestProvider;
 import org.ctoolkit.restapi.client.HttpFailureException;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.NotFoundException;
-import org.ctoolkit.restapi.client.Patch;
+import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.RequestTimeoutException;
 import org.ctoolkit.restapi.client.ResourceFacade;
 import org.ctoolkit.restapi.client.SingleRequest;
+import org.ctoolkit.restapi.client.SingleRetrievalRequest;
 import org.ctoolkit.restapi.client.UnauthorizedException;
+import org.ctoolkit.restapi.client.UnderlyingRequest;
 import org.ctoolkit.restapi.client.UploadMediaRequestProvider;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
@@ -51,8 +53,7 @@ import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
-import org.ctoolkit.restapi.client.adaptee.PatchAdaptee;
-import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.UnderlyingExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
@@ -108,6 +109,16 @@ public class ResourceFacadeAdapter
         this.factory = factory;
         this.injector = injector;
         this.apiFactory = apiFactory;
+    }
+
+    /**
+     * Returns the mapper instance.
+     *
+     * @return the mapper instance
+     */
+    MapperFacade getMapper()
+    {
+        return mapper;
     }
 
     /**
@@ -239,15 +250,15 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    public <T> SingleRequest<T> newInstance( @Nonnull Class<T> resource )
+    public <T> PayloadRequest<T> newInstance( @Nonnull Class<T> resource )
     {
         return newInstance( resource, null, null );
     }
 
     @Override
-    public <T> SingleRequest<T> newInstance( @Nonnull Class<T> resource,
-                                             @Nullable Map<String, Object> parameters,
-                                             @Nullable Locale locale )
+    public <T> PayloadRequest<T> newInstance( @Nonnull Class<T> resource,
+                                              @Nullable Map<String, Object> parameters,
+                                              @Nullable Locale locale )
     {
         checkNotNull( resource );
 
@@ -316,7 +327,7 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    public <T> SingleRequest<T> get( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
+    public <T> SingleRetrievalRequest<T> get( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
         checkNotNull( resource );
         checkNotNull( identifier );
@@ -337,13 +348,13 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    public <T> SingleRequest<T> get( @Nonnull Class<T> resource, @Nonnull String identifier )
+    public <T> SingleRetrievalRequest<T> get( @Nonnull Class<T> resource, @Nonnull String identifier )
     {
         return get( resource, new Identifier( identifier ) );
     }
 
     @Override
-    public <T> SingleRequest<T> get( @Nonnull Class<T> resource, @Nonnull Long identifier )
+    public <T> SingleRetrievalRequest<T> get( @Nonnull Class<T> resource, @Nonnull Long identifier )
     {
         return get( resource, new Identifier( identifier ) );
     }
@@ -511,20 +522,20 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    public <T> SingleRequest<T> insert( @Nonnull T resource )
+    public <T> PayloadRequest<T> insert( @Nonnull T resource )
     {
         return insert( resource, null );
     }
 
     @Override
-    public <T> SingleRequest<T> insert( @Nonnull T resource, @Nullable Identifier parentKey )
+    public <T> PayloadRequest<T> insert( @Nonnull T resource, @Nullable Identifier parentKey )
     {
         return internalInsert( resource, parentKey, null );
     }
 
-    <T> SingleRequest<T> internalInsert( @Nonnull T resource,
-                                         @Nullable Identifier parentKey,
-                                         @Nullable MediaProvider<?> provider )
+    <T> PayloadRequest<T> internalInsert( @Nonnull T resource,
+                                          @Nullable Identifier parentKey,
+                                          @Nullable MediaProvider<?> provider )
     {
         checkNotNull( resource );
 
@@ -595,26 +606,26 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    public <T> SingleRequest<T> update( @Nonnull T resource, @Nonnull Identifier identifier )
+    public <T> PayloadRequest<T> update( @Nonnull T resource, @Nonnull Identifier identifier )
     {
         return internalUpdate( resource, identifier, null );
     }
 
     @Override
-    public <T> SingleRequest<T> update( @Nonnull T resource, @Nonnull String identifier )
+    public <T> PayloadRequest<T> update( @Nonnull T resource, @Nonnull String identifier )
     {
         return update( resource, new Identifier( identifier ) );
     }
 
     @Override
-    public <T> SingleRequest<T> update( @Nonnull T resource, @Nonnull Long identifier )
+    public <T> PayloadRequest<T> update( @Nonnull T resource, @Nonnull Long identifier )
     {
         return update( resource, new Identifier( identifier ) );
     }
 
-    <T> SingleRequest<T> internalUpdate( @Nonnull T resource,
-                                         @Nonnull Identifier identifier,
-                                         @Nullable MediaProvider<?> provider )
+    <T> PayloadRequest<T> internalUpdate( @Nonnull T resource,
+                                          @Nonnull Identifier identifier,
+                                          @Nullable MediaProvider<?> provider )
     {
         checkNotNull( resource );
         checkNotNull( identifier );
@@ -686,64 +697,24 @@ public class ResourceFacadeAdapter
         }
     }
 
-    @Override
-    public <T> SingleRequest<T> patch( @Nonnull Patch<T> resource, @Nonnull Identifier identifier )
+    <R, U> R callbackExecuteUnderlying( @Nonnull UnderlyingExecutorAdaptee<U> adaptee,
+                                        @Nonnull U remoteRequest,
+                                        @Nonnull Class<R> responseType,
+                                        @Nullable Map<String, Object> parameters,
+                                        @Nullable Locale locale )
     {
-        checkNotNull( resource );
-        checkNotNull( identifier );
-
-        Class<?> remoteResource = evaluateRemoteResource( resource.getClass() );
-        Object source;
-
-        if ( resource.getClass() == remoteResource )
-        {
-            source = resource;
-        }
-        else
-        {
-            source = mapper.map( resource, remoteResource );
-        }
-
-        String alias = remoteResource.getSimpleName();
-        Class<T> responseType = resource.type();
-        if ( responseType == null )
-        {
-            throw new NotFoundException( "The Patch.type() must return a non null value." );
-        }
-
-        PatchExecutorAdaptee adaptee = adaptee( PatchExecutorAdaptee.class, responseType );
-        Object remoteRequest;
-        try
-        {
-            //noinspection unchecked
-            remoteRequest = adaptee.preparePatch( source, identifier, alias );
-        }
-        catch ( IOException e )
-        {
-            throw new ClientErrorException( 400, e.getMessage() );
-        }
-
-        return new PatchRequest<>( responseType, identifier, this, adaptee, remoteRequest );
-    }
-
-    <R> R callbackExecutePatch( @Nonnull PatchExecutorAdaptee adaptee,
-                                @Nonnull Object remoteRequest,
-                                @Nonnull Class<R> responseType,
-                                @Nonnull Object identifier,
-                                @Nullable Map<String, Object> parameters,
-                                @Nullable Locale locale )
-    {
+        checkNotNull( adaptee );
+        checkNotNull( remoteRequest );
         checkNotNull( responseType );
-        checkNotNull( identifier );
 
         Object source;
         try
         {
-            source = adaptee.executePatch( remoteRequest, parameters, locale );
+            source = adaptee.executeUnderlying( remoteRequest, parameters, locale );
         }
         catch ( IOException e )
         {
-            throw prepareUpdateException( e, responseType, identifier );
+            throw prepareUpdateException( e, responseType, null );
         }
 
         if ( source == null )
@@ -763,22 +734,23 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    public <S> org.ctoolkit.restapi.client.PatchRequest<S> patch( @Nonnull Class<S> resource )
+    public <U> UnderlyingRequest<U> underlying( @Nonnull Class<U> resource )
     {
         @SuppressWarnings( "unchecked" )
-        PatchAdaptee<S> adaptee = adaptee( PatchAdaptee.class, resource );
+        UnderlyingExecutorAdaptee<U> adaptee = adaptee( UnderlyingExecutorAdaptee.class, resource );
 
-        return new PatchRequestImpl<>( this, adaptee );
+        return new UnderlyingRequestPreparation<>( this, adaptee );
     }
 
-    <S> S callbackPatchAdaptee( @Nonnull PatchAdaptee<S> adaptee,
-                                Object resource,
-                                Identifier identifier )
+    <U> U callbackPrepareUnderlying( @Nonnull UnderlyingExecutorAdaptee<U> adaptee,
+                                     @Nullable Object resource,
+                                     @Nullable Identifier identifier,
+                                     @Nullable Map<String, Object> parameters )
     {
-        S remoteRequest;
+        U remoteRequest;
         try
         {
-            remoteRequest = adaptee.preparePatch( resource, identifier );
+            remoteRequest = adaptee.prepareUnderlying( resource, identifier, parameters );
         }
         catch ( IOException e )
         {
@@ -940,7 +912,7 @@ public class ResourceFacadeAdapter
         return toBeThrown;
     }
 
-    private Class<?> evaluateRemoteResource( Class resource )
+    Class<?> evaluateRemoteResource( Class resource )
     {
         Set<Type<?>> types = factory.lookupMappedClasses( TypeFactory.valueOf( resource ) );
         Iterator<Type<?>> iterator = types.iterator();

@@ -20,7 +20,7 @@ package org.ctoolkit.restapi.client.adapter;
 
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
-import org.ctoolkit.restapi.client.SingleRequest;
+import org.ctoolkit.restapi.client.SingleRetrievalRequest;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 
 import javax.annotation.Nonnull;
@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class GetRequest<T>
-        implements SingleRequest<T>
+        implements SingleRetrievalRequest<T>
 {
     private final Class<T> resource;
 
@@ -60,13 +60,6 @@ public class GetRequest<T>
         this.adapter = checkNotNull( adapter );
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
-    }
-
-    @Override
-    @SuppressWarnings( "unchecked" )
-    public <Q> Q query( Class<Q> type )
-    {
-        return ( Q ) remoteRequest;
     }
 
     @Override

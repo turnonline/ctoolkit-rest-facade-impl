@@ -63,13 +63,6 @@ public class DeleteRequest
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <Q> Q query( Class<Q> type )
-    {
-        return ( Q ) remoteRequest;
-    }
-
-    @Override
     public Void execute()
     {
         return execute( null, null );

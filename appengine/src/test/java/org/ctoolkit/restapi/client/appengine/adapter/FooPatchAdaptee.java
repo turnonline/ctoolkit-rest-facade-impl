@@ -19,9 +19,10 @@
 package org.ctoolkit.restapi.client.appengine.adapter;
 
 import org.ctoolkit.restapi.client.Identifier;
-import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.UnderlyingExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
+import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingRequest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,8 +35,8 @@ import java.util.Map;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class FooPatchAdaptee
-        extends AbstractGoogleClientAdaptee<FakeClient, RemoteFoo>
-        implements PatchExecutorAdaptee<RemoteFoo>
+        extends AbstractGoogleClientAdaptee<FakeClient, UnderlyingRequest>
+        implements UnderlyingExecutorAdaptee<UnderlyingRequest>
 {
     @Inject
     public FooPatchAdaptee( FakeClient client )
@@ -44,18 +45,18 @@ public class FooPatchAdaptee
     }
 
     @Override
-    public Object preparePatch( @Nonnull Object resource,
-                                @Nonnull Identifier identifier,
-                                @Nonnull String alias )
+    public UnderlyingRequest prepareUnderlying( @Nullable Object resource,
+                                                @Nullable Identifier identifier,
+                                                @Nullable Map<String, Object> parameters )
             throws IOException
     {
-        return new FakeClient();
+        return new UnderlyingRequest();
     }
 
     @Override
-    public RemoteFoo executePatch( @Nonnull Object request,
-                                   @Nullable Map<String, Object> parameters,
-                                   @Nullable Locale locale )
+    public Object executeUnderlying( @Nonnull UnderlyingRequest request,
+                                     @Nullable Map<String, Object> parameters,
+                                     @Nullable Locale locale )
             throws IOException
     {
         return new RemoteFoo();

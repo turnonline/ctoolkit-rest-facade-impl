@@ -18,21 +18,24 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
-import org.ctoolkit.restapi.client.Patch;
+import java.io.IOException;
 
 /**
- * The resource model for testing purpose.
+ * fake underlying request for testing purpose.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class PatchResourceNoMapping
-        implements Patch<ResourceNoMapping>
+public class UnderlyingRequest
 {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public Class<ResourceNoMapping> type()
+    public Export export() throws IOException
     {
-        return ResourceNoMapping.class;
+        return new Export();
+    }
+
+    public class Export
+    {
+        public void execute() throws IOException
+        {
+        }
     }
 }

@@ -20,7 +20,7 @@ package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.http.AbstractInputStreamContent;
 import org.ctoolkit.restapi.client.Identifier;
-import org.ctoolkit.restapi.client.SingleRequest;
+import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.SingleUploadMediaRequest;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 
@@ -60,19 +60,19 @@ public class InputStreamUploadRequest<T>
     }
 
     @Override
-    public SingleRequest<T> insert()
+    public PayloadRequest<T> insert()
     {
         return adapter.internalInsert( resource, null, provider );
     }
 
     @Override
-    public SingleRequest<T> insert( @Nullable Identifier parent )
+    public PayloadRequest<T> insert( @Nullable Identifier parent )
     {
         return adapter.internalInsert( resource, parent, provider );
     }
 
     @Override
-    public SingleRequest<T> update( @Nonnull Identifier identifier )
+    public PayloadRequest<T> update( @Nonnull Identifier identifier )
     {
         return adapter.internalUpdate( resource, identifier, provider );
     }

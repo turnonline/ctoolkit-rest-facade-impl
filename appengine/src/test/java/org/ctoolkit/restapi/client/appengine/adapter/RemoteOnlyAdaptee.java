@@ -20,10 +20,8 @@ package org.ctoolkit.restapi.client.appengine.adapter;
 
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
-import org.ctoolkit.restapi.client.adaptee.PatchAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
-import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingRequest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,7 +35,7 @@ import java.util.Map;
  */
 public class RemoteOnlyAdaptee
         extends AbstractGoogleClientAdaptee<FakeClient, RemoteOnly>
-        implements GetExecutorAdaptee<RemoteOnly>, PatchAdaptee<UnderlyingRequest>
+        implements GetExecutorAdaptee<RemoteOnly>
 {
     @Inject
     public RemoteOnlyAdaptee( FakeClient client )
@@ -59,11 +57,5 @@ public class RemoteOnlyAdaptee
             throws IOException
     {
         return new RemoteOnly();
-    }
-
-    @Override
-    public UnderlyingRequest preparePatch( Object resource, Identifier identifier ) throws IOException
-    {
-        return new UnderlyingRequest();
     }
 }

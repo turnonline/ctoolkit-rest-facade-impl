@@ -86,13 +86,6 @@ public class DownloadRequest
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <Q> Q query( Class<Q> type )
-    {
-        return ( Q ) downloader;
-    }
-
-    @Override
     public Void execute()
     {
         return execute( null, null );

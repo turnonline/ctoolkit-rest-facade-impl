@@ -18,9 +18,9 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
-import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 
 import javax.annotation.Nonnull;
@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class InsertRequest<T>
-        implements SingleRequest<T>
+        implements PayloadRequest<T>
 {
     private final Class<T> resource;
 
@@ -61,14 +61,6 @@ public class InsertRequest<T>
         this.adapter = checkNotNull( adapter );
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
-    }
-
-
-    @Override
-    @SuppressWarnings( "unchecked" )
-    public <Q> Q query( Class<Q> type )
-    {
-        return ( Q ) remoteRequest;
     }
 
     @Override
@@ -104,5 +96,11 @@ public class InsertRequest<T>
     {
         this.credential = credential;
         return this;
+    }
+
+    @Override
+    public <R> Request<R> response( Class<R> type )
+    {
+        return new InsertRequest<>( type, parentKey, adapter, adaptee, remoteRequest );
     }
 }

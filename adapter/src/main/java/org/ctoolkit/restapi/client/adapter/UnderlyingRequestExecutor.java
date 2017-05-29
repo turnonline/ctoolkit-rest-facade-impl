@@ -20,8 +20,7 @@ package org.ctoolkit.restapi.client.adapter;
 
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
-import org.ctoolkit.restapi.client.SingleRequest;
-import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.UnderlyingExecutorAdaptee;
 
 import javax.annotation.Nonnull;
 import java.util.Locale;
@@ -30,43 +29,33 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The PATCH request implementation that delegates callback to related adapter.
+ * The underlying request that collects input parameters and then delegates callback
+ * to related adapter in order to execute remote call.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class PatchRequest<T>
-        implements SingleRequest<T>
+public class UnderlyingRequestExecutor<T, U>
+        implements Request<T>
 {
     private final Class<T> responseType;
 
-    private final Object identifier;
-
     private final ResourceFacadeAdapter adapter;
 
-    private final PatchExecutorAdaptee adaptee;
+    private final UnderlyingExecutorAdaptee<U> adaptee;
 
-    private final Object remoteRequest;
+    private final U remoteRequest;
 
     private RequestCredential credential;
 
-    PatchRequest( @Nonnull Class<T> responseType,
-                  @Nonnull Object identifier,
-                  @Nonnull ResourceFacadeAdapter adapter,
-                  @Nonnull PatchExecutorAdaptee adaptee,
-                  @Nonnull Object remoteRequest )
+    UnderlyingRequestExecutor( @Nonnull Class<T> responseType,
+                               @Nonnull ResourceFacadeAdapter adapter,
+                               @Nonnull UnderlyingExecutorAdaptee<U> adaptee,
+                               @Nonnull U remoteRequest )
     {
         this.responseType = checkNotNull( responseType );
-        this.identifier = checkNotNull( identifier );
         this.adapter = checkNotNull( adapter );
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
-    }
-
-    @Override
-    @SuppressWarnings( "unchecked" )
-    public <Q> Q query( Class<Q> type )
-    {
-        return ( Q ) remoteRequest;
     }
 
     @Override
@@ -94,7 +83,7 @@ public class PatchRequest<T>
         {
             parameters = credential.populate( parameters );
         }
-        return adapter.callbackExecutePatch( adaptee, remoteRequest, responseType, identifier, parameters, locale );
+        return adapter.callbackExecuteUnderlying( adaptee, remoteRequest, responseType, parameters, locale );
     }
 
     @Override

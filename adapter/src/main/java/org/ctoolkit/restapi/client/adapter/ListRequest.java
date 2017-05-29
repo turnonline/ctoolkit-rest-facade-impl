@@ -63,13 +63,6 @@ public class ListRequest<T>
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <Q> Q query( Class<Q> type )
-    {
-        return ( Q ) remoteRequest;
-    }
-
-    @Override
     public List<T> execute()
     {
         return execute( null, null );

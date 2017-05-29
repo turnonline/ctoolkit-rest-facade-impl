@@ -30,8 +30,7 @@ import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
-import org.ctoolkit.restapi.client.adaptee.PatchAdaptee;
-import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.UnderlyingExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.BeeGetListAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.FooDeleteAdaptee;
@@ -46,7 +45,6 @@ import org.ctoolkit.restapi.client.appengine.adapter.model.Bee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.Foo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteBee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
-import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteInnerFoo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
 import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingRequest;
 
@@ -87,7 +85,7 @@ public class AdapterAppEngineModule
         {
         } ).to( FooUpdateAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<PatchExecutorAdaptee<RemoteFoo>>()
+        bind( new TypeLiteral<UnderlyingExecutorAdaptee<UnderlyingRequest>>()
         {
         } ).to( FooPatchAdaptee.class ).in( Singleton.class );
 
@@ -108,10 +106,6 @@ public class AdapterAppEngineModule
         bind( new TypeLiteral<GetExecutorAdaptee<RemoteOnly>>()
         {
         } ).to( RemoteOnlyAdaptee.class ).in( Singleton.class );
-
-        bind( new TypeLiteral<PatchAdaptee<UnderlyingRequest>>()
-        {
-        } ).to( RemoteOnlyAdaptee.class ).in( Singleton.class );
     }
 
     @Provides
@@ -130,7 +124,6 @@ public class AdapterAppEngineModule
     MapperFacade provideMapperFacade( MapperFactory factory )
     {
         factory.classMap( Foo.class, RemoteFoo.class ).byDefault().register();
-        factory.classMap( Foo.InnerFoo.class, RemoteInnerFoo.class ).byDefault().register();
         factory.classMap( Bee.class, RemoteBee.class ).byDefault().register();
 
         return factory.getMapperFacade();

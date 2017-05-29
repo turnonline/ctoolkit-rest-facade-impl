@@ -38,7 +38,7 @@ import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
-import org.ctoolkit.restapi.client.adaptee.PatchExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.UnderlyingExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.testng.annotations.Test;
@@ -120,6 +120,9 @@ public class ResourceFacadeAdapterTest
 
                 adaptee.prepareGet( ( Identifier ) any );
                 result = request;
+
+                injector.getExistingResourceProvider( ( Class<Object> ) any );
+                result = null;
 
                 adaptee.executeGet( any, ( Map<String, Object> ) any, ( Locale ) any );
                 result = resource;
@@ -244,30 +247,26 @@ public class ResourceFacadeAdapterTest
     }
 
     @Test
-    public void noResourceMappingPatch( @Mocked final PatchExecutorAdaptee adaptee,
-                                        @Mocked final RemoteRequest request,
-                                        @Mocked final PatchResourceNoMapping inputResource,
-                                        @Mocked final ResourceNoMapping responseResource )
+    public void noResourceMappingUnderlying( @Mocked final UnderlyingExecutorAdaptee adaptee,
+                                             @Mocked final RemoteRequest request,
+                                             @Mocked final ResourceNoMapping responseResource )
             throws IOException
     {
         new Expectations()
         {
             {
-                injector.getExecutorAdaptee( PatchExecutorAdaptee.class, ResourceNoMapping.class );
+                injector.getExecutorAdaptee( UnderlyingExecutorAdaptee.class, UnderlyingRequest.class );
                 result = adaptee;
 
-                adaptee.preparePatch( any, ( Identifier ) any, anyString );
+                adaptee.prepareUnderlying( any, ( Identifier ) any, ( Map<String, Object> ) any );
                 result = request;
 
-                adaptee.executePatch( any, ( Map<String, Object> ) any, ( Locale ) any );
+                adaptee.executeUnderlying( any, ( Map<String, Object> ) any, ( Locale ) any );
                 result = responseResource;
-
-                inputResource.type();
-                result = ResourceNoMapping.class;
             }
         };
 
-        tested.patch( inputResource, new Identifier( 1L ) ).execute();
+        tested.underlying( UnderlyingRequest.class ).response( ResourceNoMapping.class ).execute();
 
         new NoMappingVerifications();
     }
@@ -340,29 +339,26 @@ public class ResourceFacadeAdapterTest
     }
 
     @Test
-    public void patchReturnsNoContent( @Mocked final PatchExecutorAdaptee adaptee,
-                                       @Mocked final RemoteRequest request,
-                                       @Mocked final PatchResourceNoMapping inputResource )
+    public void underlyingReturnsNoContent( @Mocked final UnderlyingExecutorAdaptee adaptee,
+                                            @Mocked final RemoteRequest request,
+                                            @Mocked final ResourceNoMapping inputResource )
             throws IOException
     {
         new Expectations()
         {
             {
-                injector.getExecutorAdaptee( PatchExecutorAdaptee.class, ResourceNoMapping.class );
+                injector.getExecutorAdaptee( UnderlyingExecutorAdaptee.class, UnderlyingRequest.class );
                 result = adaptee;
 
-                adaptee.preparePatch( any, ( Identifier ) any, anyString );
+                adaptee.prepareUnderlying( any, ( Identifier ) any, ( Map<String, Object> ) any );
                 result = request;
 
-                adaptee.executePatch( any, ( Map<String, Object> ) any, ( Locale ) any );
+                adaptee.executeUnderlying( any, ( Map<String, Object> ) any, ( Locale ) any );
                 result = null;
-
-                inputResource.type();
-                result = ResourceNoMapping.class;
             }
         };
 
-        assertNull( tested.patch( inputResource, new Identifier( 1L ) ).execute() );
+        assertNull( tested.underlying( UnderlyingRequest.class ).resource( inputResource ).execute() );
     }
 
     @Test

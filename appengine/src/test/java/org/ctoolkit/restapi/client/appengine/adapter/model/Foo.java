@@ -18,8 +18,6 @@
 
 package org.ctoolkit.restapi.client.appengine.adapter.model;
 
-import org.ctoolkit.restapi.client.Patch;
-
 /**
  * The model for testing purpose.
  *
@@ -37,17 +35,5 @@ public class Foo
     public void setName( String name )
     {
         this.name = name;
-    }
-
-    public static class InnerFoo
-            implements Patch<Foo>
-    {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public Class<Foo> type()
-        {
-            return Foo.class;
-        }
     }
 }
