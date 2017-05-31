@@ -24,6 +24,8 @@ import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -34,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class DeleteRequest
+class DeleteRequest
         implements SingleRequest<Void>
 {
     private final Class resource;
@@ -49,6 +51,10 @@ public class DeleteRequest
 
     private RequestCredential credential;
 
+    private Map<String, Object> params;
+
+    private Locale withLocale;
+
     DeleteRequest( @Nonnull Class resource,
                    @Nonnull Object identifier,
                    @Nonnull ResourceFacadeAdapter adapter,
@@ -60,40 +66,73 @@ public class DeleteRequest
         this.adapter = checkNotNull( adapter );
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
+        this.params = new HashMap<>();
     }
 
     @Override
-    public Void execute()
+    public Void finish()
     {
-        return execute( null, null );
+        return finish( null, withLocale );
     }
 
     @Override
-    public Void execute( Map<String, Object> parameters )
+    public Void finish( @Nullable Map<String, Object> parameters )
     {
-        return execute( parameters, null );
+        return finish( parameters, withLocale );
     }
 
     @Override
-    public Void execute( Locale locale )
+    public Void finish( @Nullable Locale locale )
     {
-        return execute( null, locale );
+        return finish( null, locale );
     }
 
     @Override
-    public Void execute( Map<String, Object> parameters, Locale locale )
+    public Void finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
     {
         if ( credential != null )
         {
             parameters = credential.populate( parameters );
         }
-        return adapter.callbackExecuteDelete( adaptee, remoteRequest, resource, identifier, parameters, locale );
+        if ( parameters != null )
+        {
+            params.putAll( parameters );
+        }
+
+        return adapter.callbackExecuteDelete( adaptee, remoteRequest, resource, identifier, params, locale );
     }
 
     @Override
-    public Request<Void> config( RequestCredential credential )
+    public Request<Void> configWith( @Nonnull RequestCredential credential )
     {
-        this.credential = credential;
+        this.credential = checkNotNull( credential );
+        return this;
+    }
+
+    @Override
+    public Request<Void> forLang( @Nonnull Locale locale )
+    {
+        this.withLocale = checkNotNull( locale );
+        return this;
+    }
+
+    @Override
+    public Request<Void> add( @Nonnull String name, @Nonnull Object value )
+    {
+        checkNotNull( name );
+        checkNotNull( value );
+
+        params.put( name, value );
+        return this;
+    }
+
+    @Override
+    public Request<Void> add( @Nonnull String name, @Nonnull String value )
+    {
+        checkNotNull( name );
+        checkNotNull( value );
+
+        params.put( name, value );
         return this;
     }
 }

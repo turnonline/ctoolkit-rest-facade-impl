@@ -23,6 +23,8 @@ import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.UnderlyingExecutorAdaptee;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -34,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class UnderlyingRequestExecutor<T, U>
+class UnderlyingRequestExecutor<T, U>
         implements Request<T>
 {
     private final Class<T> responseType;
@@ -47,6 +49,10 @@ public class UnderlyingRequestExecutor<T, U>
 
     private RequestCredential credential;
 
+    private Map<String, Object> params;
+
+    private Locale withLocale;
+
     UnderlyingRequestExecutor( @Nonnull Class<T> responseType,
                                @Nonnull ResourceFacadeAdapter adapter,
                                @Nonnull UnderlyingExecutorAdaptee<U> adaptee,
@@ -56,40 +62,73 @@ public class UnderlyingRequestExecutor<T, U>
         this.adapter = checkNotNull( adapter );
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
+        this.params = new HashMap<>();
     }
 
     @Override
-    public T execute()
+    public T finish()
     {
-        return execute( null, null );
+        return finish( null, withLocale );
     }
 
     @Override
-    public T execute( Map<String, Object> parameters )
+    public T finish( @Nullable Map<String, Object> parameters )
     {
-        return execute( parameters, null );
+        return finish( parameters, withLocale );
     }
 
     @Override
-    public T execute( Locale locale )
+    public T finish( @Nullable Locale locale )
     {
-        return execute( null, locale );
+        return finish( null, locale );
     }
 
     @Override
-    public T execute( Map<String, Object> parameters, Locale locale )
+    public T finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
     {
         if ( credential != null )
         {
             parameters = credential.populate( parameters );
         }
-        return adapter.callbackExecuteUnderlying( adaptee, remoteRequest, responseType, parameters, locale );
+        if ( parameters != null )
+        {
+            params.putAll( parameters );
+        }
+
+        return adapter.callbackExecuteUnderlying( adaptee, remoteRequest, responseType, params, locale );
     }
 
     @Override
-    public Request<T> config( RequestCredential credential )
+    public Request<T> configWith( @Nonnull RequestCredential credential )
     {
-        this.credential = credential;
+        this.credential = checkNotNull( credential );
+        return this;
+    }
+
+    @Override
+    public Request<T> forLang( @Nonnull Locale locale )
+    {
+        this.withLocale = checkNotNull( locale );
+        return this;
+    }
+
+    @Override
+    public Request<T> add( @Nonnull String name, @Nonnull Object value )
+    {
+        checkNotNull( name );
+        checkNotNull( value );
+
+        params.put( name, value );
+        return this;
+    }
+
+    @Override
+    public Request<T> add( @Nonnull String name, @Nonnull String value )
+    {
+        checkNotNull( name );
+        checkNotNull( value );
+
+        params.put( name, value );
         return this;
     }
 }

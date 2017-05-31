@@ -32,8 +32,8 @@ import java.io.InputStream;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class InputStreamMediaProvider
-        implements MediaProvider<AbstractInputStreamContent>
+class InputStreamMediaProvider
+        implements MediaProvider
 {
     private AbstractInputStreamContent content;
 

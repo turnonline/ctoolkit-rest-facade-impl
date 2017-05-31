@@ -100,10 +100,10 @@ public class ResourceFacadeAdapter
     private final GoogleApiProxyFactory apiFactory;
 
     @Inject
-    public ResourceFacadeAdapter( MapperFacade mapper,
-                                  MapperFactory factory,
-                                  ResourceProviderInjector injector,
-                                  GoogleApiProxyFactory apiFactory )
+    ResourceFacadeAdapter( MapperFacade mapper,
+                           MapperFactory factory,
+                           ResourceProviderInjector injector,
+                           GoogleApiProxyFactory apiFactory )
     {
         this.mapper = mapper;
         this.factory = factory;
@@ -535,7 +535,7 @@ public class ResourceFacadeAdapter
 
     <T> PayloadRequest<T> internalInsert( @Nonnull T resource,
                                           @Nullable Identifier parentKey,
-                                          @Nullable MediaProvider<?> provider )
+                                          @Nullable MediaProvider provider )
     {
         checkNotNull( resource );
 
@@ -625,7 +625,7 @@ public class ResourceFacadeAdapter
 
     <T> PayloadRequest<T> internalUpdate( @Nonnull T resource,
                                           @Nonnull Identifier identifier,
-                                          @Nullable MediaProvider<?> provider )
+                                          @Nullable MediaProvider provider )
     {
         checkNotNull( resource );
         checkNotNull( identifier );

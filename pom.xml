@@ -31,13 +31,16 @@
     <artifactId>ctoolkit-rest-facade-impl</artifactId>
     <version>0.23-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Uniform REST Client Parent Project</name>
-    <description>Uniform client facade API implementation to perform common operations on top of REST.</description>
+    <name>CtoolkiT REST Client Parent Project</name>
+    <description>
+        Unified client facade implementation to perform REST operations of various APIs through a single interface.
+    </description>
     <url>https://github.com/turnonline/ctoolkit-rest-facade-impl</url>
 
     <scm>
         <connection>scm:git:[fetch=]git@github.com:turnonline/ctoolkit-rest-facade-impl.git</connection>
-        <developerConnection>scm:git:[push=]git@github.com:turnonline/ctoolkit-rest-facade-impl.git</developerConnection>
+        <developerConnection>scm:git:[push=]git@github.com:turnonline/ctoolkit-rest-facade-impl.git
+        </developerConnection>
         <url>https://github.com/turnonline/ctoolkit-rest-facade-impl</url>
         <tag>HEAD</tag>
     </scm>
@@ -179,7 +182,7 @@
     <properties>
         <ctoolkit-library-bom.version>4</ctoolkit-library-bom.version>
         <appengine.version>1.9.50</appengine.version>
-        <ctoolkit-rest-facade-api.version>0.16-20170529.085728-1</ctoolkit-rest-facade-api.version>
+        <ctoolkit-rest-facade-api.version>0.16-20170531.044424-2</ctoolkit-rest-facade-api.version>
         <google-api-services-analytics.version>v3-rev134-1.22.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev58-1.22.0</google-api-services-drive.version>
         <google-api-services-identitytoolkit.version>v3-rev232-1.22.0</google-api-services-identitytoolkit.version>

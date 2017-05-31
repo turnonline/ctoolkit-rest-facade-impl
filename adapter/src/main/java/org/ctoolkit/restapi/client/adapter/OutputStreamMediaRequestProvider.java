@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class OutputStreamMediaRequestProvider
+class OutputStreamMediaRequestProvider
         implements DownloadMediaRequestProvider
 {
     private final ResourceFacadeAdapter adapter;

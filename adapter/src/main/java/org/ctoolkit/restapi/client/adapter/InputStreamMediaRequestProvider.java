@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class InputStreamMediaRequestProvider<T>
+class InputStreamMediaRequestProvider<T>
         implements UploadMediaRequestProvider<T>
 {
     private final ResourceFacadeAdapter adapter;

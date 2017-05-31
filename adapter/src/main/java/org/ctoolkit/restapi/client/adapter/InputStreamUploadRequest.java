@@ -34,14 +34,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class InputStreamUploadRequest<T>
+class InputStreamUploadRequest<T>
         implements SingleUploadMediaRequest<T>
 {
     private final ResourceFacadeAdapter adapter;
 
     private final T resource;
 
-    private final MediaProvider<AbstractInputStreamContent> provider;
+    private final MediaProvider provider;
 
     /**
      * Creates an instance based on the given input.
@@ -52,7 +52,7 @@ public class InputStreamUploadRequest<T>
      */
     InputStreamUploadRequest( @Nonnull ResourceFacadeAdapter adapter,
                               @Nonnull T resource,
-                              @Nonnull MediaProvider<AbstractInputStreamContent> provider )
+                              @Nonnull MediaProvider provider )
     {
         this.adapter = checkNotNull( adapter );
         this.resource = checkNotNull( resource );

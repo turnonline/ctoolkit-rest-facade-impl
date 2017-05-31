@@ -84,7 +84,7 @@ public class GenericJsonExportJobAdaptee
     @Override
     public Object prepareInsert( @Nonnull ExportJob resource,
                                  @Nullable Identifier parentKey,
-                                 @Nullable MediaProvider<?> provider )
+                                 @Nullable MediaProvider provider )
             throws IOException
     {
         checkNotNull( resource );
@@ -111,7 +111,7 @@ public class GenericJsonExportJobAdaptee
     @Override
     public Object prepareUpdate( @Nonnull ExportJob resource,
                                  @Nonnull Identifier identifier,
-                                 @Nullable MediaProvider<?> provider )
+                                 @Nullable MediaProvider provider )
             throws IOException
     {
         checkNotNull( resource );
@@ -143,9 +143,9 @@ public class GenericJsonExportJobAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale )
+    public Object executeDelete( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -154,5 +154,6 @@ public class GenericJsonExportJobAdaptee
         credential.fillInFrom( parameters, true );
 
         ( ( CustomizedCtoolkitAgent.ExportBatch.Job.Delete ) request ).execute( credential );
+        return null;
     }
 }

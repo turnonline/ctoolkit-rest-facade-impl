@@ -54,7 +54,7 @@ public class FileAdaptee
     @Override
     public Drive.Files.Create prepareInsert( @Nonnull File resource,
                                              @Nullable Identifier parentKey,
-                                             @Nullable MediaProvider<?> provider )
+                                             @Nullable MediaProvider provider )
             throws IOException
     {
         checkNotNull( resource );
@@ -73,9 +73,9 @@ public class FileAdaptee
     }
 
     @Override
-    public File executeInsert( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale )
+    public Object executeInsert( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -93,15 +93,16 @@ public class FileAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale )
+    public Object executeDelete( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
 
         acceptLanguage( get( request ), locale );
         execute( request );
+        return null;
     }
 
     @Override

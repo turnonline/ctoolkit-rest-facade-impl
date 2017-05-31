@@ -24,6 +24,7 @@ import org.ctoolkit.restapi.client.UnderlyingRequest;
 import org.ctoolkit.restapi.client.adaptee.UnderlyingExecutorAdaptee;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -54,10 +55,11 @@ class UnderlyingRequestPreparation<U>
     {
         this.adapter = checkNotNull( adapter );
         this.adaptee = checkNotNull( adaptee );
+        this.parameters = new HashMap<>();
     }
 
     @Override
-    public U get()
+    public U build()
     {
         if ( remoteRequest == null )
         {
@@ -67,13 +69,13 @@ class UnderlyingRequestPreparation<U>
     }
 
     @Override
-    public <R> Request<R> response( @Nonnull Class<R> type )
+    public <R> Request<R> answerBy( @Nonnull Class<R> type )
     {
-        return new UnderlyingRequestExecutor<>( type, adapter, adaptee, get() );
+        return new UnderlyingRequestExecutor<>( type, adapter, adaptee, build() );
     }
 
     @Override
-    public <R> Request<R> resource( @Nonnull R resource )
+    public <R> Request<R> withPayload( @Nonnull R resource )
     {
         checkNotNull( resource );
 
@@ -92,20 +94,40 @@ class UnderlyingRequestPreparation<U>
         this.resource = source;
         @SuppressWarnings( "unchecked" )
         Class<R> resourceType = ( Class<R> ) source.getClass();
-        return new UnderlyingRequestExecutor<>( resourceType, adapter, adaptee, get() );
+        return new UnderlyingRequestExecutor<>( resourceType, adapter, adaptee, build() );
     }
 
     @Override
-    public UnderlyingRequest<U> identifier( @Nonnull Identifier identifier )
+    public UnderlyingRequest<U> identifiedBy( @Nonnull Identifier identifier )
     {
         this.identifier = identifier;
         return this;
     }
 
     @Override
-    public UnderlyingRequest<U> parameters( @Nonnull Map<String, Object> parameters )
+    public UnderlyingRequest<U> addParams( @Nonnull Map<String, Object> parameters )
     {
-        this.parameters = parameters;
+        this.parameters.putAll( checkNotNull( parameters ) );
+        return this;
+    }
+
+    @Override
+    public UnderlyingRequest<U> add( @Nonnull String name, @Nonnull Object value )
+    {
+        checkNotNull( name );
+        checkNotNull( value );
+
+        parameters.put( name, value );
+        return this;
+    }
+
+    @Override
+    public UnderlyingRequest<U> add( @Nonnull String name, @Nonnull String value )
+    {
+        checkNotNull( name );
+        checkNotNull( value );
+
+        parameters.put( name, value );
         return this;
     }
 }

@@ -106,28 +106,28 @@ public class AdapterAppEngineTest
     {
         SingleRetrievalRequest<RemoteOnly> request = resources.get( RemoteOnly.class, new Identifier( 1L ) );
         assertNotNull( request );
-        assertNotNull( request.execute() );
+        assertNotNull( request.finish() );
 
         PayloadRequest<Foo> payloadRequest = resources.newInstance( Foo.class );
         assertNotNull( payloadRequest );
-        assertNotNull( payloadRequest.execute() );
+        assertNotNull( payloadRequest.finish() );
 
         SingleRetrievalRequest singleRetrievalRequest = resources.get( Foo.class, new Identifier( 1L ) );
         assertNotNull( singleRetrievalRequest );
-        assertNotNull( singleRetrievalRequest.execute() );
+        assertNotNull( singleRetrievalRequest.finish() );
 
         singleRetrievalRequest = resources.get( Foo.class, 1L );
         assertNotNull( singleRetrievalRequest );
-        assertNotNull( singleRetrievalRequest.execute() );
+        assertNotNull( singleRetrievalRequest.finish() );
 
         singleRetrievalRequest = resources.get( Foo.class, "identifier" );
         assertNotNull( singleRetrievalRequest );
-        assertNotNull( singleRetrievalRequest.execute() );
+        assertNotNull( singleRetrievalRequest.finish() );
 
         ByteArrayOutputStream content = new ByteArrayOutputStream();
         String type = "application/pdf";
         Request dr = resources.media( Foo.class ).downloadTo( content, type ).identifiedBy( 1L );
-        assertNull( dr.execute( Locale.GERMANY ) );
+        assertNull( dr.finish( Locale.GERMANY ) );
         String errorMessage = "Output stream has expected to be populated by downloaded content!";
         assertTrue( content.size() > 0, errorMessage );
 
@@ -135,35 +135,35 @@ public class AdapterAppEngineTest
         foo.setName( "John Foo" );
         payloadRequest = resources.insert( foo );
         assertNotNull( payloadRequest );
-        assertNotNull( payloadRequest.execute() );
+        assertNotNull( payloadRequest.finish() );
 
         foo = new Foo();
         foo.setName( "Michal Foo" );
         payloadRequest = resources.update( foo, new Identifier( 1L ) );
         assertNotNull( payloadRequest );
-        assertNotNull( payloadRequest.execute() );
+        assertNotNull( payloadRequest.finish() );
 
         payloadRequest = resources.update( foo, 1L );
         assertNotNull( payloadRequest );
-        assertNotNull( payloadRequest.execute() );
+        assertNotNull( payloadRequest.finish() );
 
         payloadRequest = resources.update( foo, "identifier" );
         assertNotNull( payloadRequest );
-        assertNotNull( payloadRequest.execute() );
+        assertNotNull( payloadRequest.finish() );
 
-        resources.underlying( UnderlyingRequest.class ).identifier( new Identifier( 1L ) ).get().export().execute();
+        resources.underlying( UnderlyingRequest.class ).identifiedBy( new Identifier( 1L ) ).build().export().execute();
 
         SingleRequest singleRequest = resources.delete( Foo.class, new Identifier( 1L ) );
         assertNotNull( singleRequest );
-        singleRequest.execute();
+        singleRequest.finish();
 
         singleRequest = resources.delete( Foo.class, 1L );
         assertNotNull( singleRequest );
-        singleRequest.execute();
+        singleRequest.finish();
 
         singleRequest = resources.delete( Foo.class, "identifier" );
         assertNotNull( singleRequest );
-        singleRequest.execute();
+        singleRequest.finish();
     }
 
     @Test

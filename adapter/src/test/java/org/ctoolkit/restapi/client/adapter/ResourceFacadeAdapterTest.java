@@ -101,7 +101,7 @@ public class ResourceFacadeAdapterTest
             }
         };
 
-        tested.newInstance( ResourceNoMapping.class ).execute();
+        tested.newInstance( ResourceNoMapping.class ).finish();
 
         new NoMappingVerifications();
     }
@@ -129,7 +129,7 @@ public class ResourceFacadeAdapterTest
             }
         };
 
-        tested.get( ResourceNoMapping.class, new Identifier( 1L ) ).execute();
+        tested.get( ResourceNoMapping.class, new Identifier( 1L ) ).finish();
 
         new NoMappingVerifications();
     }
@@ -157,7 +157,7 @@ public class ResourceFacadeAdapterTest
             }
         };
 
-        tested.list( ResourceNoMapping.class ).execute();
+        tested.list( ResourceNoMapping.class ).finish();
 
         new NoMappingVerifications();
     }
@@ -189,7 +189,7 @@ public class ResourceFacadeAdapterTest
             }
         };
 
-        tested.list( ResourceNoMapping.class ).execute();
+        tested.list( ResourceNoMapping.class ).finish();
 
         new NoMappingVerifications();
     }
@@ -215,7 +215,7 @@ public class ResourceFacadeAdapterTest
             }
         };
 
-        tested.insert( inputResource, new Identifier( 1L ) ).execute();
+        tested.insert( inputResource, new Identifier( 1L ) ).finish();
 
         new NoMappingVerifications();
     }
@@ -241,7 +241,7 @@ public class ResourceFacadeAdapterTest
             }
         };
 
-        tested.update( inputResource, new Identifier( 1L ) ).execute();
+        tested.update( inputResource, new Identifier( 1L ) ).finish();
 
         new NoMappingVerifications();
     }
@@ -266,7 +266,7 @@ public class ResourceFacadeAdapterTest
             }
         };
 
-        tested.underlying( UnderlyingRequest.class ).response( ResourceNoMapping.class ).execute();
+        tested.underlying( UnderlyingRequest.class ).answerBy( ResourceNoMapping.class ).finish();
 
         new NoMappingVerifications();
     }
@@ -287,7 +287,7 @@ public class ResourceFacadeAdapterTest
             }
         };
 
-        tested.delete( ResourceNoMapping.class, new Identifier( 1L ) ).execute();
+        tested.delete( ResourceNoMapping.class, new Identifier( 1L ) ).finish();
 
         new NoMappingVerifications();
     }
@@ -312,7 +312,7 @@ public class ResourceFacadeAdapterTest
             }
         };
 
-        assertNull( tested.insert( inputResource, new Identifier( 1L ) ).execute() );
+        assertNull( tested.insert( inputResource, new Identifier( 1L ) ).finish() );
     }
 
     @Test
@@ -335,7 +335,7 @@ public class ResourceFacadeAdapterTest
             }
         };
 
-        assertNull( tested.update( inputResource, new Identifier( 1L ) ).execute() );
+        assertNull( tested.update( inputResource, new Identifier( 1L ) ).finish() );
     }
 
     @Test
@@ -358,7 +358,7 @@ public class ResourceFacadeAdapterTest
             }
         };
 
-        assertNull( tested.underlying( UnderlyingRequest.class ).resource( inputResource ).execute() );
+        assertNull( tested.underlying( UnderlyingRequest.class ).withPayload( inputResource ).finish() );
     }
 
     @Test

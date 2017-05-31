@@ -20,6 +20,7 @@ package org.ctoolkit.restapi.client.pubsub.adaptee;
 
 import com.google.api.services.pubsub.Pubsub;
 import com.google.api.services.pubsub.model.PublishRequest;
+import com.google.api.services.pubsub.model.PublishResponse;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
@@ -52,7 +53,7 @@ public class PublishAdaptee
     @Override
     public Pubsub.Projects.Topics.Publish prepareInsert( @Nonnull PublishRequest resource,
                                                          @Nullable Identifier parentKey,
-                                                         @Nullable MediaProvider<?> provider )
+                                                         @Nullable MediaProvider provider )
             throws IOException
     {
         checkNotNull( resource );
@@ -61,14 +62,14 @@ public class PublishAdaptee
     }
 
     @Override
-    public PublishRequest executeInsert( @Nonnull Object request,
-                                         @Nullable Map<String, Object> parameters,
-                                         @Nullable Locale locale )
+    public PublishResponse executeInsert( @Nonnull Object request,
+                                          @Nullable Map<String, Object> parameters,
+                                          @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
 
         fill( get( request ), parameters, locale );
-        return execute( request );
+        return PublishResponse.class.cast( execute( request ) );
     }
 }
