@@ -43,7 +43,7 @@ class GetRequest<T>
 
     private final Object identifier;
 
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final GetExecutorAdaptee adaptee;
 
@@ -57,7 +57,7 @@ class GetRequest<T>
 
     GetRequest( @Nonnull Class<T> resource,
                 @Nonnull Object identifier,
-                @Nonnull ResourceFacadeAdapter adapter,
+                @Nonnull RestFacadeAdapter adapter,
                 @Nonnull GetExecutorAdaptee adaptee,
                 @Nonnull Object remoteRequest )
     {

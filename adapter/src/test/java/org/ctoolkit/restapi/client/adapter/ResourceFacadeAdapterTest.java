@@ -59,7 +59,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 
 /**
- * Unit tests to test {@link ResourceFacadeAdapter}.
+ * Unit tests to test {@link RestFacadeAdapter}.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
@@ -67,7 +67,7 @@ import static org.testng.Assert.assertNull;
 public class ResourceFacadeAdapterTest
 {
     @Tested
-    private ResourceFacadeAdapter tested;
+    private RestFacadeAdapter tested;
 
     @Injectable
     private MapperFacade mapper;

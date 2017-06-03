@@ -42,7 +42,7 @@ class ListRequest<T>
 {
     private final Class<T> resource;
 
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final ListExecutorAdaptee adaptee;
 
@@ -59,7 +59,7 @@ class ListRequest<T>
     private int length = -1;
 
     ListRequest( @Nonnull Class<T> resource,
-                 @Nonnull ResourceFacadeAdapter adapter,
+                 @Nonnull RestFacadeAdapter adapter,
                  @Nonnull ListExecutorAdaptee adaptee,
                  @Nonnull Object remoteRequest )
     {

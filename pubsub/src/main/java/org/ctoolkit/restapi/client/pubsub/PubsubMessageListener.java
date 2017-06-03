@@ -37,5 +37,5 @@ public interface PubsubMessageListener
      * @param message      the published message
      * @param subscription the subscription that received push message
      */
-    void onReceive( @Nonnull PubsubMessage message, @Nonnull String subscription );
+    void onMessage( @Nonnull PubsubMessage message, @Nonnull String subscription );
 }

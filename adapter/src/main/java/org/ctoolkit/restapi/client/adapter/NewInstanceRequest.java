@@ -42,7 +42,7 @@ class NewInstanceRequest<T>
 {
     private final Class<T> resource;
 
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final NewExecutorAdaptee adaptee;
 
@@ -55,7 +55,7 @@ class NewInstanceRequest<T>
     private Locale withLocale;
 
     NewInstanceRequest( @Nonnull Class<T> resource,
-                        @Nonnull ResourceFacadeAdapter adapter,
+                        @Nonnull RestFacadeAdapter adapter,
                         @Nonnull NewExecutorAdaptee adaptee,
                         @Nullable Object remoteRequest )
     {

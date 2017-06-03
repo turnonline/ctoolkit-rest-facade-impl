@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 class DownloadRequest
         implements SingleRequest<Void>
 {
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final DownloadExecutorAdaptee adaptee;
 
@@ -73,7 +73,7 @@ class DownloadRequest
      * @param output     the output stream where desired content will be downloaded to.
      * @param type       the content type or {@code null} to expect default
      */
-    DownloadRequest( @Nonnull ResourceFacadeAdapter adapter,
+    DownloadRequest( @Nonnull RestFacadeAdapter adapter,
                      @Nonnull DownloadExecutorAdaptee adaptee,
                      @Nonnull MediaHttpDownloader downloader,
                      @Nonnull Class resource,

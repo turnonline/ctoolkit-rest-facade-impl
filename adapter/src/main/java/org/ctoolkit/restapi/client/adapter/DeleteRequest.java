@@ -43,7 +43,7 @@ class DeleteRequest
 
     private final Object identifier;
 
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final DeleteExecutorAdaptee adaptee;
 
@@ -57,7 +57,7 @@ class DeleteRequest
 
     DeleteRequest( @Nonnull Class resource,
                    @Nonnull Object identifier,
-                   @Nonnull ResourceFacadeAdapter adapter,
+                   @Nonnull RestFacadeAdapter adapter,
                    @Nonnull DeleteExecutorAdaptee adaptee,
                    @Nonnull Object remoteRequest )
     {

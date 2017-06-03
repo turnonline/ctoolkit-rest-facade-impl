@@ -22,7 +22,7 @@ import org.ctoolkit.restapi.client.ApiCredential;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.Request;
-import org.ctoolkit.restapi.client.ResourceFacade;
+import org.ctoolkit.restapi.client.RestFacade;
 import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.SingleRetrievalRequest;
 import org.ctoolkit.restapi.client.appengine.GuiceTestCase;
@@ -96,7 +96,7 @@ public class AdapterAppEngineTest
     String readTimeout;
 
     @Inject
-    private ResourceFacade resources;
+    private RestFacade resources;
 
     @Inject
     private GoogleApiProxyFactory builder;
@@ -126,7 +126,7 @@ public class AdapterAppEngineTest
 
         ByteArrayOutputStream content = new ByteArrayOutputStream();
         String type = "application/pdf";
-        Request dr = resources.media( Foo.class ).downloadTo( content, type ).identifiedBy( 1L );
+        Request dr = resources.download( Foo.class ).to( content, type ).identifiedBy( 1L );
         assertNull( dr.finish( Locale.GERMANY ) );
         String errorMessage = "Output stream has expected to be populated by downloaded content!";
         assertTrue( content.size() > 0, errorMessage );

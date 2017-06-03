@@ -41,7 +41,7 @@ class UnderlyingRequestExecutor<T, U>
 {
     private final Class<T> responseType;
 
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final UnderlyingExecutorAdaptee<U> adaptee;
 
@@ -54,7 +54,7 @@ class UnderlyingRequestExecutor<T, U>
     private Locale withLocale;
 
     UnderlyingRequestExecutor( @Nonnull Class<T> responseType,
-                               @Nonnull ResourceFacadeAdapter adapter,
+                               @Nonnull RestFacadeAdapter adapter,
                                @Nonnull UnderlyingExecutorAdaptee<U> adaptee,
                                @Nonnull U remoteRequest )
     {

@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 class UnderlyingRequestPreparation<U>
         implements UnderlyingRequest<U>
 {
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final UnderlyingExecutorAdaptee<U> adaptee;
 
@@ -50,7 +50,7 @@ class UnderlyingRequestPreparation<U>
 
     private U remoteRequest;
 
-    UnderlyingRequestPreparation( @Nonnull ResourceFacadeAdapter adapter,
+    UnderlyingRequestPreparation( @Nonnull RestFacadeAdapter adapter,
                                   @Nonnull UnderlyingExecutorAdaptee<U> adaptee )
     {
         this.adapter = checkNotNull( adapter );

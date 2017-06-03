@@ -43,7 +43,7 @@ class UpdateRequest<T>
 
     private final Object identifier;
 
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final UpdateExecutorAdaptee adaptee;
 
@@ -57,7 +57,7 @@ class UpdateRequest<T>
 
     UpdateRequest( @Nonnull Class<T> resource,
                    @Nonnull Object identifier,
-                   @Nonnull ResourceFacadeAdapter adapter,
+                   @Nonnull RestFacadeAdapter adapter,
                    @Nonnull UpdateExecutorAdaptee adaptee,
                    @Nonnull Object remoteRequest )
     {

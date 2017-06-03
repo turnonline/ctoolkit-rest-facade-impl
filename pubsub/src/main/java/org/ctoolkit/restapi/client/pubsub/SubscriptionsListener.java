@@ -3,16 +3,19 @@ package org.ctoolkit.restapi.client.pubsub;
 import com.google.api.client.json.JsonParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.pubsub.model.PubsubMessage;
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -26,24 +29,45 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SubscriptionsListener
         extends HttpServlet
 {
+    public static final String SUBSCRIPTION_SUFFIX_INIT_PARAM = "Subscription_Suffix";
+
     private static final long serialVersionUID = -4754611197274771298L;
 
     private static final Logger logger = LoggerFactory.getLogger( SubscriptionsListener.class );
 
-    private final PubsubMessageListener listener;
+    private final Map<String, PubsubMessageListener> listeners;
 
-    private final String subscription;
+    private PubsubMessageListener listener;
+
+    private String subscription;
 
     /**
      * Constructs subscriptions listener.
      *
-     * @param listener     the listener to receive messages for given subscription
-     * @param subscription the subscription suffix
+     * @param listeners the map of configured listeners
      */
-    public SubscriptionsListener( @Nonnull PubsubMessageListener listener, @Nonnull String subscription )
+    @Inject
+    public SubscriptionsListener( Map<String, PubsubMessageListener> listeners )
     {
-        this.listener = checkNotNull( listener );
-        this.subscription = checkNotNull( subscription );
+        this.listeners = checkNotNull( listeners );
+    }
+
+    @Override
+    public void init() throws ServletException
+    {
+        subscription = getInitParameter( SUBSCRIPTION_SUFFIX_INIT_PARAM );
+        if ( Strings.isNullOrEmpty( subscription ) )
+        {
+            throw new IllegalArgumentException( "Subscription suffix must be configured via servlet init parameters." );
+        }
+        logger.info( "Subscription listener has been initialized for suffix: " + subscription );
+
+        listener = listeners.get( subscription );
+        if ( listener == null )
+        {
+            String message = PubsubMessageListener.class.getSimpleName() + " not found for '" + subscription + "'";
+            throw new IllegalArgumentException( message );
+        }
     }
 
     @Override
@@ -57,7 +81,7 @@ public class SubscriptionsListener
             // Parse the JSON message to the POJO model class
             JsonParser parser = JacksonFactory.getDefaultInstance().createJsonParser( inputStream );
             parser.skipToKey( "message" );
-            listener.onReceive( parser.parseAndClose( PubsubMessage.class ), subscription );
+            listener.onMessage( parser.parseAndClose( PubsubMessage.class ), subscription );
 
             // Acknowledge the message by returning a success code .
             // 204 status code is considered as an implicit acknowledgement.

@@ -40,7 +40,7 @@ import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.RequestTimeoutException;
-import org.ctoolkit.restapi.client.ResourceFacade;
+import org.ctoolkit.restapi.client.RestFacade;
 import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.SingleRetrievalRequest;
 import org.ctoolkit.restapi.client.UnauthorizedException;
@@ -86,10 +86,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see MapperFactory
  */
-public class ResourceFacadeAdapter
-        implements ResourceFacade
+public class RestFacadeAdapter
+        implements RestFacade
 {
-    private static final Logger logger = LoggerFactory.getLogger( ResourceFacadeAdapter.class );
+    private static final Logger logger = LoggerFactory.getLogger( RestFacadeAdapter.class );
 
     private final MapperFacade mapper;
 
@@ -100,10 +100,10 @@ public class ResourceFacadeAdapter
     private final GoogleApiProxyFactory apiFactory;
 
     @Inject
-    ResourceFacadeAdapter( MapperFacade mapper,
-                           MapperFactory factory,
-                           ResourceProviderInjector injector,
-                           GoogleApiProxyFactory apiFactory )
+    RestFacadeAdapter( MapperFacade mapper,
+                       MapperFactory factory,
+                       ResourceProviderInjector injector,
+                       GoogleApiProxyFactory apiFactory )
     {
         this.mapper = mapper;
         this.factory = factory;
@@ -277,14 +277,14 @@ public class ResourceFacadeAdapter
     }
 
     @Override
-    public <T> UploadMediaRequestProvider<T> media( @Nonnull T resource )
+    public <T> UploadMediaRequestProvider<T> upload( @Nonnull T resource )
     {
         checkNotNull( resource );
         return new InputStreamMediaRequestProvider<>( this, resource );
     }
 
     @Override
-    public <T> DownloadMediaRequestProvider media( @Nonnull Class<T> resource )
+    public <T> DownloadMediaRequestProvider download( @Nonnull Class<T> resource )
     {
         checkNotNull( resource );
         return new OutputStreamMediaRequestProvider( this, resource );

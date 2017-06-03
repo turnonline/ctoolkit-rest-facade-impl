@@ -41,7 +41,7 @@ class InsertRequest<T>
 {
     private final Class<T> resource;
 
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final InsertExecutorAdaptee adaptee;
 
@@ -57,7 +57,7 @@ class InsertRequest<T>
 
     InsertRequest( @Nonnull Class<T> resource,
                    @Nullable Object parentKey,
-                   @Nonnull ResourceFacadeAdapter adapter,
+                   @Nonnull RestFacadeAdapter adapter,
                    @Nonnull InsertExecutorAdaptee adaptee,
                    @Nonnull Object remoteRequest )
     {
