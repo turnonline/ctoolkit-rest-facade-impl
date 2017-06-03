@@ -21,11 +21,14 @@ package org.ctoolkit.restapi.client.pubsub;
 import com.google.api.services.pubsub.model.PubsubMessage;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -49,10 +52,9 @@ public class TopicMessage
 
     private TopicMessage( Builder builder )
     {
-        checkArgument( !Strings.isNullOrEmpty( builder.projectId ) );
-        checkArgument( !Strings.isNullOrEmpty( builder.topicId ) );
-        checkNotNull( builder.messages );
-        checkArgument( !builder.messages.isEmpty() );
+        checkNotNull( builder.projectId );
+        checkNotNull( builder.topicId );
+        checkArgument( !builder.messages.isEmpty(), "At least one message must be provided." );
 
         this.messages = builder.messages;
         this.topic = MessageFormat.format( TOPIC_PATH_TEMPLATE, builder.projectId, builder.topicId );
@@ -68,8 +70,7 @@ public class TopicMessage
      */
     public static TopicMessage create( @Nonnull String projectId, @Nonnull String topicId, @Nonnull byte[] data )
     {
-        List<PubsubMessage> list = Lists.newArrayList( new PubsubMessage().encodeData( data ) );
-        return new Builder().setProjectId( projectId ).setTopicId( topicId ).setMessages( list ).build();
+        return newBuilder().setProjectId( projectId ).setTopicId( topicId ).addMessage( data ).build();
     }
 
     /**
@@ -82,11 +83,7 @@ public class TopicMessage
      */
     public static TopicMessage create( @Nonnull String projectId, @Nonnull String topicId, @Nonnull String data )
     {
-        checkArgument( !Strings.isNullOrEmpty( data ) );
-
-        byte[] bytes = data.getBytes( Charsets.UTF_8 );
-        List<PubsubMessage> list = Lists.newArrayList( new PubsubMessage().encodeData( bytes ) );
-        return new Builder().setProjectId( projectId ).setTopicId( topicId ).setMessages( list ).build();
+        return newBuilder().setProjectId( projectId ).setTopicId( topicId ).addMessage( data ).build();
     }
 
     /**
@@ -101,7 +98,17 @@ public class TopicMessage
                                        @Nonnull String topicId,
                                        List<PubsubMessage> messages )
     {
-        return new Builder().setProjectId( projectId ).setTopicId( topicId ).setMessages( messages ).build();
+        return newBuilder().setProjectId( projectId ).setTopicId( topicId ).setMessages( messages ).build();
+    }
+
+    /**
+     * Creates a new topic builder.
+     *
+     * @return the builder instance
+     */
+    public static Builder newBuilder()
+    {
+        return new Builder();
     }
 
     public String getTopic()
@@ -123,7 +130,7 @@ public class TopicMessage
                 '}';
     }
 
-    private static class Builder
+    public static class Builder
     {
         private String projectId;
 
@@ -133,27 +140,161 @@ public class TopicMessage
 
         private Builder()
         {
+            messages = new ArrayList<>();
         }
 
-        Builder setProjectId( String projectId )
+        /**
+         * Set the project ID.
+         *
+         * @return the builder
+         */
+        public Builder setProjectId( @Nonnull String projectId )
         {
+            checkArgument( !Strings.isNullOrEmpty( projectId ), "Project ID must be non empty string." );
             this.projectId = projectId;
             return this;
         }
 
-        Builder setTopicId( String topicId )
+        /**
+         * Set the topic ID.
+         *
+         * @return the builder
+         */
+        public Builder setTopicId( @Nonnull String topicId )
         {
+            checkArgument( !Strings.isNullOrEmpty( topicId ), "Topic ID must be non empty string." );
             this.topicId = topicId;
             return this;
         }
 
-        Builder setMessages( List<PubsubMessage> messages )
+        /**
+         * Set the list of messages.
+         *
+         * @param messages the list of messages
+         * @return the builder
+         */
+        public Builder setMessages( @Nonnull List<PubsubMessage> messages )
         {
-            this.messages = messages;
+            this.messages.addAll( checkNotNull( messages ) );
             return this;
         }
 
-        TopicMessage build()
+        /**
+         * Add message payload.
+         *
+         * @param message the message payload
+         * @return the builder
+         */
+        public Builder addMessage( @Nonnull PubsubMessage message )
+        {
+            this.messages.add( checkNotNull( message ) );
+            return this;
+        }
+
+        /**
+         * Add message payload.
+         *
+         * @param data the message payload
+         * @return the builder
+         */
+        public Builder addMessage( @Nonnull String data )
+        {
+            return addMessage( data, null );
+        }
+
+        /**
+         * Add message payload with attribute.
+         *
+         * @param data  the message payload
+         * @param key   the attribute key
+         * @param value the attribute value
+         * @return the builder
+         */
+        public Builder addMessage( @Nonnull String data, @Nonnull String key, @Nonnull String value )
+        {
+            Map<String, String> attributes = buildAttributes( key, value );
+            return addMessage( data, attributes );
+        }
+
+        /**
+         * Add message payload with optional attributes.
+         *
+         * @param data       the message payload
+         * @param attributes the optional map of attributes
+         * @return the builder
+         */
+        public Builder addMessage( @Nonnull String data, @Nullable Map<String, String> attributes )
+        {
+            checkArgument( !Strings.isNullOrEmpty( data ), "Data must be non empty string." );
+
+            byte[] bytes = data.getBytes( Charsets.UTF_8 );
+            PubsubMessage message = new PubsubMessage().encodeData( bytes );
+
+            if ( attributes != null && !attributes.isEmpty() )
+            {
+                message.setAttributes( attributes );
+            }
+            this.messages.add( message );
+
+            return this;
+        }
+
+        /**
+         * Add message payload.
+         *
+         * @param bytes the message payload
+         * @return the builder
+         */
+        public Builder addMessage( @Nonnull byte[] bytes )
+        {
+            return addMessage( bytes, null );
+        }
+
+        /**
+         * Add message payload with attribute.
+         *
+         * @param bytes the message payload
+         * @param key   the attribute key
+         * @param value the attribute value
+         * @return the builder
+         */
+        public Builder addMessage( @Nonnull byte[] bytes, @Nonnull String key, @Nonnull String value )
+        {
+            Map<String, String> attributes = buildAttributes( key, value );
+            return addMessage( bytes, attributes );
+        }
+
+        /**
+         * Add message payload with optional attributes.
+         *
+         * @param bytes      the message payload
+         * @param attributes the optional map of attributes
+         * @return the builder
+         */
+        public Builder addMessage( @Nonnull byte[] bytes, @Nullable Map<String, String> attributes )
+        {
+            PubsubMessage message = new PubsubMessage().encodeData( checkNotNull( bytes ) );
+
+            if ( attributes != null && !attributes.isEmpty() )
+            {
+                message.setAttributes( attributes );
+            }
+
+            this.messages.add( message );
+            return this;
+        }
+
+        private Map<String, String> buildAttributes( @Nonnull String key, @Nonnull String value )
+        {
+            checkArgument( !Strings.isNullOrEmpty( key ), "Key must be non empty string." );
+            checkArgument( !Strings.isNullOrEmpty( value ), "Value must be non empty string." );
+
+            Map<String, String> attributes = new HashMap<>();
+            attributes.put( key, value );
+            return attributes;
+        }
+
+        public TopicMessage build()
         {
             return new TopicMessage( this );
         }
