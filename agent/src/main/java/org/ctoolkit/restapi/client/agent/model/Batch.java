@@ -29,7 +29,7 @@ import java.util.List;
 public class Batch<I extends BatchItem, J extends JobInfo>
         implements Serializable
 {
-    private String key;
+    private Long id;
 
     private String name;
 
@@ -43,14 +43,14 @@ public class Batch<I extends BatchItem, J extends JobInfo>
 
     private List<I> items = new ArrayList<I>();
 
-    public String getKey()
+    public Long getId()
     {
-        return key;
+        return id;
     }
 
-    public void setKey( String key )
+    public void setId( Long id )
     {
-        this.key = key;
+        this.id = id;
     }
 
     public String getName()
@@ -117,7 +117,7 @@ public class Batch<I extends BatchItem, J extends JobInfo>
     public String toString()
     {
         return "Batch{" +
-                "key='" + key + '\'' +
+                "id='" + id + '\'' +
                 ", name=" + name +
                 ", mapReduceJobId='" + mapReduceJobId + '\'' +
                 ", createDate=" + createDate +
