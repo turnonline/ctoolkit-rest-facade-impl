@@ -16,13 +16,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.restapi.client.appengine.adapter.model;
+package org.ctoolkit.restapi.client.adapter;
+
+import java.io.IOException;
 
 /**
- * The remote model for testing purpose.
+ * fake underlying request for testing purpose.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class RemoteInnerFoo
+public class UnderlyingRequest
 {
+    public Export export() throws IOException
+    {
+        return new Export();
+    }
+
+    public class Export
+    {
+        public void execute() throws IOException
+        {
+        }
+    }
 }

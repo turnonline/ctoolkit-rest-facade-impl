@@ -24,7 +24,7 @@ import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
-import org.ctoolkit.restapi.client.adaptee.PatchAdaptee;
+import org.ctoolkit.restapi.client.adaptee.UnderlyingExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 
 import javax.annotation.Nonnull;
@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class FileAdaptee
         extends AbstractGoogleClientAdaptee<Drive, File>
-        implements InsertExecutorAdaptee<File>, DeleteExecutorAdaptee<File>, PatchAdaptee<Drive.Files>
+        implements InsertExecutorAdaptee<File>, DeleteExecutorAdaptee<File>, UnderlyingExecutorAdaptee<Drive.Files>
 {
     @Inject
     public FileAdaptee( Drive client )
@@ -54,7 +54,7 @@ public class FileAdaptee
     @Override
     public Drive.Files.Create prepareInsert( @Nonnull File resource,
                                              @Nullable Identifier parentKey,
-                                             @Nullable MediaProvider<?> provider )
+                                             @Nullable MediaProvider provider )
             throws IOException
     {
         checkNotNull( resource );
@@ -73,9 +73,9 @@ public class FileAdaptee
     }
 
     @Override
-    public File executeInsert( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale )
+    public Object executeInsert( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -93,21 +93,29 @@ public class FileAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale )
+    public Object executeDelete( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
 
         acceptLanguage( get( request ), locale );
         execute( request );
+        return null;
     }
 
     @Override
-    public Drive.Files preparePatch( Object resource, Identifier identifier )
+    public Drive.Files prepareUnderlying( @Nullable Object resource, @Nullable Identifier identifier, @Nullable Map<String, Object> parameters )
             throws IOException
     {
         return client().files();
+    }
+
+    @Override
+    public Object executeUnderlying( @Nonnull Drive.Files request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+            throws IOException
+    {
+        throw new UnsupportedOperationException();
     }
 }

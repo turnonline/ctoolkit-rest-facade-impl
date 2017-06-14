@@ -28,6 +28,7 @@ import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -38,10 +39,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class DownloadRequest
+class DownloadRequest
         implements SingleRequest<Void>
 {
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final DownloadExecutorAdaptee adaptee;
 
@@ -57,6 +58,10 @@ public class DownloadRequest
 
     private RequestCredential credential;
 
+    private Map<String, Object> params;
+
+    private Locale withLocale;
+
     /**
      * Constructor.
      *
@@ -68,7 +73,7 @@ public class DownloadRequest
      * @param output     the output stream where desired content will be downloaded to.
      * @param type       the content type or {@code null} to expect default
      */
-    DownloadRequest( @Nonnull ResourceFacadeAdapter adapter,
+    DownloadRequest( @Nonnull RestFacadeAdapter adapter,
                      @Nonnull DownloadExecutorAdaptee adaptee,
                      @Nonnull MediaHttpDownloader downloader,
                      @Nonnull Class resource,
@@ -83,47 +88,73 @@ public class DownloadRequest
         this.identifier = checkNotNull( identifier );
         this.output = checkNotNull( output );
         this.type = type;
+        this.params = new HashMap<>();
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <Q> Q query( Class<Q> type )
+    public Void finish()
     {
-        return ( Q ) downloader;
+        return finish( null, withLocale );
     }
 
     @Override
-    public Void execute()
+    public Void finish( @Nullable Map<String, Object> parameters )
     {
-        return execute( null, null );
+        return finish( parameters, withLocale );
     }
 
     @Override
-    public Void execute( Map<String, Object> parameters )
+    public Void finish( @Nullable Locale locale )
     {
-        return execute( parameters, null );
+        return finish( null, locale );
     }
 
     @Override
-    public Void execute( Locale locale )
-    {
-        return execute( null, locale );
-    }
-
-    @Override
-    public Void execute( Map<String, Object> params, Locale locale )
+    public Void finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
     {
         if ( credential != null )
         {
-            params = credential.populate( params );
+            parameters = credential.populate( parameters );
         }
+        if ( parameters != null )
+        {
+            params.putAll( parameters );
+        }
+
         return adapter.executeDownload( downloader, adaptee, resource, identifier, output, type, params, locale );
     }
 
     @Override
-    public Request<Void> config( RequestCredential credential )
+    public Request<Void> configWith( RequestCredential credential )
     {
-        this.credential = credential;
+        this.credential = checkNotNull( credential );
+        return this;
+    }
+
+    @Override
+    public Request<Void> forLang( @Nonnull Locale locale )
+    {
+        this.withLocale = checkNotNull( locale );
+        return this;
+    }
+
+    @Override
+    public Request<Void> add( @Nonnull String name, @Nonnull Object value )
+    {
+        checkNotNull( name );
+        checkNotNull( value );
+
+        params.put( name, value );
+        return this;
+    }
+
+    @Override
+    public Request<Void> add( @Nonnull String name, @Nonnull String value )
+    {
+        checkNotNull( name );
+        checkNotNull( value );
+
+        params.put( name, value );
         return this;
     }
 }

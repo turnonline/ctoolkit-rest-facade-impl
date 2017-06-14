@@ -87,7 +87,7 @@ public class GenericJsonChangeItemAdaptee
     @Override
     public Object prepareInsert( @Nonnull ChangeItem resource,
                                  @Nullable Identifier parentKey,
-                                 @Nullable MediaProvider<?> provider )
+                                 @Nullable MediaProvider provider )
             throws IOException
     {
         checkNotNull( resource );
@@ -114,7 +114,7 @@ public class GenericJsonChangeItemAdaptee
     @Override
     public Object prepareUpdate( @Nonnull ChangeItem resource,
                                  @Nonnull Identifier identifier,
-                                 @Nullable MediaProvider<?> provider )
+                                 @Nullable MediaProvider provider )
             throws IOException
     {
         checkNotNull( resource );
@@ -153,7 +153,7 @@ public class GenericJsonChangeItemAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public Object executeDelete( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -162,5 +162,6 @@ public class GenericJsonChangeItemAdaptee
         credential.fillInFrom( parameters, true );
 
         ( ( CustomizedCtoolkitAgent.ChangeBatch.Item.Delete ) request ).execute( credential );
+        return null;
     }
 }

@@ -16,23 +16,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.restapi.client.adapter;
+package org.ctoolkit.restapi.client.agent.model;
 
-import org.ctoolkit.restapi.client.Patch;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * The resource model for testing purpose.
+ * The bean holding list of entity change descriptors.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class PatchResourceNoMapping
-        implements Patch<ResourceNoMapping>
+@XmlAccessorType( XmlAccessType.FIELD )
+public class ChangeSetEntities
+        implements Serializable
 {
-    private static final long serialVersionUID = 1L;
+    @XmlElement( name = "entity" )
+    private List<ChangeSetEntity> entity;
 
-    @Override
-    public Class<ResourceNoMapping> type()
+    public List<ChangeSetEntity> getEntity()
     {
-        return ResourceNoMapping.class;
+        if ( entity == null )
+        {
+            entity = new ArrayList<>();
+        }
+        return entity;
+    }
+
+    public void setEntity( List<ChangeSetEntity> entity )
+    {
+        this.entity = entity;
     }
 }

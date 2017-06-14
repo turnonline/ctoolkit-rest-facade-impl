@@ -18,11 +18,14 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.RetrievalRequest;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -34,12 +37,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class ListRequest<T>
+class ListRequest<T>
         implements RetrievalRequest<T>
 {
     private final Class<T> resource;
 
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final ListExecutorAdaptee adaptee;
 
@@ -47,12 +50,16 @@ public class ListRequest<T>
 
     private RequestCredential credential;
 
+    private Map<String, Object> params;
+
+    private Locale withLocale;
+
     private int start = -1;
 
     private int length = -1;
 
     ListRequest( @Nonnull Class<T> resource,
-                 @Nonnull ResourceFacadeAdapter adapter,
+                 @Nonnull RestFacadeAdapter adapter,
                  @Nonnull ListExecutorAdaptee adaptee,
                  @Nonnull Object remoteRequest )
     {
@@ -60,23 +67,17 @@ public class ListRequest<T>
         this.adapter = checkNotNull( adapter );
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
+        this.params = new HashMap<>();
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <Q> Q query( Class<Q> type )
+    public List<T> finish()
     {
-        return ( Q ) remoteRequest;
+        return finish( null, withLocale );
     }
 
     @Override
-    public List<T> execute()
-    {
-        return execute( null, null );
-    }
-
-    @Override
-    public List<T> execute( int start, int length )
+    public List<T> finish( int start, int length )
     {
         if ( start < 0 || length < 0 )
         {
@@ -85,35 +86,67 @@ public class ListRequest<T>
         }
         this.start = start;
         this.length = length;
-        return execute( null, null );
+        return finish( null, null );
     }
 
     @Override
-    public List<T> execute( Map<String, Object> criteria )
+    public List<T> finish( @Nullable Map<String, Object> criteria )
     {
-        return execute( criteria, null );
+        return finish( criteria, withLocale );
     }
 
     @Override
-    public List<T> execute( Locale locale )
+    public List<T> finish( @Nullable Locale locale )
     {
-        return execute( null, locale );
+        return finish( null, locale );
     }
 
     @Override
-    public List<T> execute( Map<String, Object> parameters, Locale locale )
+    public List<T> finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
     {
         if ( credential != null )
         {
             parameters = credential.populate( parameters );
         }
-        return adapter.callbackExecuteList( adaptee, remoteRequest, resource, parameters, locale, start, length );
+        if ( parameters != null )
+        {
+            params.putAll( parameters );
+        }
+
+        return adapter.callbackExecuteList( adaptee, remoteRequest, resource, params, locale, start, length );
     }
 
     @Override
-    public ListRequest<T> config( RequestCredential credential )
+    public ListRequest<T> configWith( @Nonnull RequestCredential credential )
     {
-        this.credential = credential;
+        this.credential = checkNotNull( credential );
+        return this;
+    }
+
+    @Override
+    public RetrievalRequest<T> forLang( @Nonnull Locale locale )
+    {
+        this.withLocale = checkNotNull( locale );
+        return this;
+    }
+
+    @Override
+    public Request<List<T>> add( @Nonnull String name, @Nonnull Object value )
+    {
+        checkNotNull( name );
+        checkNotNull( value );
+
+        params.put( name, value );
+        return this;
+    }
+
+    @Override
+    public Request<List<T>> add( @Nonnull String name, @Nonnull String value )
+    {
+        checkNotNull( name );
+        checkNotNull( value );
+
+        params.put( name, value );
         return this;
     }
 

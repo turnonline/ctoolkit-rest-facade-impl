@@ -31,27 +31,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class OutputStreamMediaRequestProvider
+class OutputStreamMediaRequestProvider
         implements DownloadMediaRequestProvider
 {
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final Class resource;
 
-    OutputStreamMediaRequestProvider( ResourceFacadeAdapter adapter, Class resource )
+    OutputStreamMediaRequestProvider( RestFacadeAdapter adapter, Class resource )
     {
         this.adapter = checkNotNull( adapter );
         this.resource = checkNotNull( resource );
     }
 
     @Override
-    public SingleDownloadMediaRequest downloadTo( @Nonnull OutputStream output )
+    public SingleDownloadMediaRequest to( @Nonnull OutputStream output )
     {
-        return downloadTo( output, null );
+        return to( output, null );
     }
 
     @Override
-    public SingleDownloadMediaRequest downloadTo( @Nonnull OutputStream output, String type )
+    public SingleDownloadMediaRequest to( @Nonnull OutputStream output, String type )
     {
         checkNotNull( output );
         return new OutputStreamDownloadRequest( adapter, resource, output, type );

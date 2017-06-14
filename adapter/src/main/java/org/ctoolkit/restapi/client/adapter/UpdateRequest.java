@@ -18,12 +18,14 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
-import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -34,14 +36,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class UpdateRequest<T>
-        implements SingleRequest<T>
+class UpdateRequest<T>
+        implements PayloadRequest<T>
 {
     private final Class<T> resource;
 
     private final Object identifier;
 
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final UpdateExecutorAdaptee adaptee;
 
@@ -49,9 +51,13 @@ public class UpdateRequest<T>
 
     private RequestCredential credential;
 
+    private Map<String, Object> params;
+
+    private Locale withLocale;
+
     UpdateRequest( @Nonnull Class<T> resource,
                    @Nonnull Object identifier,
-                   @Nonnull ResourceFacadeAdapter adapter,
+                   @Nonnull RestFacadeAdapter adapter,
                    @Nonnull UpdateExecutorAdaptee adaptee,
                    @Nonnull Object remoteRequest )
     {
@@ -60,47 +66,85 @@ public class UpdateRequest<T>
         this.adapter = checkNotNull( adapter );
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
+        this.params = new HashMap<>();
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <Q> Q query( Class<Q> type )
+    public T finish()
     {
-        return ( Q ) remoteRequest;
+        return finish( null, withLocale );
     }
 
     @Override
-    public T execute()
+    public T finish( @Nullable Map<String, Object> parameters )
     {
-        return execute( null, null );
+        return finish( parameters, withLocale );
     }
 
     @Override
-    public T execute( Map<String, Object> parameters )
+    public T finish( @Nullable Locale locale )
     {
-        return execute( parameters, null );
+        return finish( null, locale );
     }
 
     @Override
-    public T execute( Locale locale )
-    {
-        return execute( null, locale );
-    }
-
-    @Override
-    public T execute( Map<String, Object> parameters, Locale locale )
+    public T finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
     {
         if ( credential != null )
         {
             parameters = credential.populate( parameters );
         }
-        return adapter.callbackExecuteUpdate( adaptee, remoteRequest, resource, identifier, parameters, locale );
+        if ( parameters != null )
+        {
+            params.putAll( parameters );
+        }
+
+        return adapter.callbackExecuteUpdate( adaptee, remoteRequest, resource, identifier, params, locale );
     }
 
     @Override
-    public Request<T> config( RequestCredential credential )
+    public Request<T> configWith( @Nonnull RequestCredential credential )
     {
-        this.credential = credential;
+        this.credential = checkNotNull( credential );
         return this;
+    }
+
+    @Override
+    public Request<T> forLang( @Nonnull Locale locale )
+    {
+        this.withLocale = checkNotNull( locale );
+        return this;
+    }
+
+    @Override
+    public Request<T> add( @Nonnull String name, @Nonnull Object value )
+    {
+        checkNotNull( name );
+        checkNotNull( value );
+
+        params.put( name, value );
+        return this;
+    }
+
+    @Override
+    public Request<T> add( @Nonnull String name, @Nonnull String value )
+    {
+        checkNotNull( name );
+        checkNotNull( value );
+
+        params.put( name, value );
+        return this;
+    }
+
+    @Override
+    public <R> Request<R> answerBy( @Nonnull Class<R> type )
+    {
+        return new UpdateRequest<>( type, identifier, adapter, adaptee, remoteRequest );
+    }
+
+    @Override
+    public <R> R finish( @Nullable Class<R> type )
+    {
+        return answerBy( type ).finish();
     }
 }

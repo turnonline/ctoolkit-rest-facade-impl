@@ -57,10 +57,9 @@ public class AbstractGoogleClientAdaptee<C, M>
         return ( AbstractGoogleJsonClientRequest ) request;
     }
 
-    @SuppressWarnings( "unchecked" )
-    protected final M execute( Object request ) throws IOException
+    protected final Object execute( Object request ) throws IOException
     {
-        return ( M ) get( request ).execute();
+        return get( request ).execute();
     }
 
     /**
@@ -134,7 +133,7 @@ public class AbstractGoogleClientAdaptee<C, M>
         acceptLanguage( request, locale );
     }
 
-    protected final AbstractInputStreamContent media( @Nullable MediaProvider<?> provider )
+    protected final AbstractInputStreamContent media( @Nullable MediaProvider provider )
     {
         if ( provider == null )
         {

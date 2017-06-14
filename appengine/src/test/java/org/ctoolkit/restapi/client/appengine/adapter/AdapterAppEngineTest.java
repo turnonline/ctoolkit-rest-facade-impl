@@ -20,8 +20,11 @@ package org.ctoolkit.restapi.client.appengine.adapter;
 
 import org.ctoolkit.restapi.client.ApiCredential;
 import org.ctoolkit.restapi.client.Identifier;
-import org.ctoolkit.restapi.client.ResourceFacade;
+import org.ctoolkit.restapi.client.PayloadRequest;
+import org.ctoolkit.restapi.client.Request;
+import org.ctoolkit.restapi.client.RestFacade;
 import org.ctoolkit.restapi.client.SingleRequest;
+import org.ctoolkit.restapi.client.SingleRetrievalRequest;
 import org.ctoolkit.restapi.client.appengine.GuiceTestCase;
 import org.ctoolkit.restapi.client.appengine.adapter.model.Foo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
@@ -93,7 +96,7 @@ public class AdapterAppEngineTest
     String readTimeout;
 
     @Inject
-    private ResourceFacade resources;
+    private RestFacade resources;
 
     @Inject
     private GoogleApiProxyFactory builder;
@@ -101,71 +104,66 @@ public class AdapterAppEngineTest
     @Test
     public void facadeEndToEnd() throws IOException
     {
-        SingleRequest<RemoteOnly> request = resources.get( RemoteOnly.class, new Identifier( 1L ) );
+        SingleRetrievalRequest<RemoteOnly> request = resources.get( RemoteOnly.class, new Identifier( 1L ) );
         assertNotNull( request );
-        assertNotNull( request.execute() );
+        assertNotNull( request.finish() );
 
-        SingleRequest<Foo> singleRequest = resources.newInstance( Foo.class );
-        assertNotNull( singleRequest );
-        assertNotNull( singleRequest.execute() );
+        PayloadRequest<Foo> payloadRequest = resources.newInstance( Foo.class );
+        assertNotNull( payloadRequest );
+        assertNotNull( payloadRequest.finish() );
 
-        singleRequest = resources.get( Foo.class, new Identifier( 1L ) );
-        assertNotNull( singleRequest );
-        assertNotNull( singleRequest.execute() );
+        SingleRetrievalRequest singleRetrievalRequest = resources.get( Foo.class, new Identifier( 1L ) );
+        assertNotNull( singleRetrievalRequest );
+        assertNotNull( singleRetrievalRequest.finish() );
 
-        singleRequest = resources.get( Foo.class, 1L );
-        assertNotNull( singleRequest );
-        assertNotNull( singleRequest.execute() );
+        singleRetrievalRequest = resources.get( Foo.class, 1L );
+        assertNotNull( singleRetrievalRequest );
+        assertNotNull( singleRetrievalRequest.finish() );
 
-        singleRequest = resources.get( Foo.class, "identifier" );
-        assertNotNull( singleRequest );
-        assertNotNull( singleRequest.execute() );
+        singleRetrievalRequest = resources.get( Foo.class, "identifier" );
+        assertNotNull( singleRetrievalRequest );
+        assertNotNull( singleRetrievalRequest.finish() );
 
         ByteArrayOutputStream content = new ByteArrayOutputStream();
         String type = "application/pdf";
-        SingleRequest dr = resources.media( Foo.class ).downloadTo( content, type ).identifiedBy( 1L );
-        assertNull( dr.execute( Locale.GERMANY ) );
+        Request dr = resources.download( Foo.class ).to( content, type ).identifiedBy( 1L );
+        assertNull( dr.finish( Locale.GERMANY ) );
         String errorMessage = "Output stream has expected to be populated by downloaded content!";
         assertTrue( content.size() > 0, errorMessage );
 
         Foo foo = new Foo();
         foo.setName( "John Foo" );
-        singleRequest = resources.insert( foo );
-        assertNotNull( singleRequest );
-        assertNotNull( singleRequest.execute() );
+        payloadRequest = resources.insert( foo );
+        assertNotNull( payloadRequest );
+        assertNotNull( payloadRequest.finish() );
 
         foo = new Foo();
         foo.setName( "Michal Foo" );
-        singleRequest = resources.update( foo, new Identifier( 1L ) );
-        assertNotNull( singleRequest );
-        assertNotNull( singleRequest.execute() );
+        payloadRequest = resources.update( foo, new Identifier( 1L ) );
+        assertNotNull( payloadRequest );
+        assertNotNull( payloadRequest.finish() );
 
-        singleRequest = resources.update( foo, 1L );
-        assertNotNull( singleRequest );
-        assertNotNull( singleRequest.execute() );
+        payloadRequest = resources.update( foo, 1L );
+        assertNotNull( payloadRequest );
+        assertNotNull( payloadRequest.finish() );
 
-        singleRequest = resources.update( foo, "identifier" );
-        assertNotNull( singleRequest );
-        assertNotNull( singleRequest.execute() );
+        payloadRequest = resources.update( foo, "identifier" );
+        assertNotNull( payloadRequest );
+        assertNotNull( payloadRequest.finish() );
 
-        Foo.InnerFoo inner = new Foo.InnerFoo();
-        singleRequest = resources.patch( inner, new Identifier( 1L ) );
-        assertNotNull( singleRequest );
-        assertNotNull( singleRequest.execute() );
+        resources.underlying( UnderlyingRequest.class ).identifiedBy( new Identifier( 1L ) ).build().export().execute();
 
-        resources.patch( UnderlyingRequest.class ).identifier( new Identifier( 1L ) ).build().export().execute();
-
-        singleRequest = resources.delete( Foo.class, new Identifier( 1L ) );
+        SingleRequest singleRequest = resources.delete( Foo.class, new Identifier( 1L ) );
         assertNotNull( singleRequest );
-        singleRequest.execute();
+        singleRequest.finish();
 
         singleRequest = resources.delete( Foo.class, 1L );
         assertNotNull( singleRequest );
-        singleRequest.execute();
+        singleRequest.finish();
 
         singleRequest = resources.delete( Foo.class, "identifier" );
         assertNotNull( singleRequest );
-        singleRequest.execute();
+        singleRequest.finish();
     }
 
     @Test

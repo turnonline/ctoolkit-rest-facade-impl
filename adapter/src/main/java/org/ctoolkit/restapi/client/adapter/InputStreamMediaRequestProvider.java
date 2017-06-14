@@ -32,10 +32,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class InputStreamMediaRequestProvider<T>
+class InputStreamMediaRequestProvider<T>
         implements UploadMediaRequestProvider<T>
 {
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final T resource;
 
@@ -45,37 +45,37 @@ public class InputStreamMediaRequestProvider<T>
      * @param adapter  the adapter to callback execute method
      * @param resource the resource instance to associate with media content
      */
-    InputStreamMediaRequestProvider( @Nonnull ResourceFacadeAdapter adapter, @Nonnull T resource )
+    InputStreamMediaRequestProvider( @Nonnull RestFacadeAdapter adapter, @Nonnull T resource )
     {
         this.adapter = checkNotNull( adapter );
         this.resource = checkNotNull( resource );
     }
 
     @Override
-    public SingleUploadMediaRequest<T> upload( File file, String type )
+    public SingleUploadMediaRequest<T> data( File file, String type )
     {
-        return upload( new InputStreamMediaProvider( file, type ) );
+        return data( new InputStreamMediaProvider( file, type ) );
     }
 
     @Override
-    public SingleUploadMediaRequest<T> upload( InputStream inputStream, String type )
+    public SingleUploadMediaRequest<T> data( InputStream inputStream, String type )
     {
-        return upload( new InputStreamMediaProvider( inputStream, type ) );
+        return data( new InputStreamMediaProvider( inputStream, type ) );
     }
 
     @Override
-    public SingleUploadMediaRequest<T> upload( byte[] media, String type )
+    public SingleUploadMediaRequest<T> data( byte[] media, String type )
     {
-        return upload( new InputStreamMediaProvider( media, type ) );
+        return data( new InputStreamMediaProvider( media, type ) );
     }
 
     @Override
-    public SingleUploadMediaRequest<T> upload( byte[] array, int offset, int length, String type )
+    public SingleUploadMediaRequest<T> data( byte[] array, int offset, int length, String type )
     {
-        return upload( new InputStreamMediaProvider( array, offset, length, type ) );
+        return data( new InputStreamMediaProvider( array, offset, length, type ) );
     }
 
-    private SingleUploadMediaRequest<T> upload( InputStreamMediaProvider provider )
+    private SingleUploadMediaRequest<T> data( InputStreamMediaProvider provider )
     {
         return new InputStreamUploadRequest<>( adapter, resource, provider );
     }

@@ -32,10 +32,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class OutputStreamDownloadRequest
+class OutputStreamDownloadRequest
         implements SingleDownloadMediaRequest
 {
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final Class resource;
 
@@ -50,7 +50,7 @@ public class OutputStreamDownloadRequest
      * @param resource the type of resource to download as a media
      * @param output   the output stream where desired content will be downloaded to.
      */
-    OutputStreamDownloadRequest( @Nonnull ResourceFacadeAdapter adapter,
+    OutputStreamDownloadRequest( @Nonnull RestFacadeAdapter adapter,
                                  @Nonnull Class resource,
                                  @Nonnull OutputStream output )
     {
@@ -64,7 +64,7 @@ public class OutputStreamDownloadRequest
      * @param resource the type of resource to download as a media
      * @param output   the output stream where desired content will be downloaded to.
      */
-    OutputStreamDownloadRequest( @Nonnull ResourceFacadeAdapter adapter,
+    OutputStreamDownloadRequest( @Nonnull RestFacadeAdapter adapter,
                                  @Nonnull Class resource,
                                  @Nonnull OutputStream output,
                                  String type )

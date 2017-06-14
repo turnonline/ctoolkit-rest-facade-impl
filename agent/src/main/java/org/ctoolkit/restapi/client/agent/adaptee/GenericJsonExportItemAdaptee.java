@@ -86,7 +86,7 @@ public class GenericJsonExportItemAdaptee
     @Override
     public Object prepareInsert( @Nonnull ExportItem resource,
                                  @Nullable Identifier parentKey,
-                                 @Nullable MediaProvider<?> provider )
+                                 @Nullable MediaProvider provider )
             throws IOException
     {
         checkNotNull( resource );
@@ -113,7 +113,7 @@ public class GenericJsonExportItemAdaptee
     @Override
     public Object prepareUpdate( @Nonnull ExportItem resource,
                                  @Nonnull Identifier identifier,
-                                 @Nullable MediaProvider<?> provider )
+                                 @Nullable MediaProvider provider )
             throws IOException
     {
         checkNotNull( resource );
@@ -152,9 +152,9 @@ public class GenericJsonExportItemAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale ) throws IOException
+    public Object executeDelete( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale ) throws IOException
     {
         checkNotNull( request );
 
@@ -162,5 +162,6 @@ public class GenericJsonExportItemAdaptee
         credential.fillInFrom( parameters, true );
 
         ( ( CustomizedCtoolkitAgent.ExportBatch.Item.Delete ) request ).execute( credential );
+        return null;
     }
 }

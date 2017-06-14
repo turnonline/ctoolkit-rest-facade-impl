@@ -20,9 +20,9 @@ package org.ctoolkit.restapi.client.identity;
 
 import com.google.api.client.http.HttpHeaders;
 import com.google.common.eventbus.EventBus;
+import mockit.Expectations;
 import mockit.Injectable;
 import mockit.Mocked;
-import mockit.NonStrictExpectations;
 import mockit.Tested;
 import mockit.Verifications;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
@@ -52,12 +52,9 @@ public class IdentityTokenBeforeRequestSubscriberTest
     public void noCookies( @Mocked final BeforeRequestEvent event,
                            @Mocked final HttpHeaders headers ) throws Exception
     {
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
-                event.getRequest().getHeaders();
-                result = headers;
-
                 provider.get().getCookies();
                 result = null;
             }
@@ -76,20 +73,18 @@ public class IdentityTokenBeforeRequestSubscriberTest
 
     @Test
     public void gtokenNotFound( @Mocked final BeforeRequestEvent event,
-                                @Mocked final HttpHeaders headers,
                                 @Mocked final Cookie cookie1,
                                 @Mocked final Cookie cookie2 ) throws Exception
     {
         final Cookie[] cookies = new Cookie[2];
         cookies[0] = cookie1;
         cookies[1] = cookie2;
+        // if HttpHeaders was @Mocked it was failing with UncaughtExceptionHandler
+        final HttpHeaders headers = new HttpHeaders();
 
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
-                event.getRequest().getHeaders();
-                result = headers;
-
                 provider.get().getCookies();
                 result = cookies;
             }
@@ -129,7 +124,7 @@ public class IdentityTokenBeforeRequestSubscriberTest
         cookies[0] = cookie1;
         cookies[1] = cookie2;
 
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 event.getRequest().getHeaders();

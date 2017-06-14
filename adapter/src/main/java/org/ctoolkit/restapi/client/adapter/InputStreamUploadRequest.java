@@ -20,12 +20,11 @@ package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.http.AbstractInputStreamContent;
 import org.ctoolkit.restapi.client.Identifier;
-import org.ctoolkit.restapi.client.SingleRequest;
+import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.SingleUploadMediaRequest;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -34,14 +33,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class InputStreamUploadRequest<T>
+class InputStreamUploadRequest<T>
         implements SingleUploadMediaRequest<T>
 {
-    private final ResourceFacadeAdapter adapter;
+    private final RestFacadeAdapter adapter;
 
     private final T resource;
 
-    private final MediaProvider<AbstractInputStreamContent> provider;
+    private final MediaProvider provider;
+
+    private Identifier identifier;
 
     /**
      * Creates an instance based on the given input.
@@ -50,9 +51,9 @@ public class InputStreamUploadRequest<T>
      * @param resource the resource instance to be associated with provided media content
      * @param provider the provider to provide concrete instance of media content
      */
-    InputStreamUploadRequest( @Nonnull ResourceFacadeAdapter adapter,
+    InputStreamUploadRequest( @Nonnull RestFacadeAdapter adapter,
                               @Nonnull T resource,
-                              @Nonnull MediaProvider<AbstractInputStreamContent> provider )
+                              @Nonnull MediaProvider provider )
     {
         this.adapter = checkNotNull( adapter );
         this.resource = checkNotNull( resource );
@@ -60,20 +61,40 @@ public class InputStreamUploadRequest<T>
     }
 
     @Override
-    public SingleRequest<T> insert()
+    public PayloadRequest<T> insert()
     {
-        return adapter.internalInsert( resource, null, provider );
+        return adapter.internalInsert( resource, identifier, provider );
     }
 
     @Override
-    public SingleRequest<T> insert( @Nullable Identifier parent )
+    public SingleUploadMediaRequest<T> identifiedBy( @Nonnull Identifier identifier )
     {
-        return adapter.internalInsert( resource, parent, provider );
+        this.identifier = checkNotNull( identifier );
+        return this;
     }
 
     @Override
-    public SingleRequest<T> update( @Nonnull Identifier identifier )
+    public SingleUploadMediaRequest<T> identifiedBy( @Nonnull String identifier )
     {
+        checkNotNull( identifier );
+        return identifiedBy( new Identifier( identifier ) );
+    }
+
+    @Override
+    public SingleUploadMediaRequest<T> identifiedBy( @Nonnull Long identifier )
+    {
+        checkNotNull( identifier );
+        return identifiedBy( new Identifier( identifier ) );
+    }
+
+    @Override
+    public PayloadRequest<T> update()
+    {
+        if ( identifier == null )
+        {
+            throw new IllegalArgumentException( "For update operation identifier is being required!" );
+        }
+
         return adapter.internalUpdate( resource, identifier, provider );
     }
 }
