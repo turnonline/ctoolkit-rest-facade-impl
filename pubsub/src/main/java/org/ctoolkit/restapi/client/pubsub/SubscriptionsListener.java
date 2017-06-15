@@ -3,18 +3,19 @@ package org.ctoolkit.restapi.client.pubsub;
 import com.google.api.client.json.JsonParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.pubsub.model.PubsubMessage;
-import com.google.common.base.Strings;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,17 +30,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SubscriptionsListener
         extends HttpServlet
 {
-    public static final String SUBSCRIPTION_SUFFIX_INIT_PARAM = "Subscription_Suffix";
+    public static final String PUSH_HANDLERS_URL_PATH = "/_ah/push-handlers/";
 
     private static final long serialVersionUID = -4754611197274771298L;
 
     private static final Logger logger = LoggerFactory.getLogger( SubscriptionsListener.class );
 
     private final Map<String, PubsubMessageListener> listeners;
-
-    private PubsubMessageListener listener;
-
-    private String subscription;
 
     /**
      * Constructs subscriptions listener.
@@ -53,30 +50,24 @@ public class SubscriptionsListener
     }
 
     @Override
-    public void init() throws ServletException
-    {
-        subscription = getInitParameter( SUBSCRIPTION_SUFFIX_INIT_PARAM );
-        if ( Strings.isNullOrEmpty( subscription ) )
-        {
-            throw new IllegalArgumentException( "Subscription suffix must be configured via servlet init parameters." );
-        }
-        logger.info( "Subscription listener has been initialized for suffix: " + subscription );
-
-        listener = listeners.get( subscription );
-        if ( listener == null )
-        {
-            String message = PubsubMessageListener.class.getSimpleName() + " not found for '" + subscription + "'";
-            throw new IllegalArgumentException( message );
-        }
-    }
-
-    @Override
     public final void doPost( final HttpServletRequest request, final HttpServletResponse response )
             throws IOException
     {
+        String subscription = getSubscriptionSuffix( request );
+
         try
         {
             ServletInputStream inputStream = request.getInputStream();
+
+            PubsubMessageListener listener = listeners.get( subscription );
+            if ( listener == null )
+            {
+                response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+                response.getWriter().close();
+
+                String message = PubsubMessageListener.class.getSimpleName() + " not found for '" + subscription + "'";
+                throw new IllegalArgumentException( message );
+            }
 
             // Parse the JSON message to the POJO model class
             JsonParser parser = JacksonFactory.getDefaultInstance().createJsonParser( inputStream );
@@ -96,20 +87,17 @@ public class SubscriptionsListener
         }
     }
 
-    @Override
-    public boolean equals( Object o )
+    @VisibleForTesting
+    String getSubscriptionSuffix( HttpServletRequest request )
     {
-        if ( this == o ) return true;
-        if ( !( o instanceof SubscriptionsListener ) ) return false;
-
-        SubscriptionsListener that = ( SubscriptionsListener ) o;
-
-        return subscription.equals( that.subscription );
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return subscription.hashCode();
+        String uri = request.getRequestURI();
+        Splitter splitter = Splitter.on( PUSH_HANDLERS_URL_PATH );
+        List<String> strings = splitter.omitEmptyStrings().splitToList( uri );
+        if ( strings.isEmpty() )
+        {
+            String message = "There is missing push handler suffix configuration for current URI: " + uri;
+            throw new IllegalArgumentException( message );
+        }
+        return strings.get( 0 );
     }
 }
