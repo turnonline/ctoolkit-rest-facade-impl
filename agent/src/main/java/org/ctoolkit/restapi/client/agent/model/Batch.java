@@ -33,7 +33,7 @@ public class Batch<I extends BatchItem, J extends JobInfo>
 
     private String name;
 
-    private String mapReduceJobId;
+    private String jobId;
 
     private Date createDate;
 
@@ -63,14 +63,14 @@ public class Batch<I extends BatchItem, J extends JobInfo>
         this.name = name;
     }
 
-    public String getMapReduceJobId()
+    public String getJobId()
     {
-        return mapReduceJobId;
+        return jobId;
     }
 
-    public void setMapReduceJobId( String mapReduceJobId )
+    public void setJobId( String jobId )
     {
-        this.mapReduceJobId = mapReduceJobId;
+        this.jobId = jobId;
     }
 
     public Date getCreateDate()
@@ -119,7 +119,7 @@ public class Batch<I extends BatchItem, J extends JobInfo>
         return "Batch{" +
                 "id='" + id + '\'' +
                 ", name=" + name +
-                ", mapReduceJobId='" + mapReduceJobId + '\'' +
+                ", jobId='" + jobId + '\'' +
                 ", createDate=" + createDate +
                 ", updateDate=" + updateDate +
                 ", jobInfo=" + jobInfo +
