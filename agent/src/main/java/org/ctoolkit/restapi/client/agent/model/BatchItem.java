@@ -27,7 +27,7 @@ import java.util.Date;
 public class BatchItem
         implements Serializable
 {
-    private String key;
+    private Long id;
 
     private String name;
 
@@ -47,14 +47,14 @@ public class BatchItem
 
     private String error;
 
-    public String getKey()
+    public Long getId()
     {
-        return key;
+        return id;
     }
 
-    public void setKey( String key )
+    public void setId( Long id )
     {
-        this.key = key;
+        this.id = id;
     }
 
     public String getName()
@@ -155,20 +155,20 @@ public class BatchItem
 
         BatchItem batchItem = ( BatchItem ) o;
 
-        return key != null ? key.equals( batchItem.key ) : batchItem.key == null;
+        return id != null ? id.equals( batchItem.id ) : batchItem.id == null;
     }
 
     @Override
     public int hashCode()
     {
-        return key != null ? key.hashCode() : 0;
+        return id != null ? id.hashCode() : 0;
     }
 
     @Override
     public String toString()
     {
         return "BatchItem{" +
-                "key='" + key + '\'' +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", fileName='" + fileName + '\'' +
                 ", dataType=" + dataType +

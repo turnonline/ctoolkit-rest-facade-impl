@@ -30,7 +30,7 @@ public abstract class JobInfo
 {
     private String id;
 
-    private String mapReduceJobId;
+    private String jobId;
 
     private int totalItems;
 
@@ -52,14 +52,14 @@ public abstract class JobInfo
         this.id = id;
     }
 
-    public String getMapReduceJobId()
+    public String getJobId()
     {
-        return mapReduceJobId;
+        return jobId;
     }
 
-    public void setMapReduceJobId( String mapReduceJobId )
+    public void setJobId( String jobId )
     {
-        this.mapReduceJobId = mapReduceJobId;
+        this.jobId = jobId;
     }
 
     public int getTotalItems()
@@ -117,7 +117,7 @@ public abstract class JobInfo
     {
         return "JobInfo{" +
                 "id='" + id + '\'' +
-                ", mapReduceJobId='" + mapReduceJobId + '\'' +
+                ", jobId='" + jobId + '\'' +
                 ", totalItems=" + totalItems +
                 ", processedItems=" + processedItems +
                 ", processedErrorItems=" + processedErrorItems +
