@@ -64,7 +64,7 @@ import static org.testng.Assert.assertNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @SuppressWarnings( {"unchecked", "ConstantConditions"} )
-public class ResourceFacadeAdapterTest
+public class RestFacadeAdapterTest
 {
     @Tested
     private RestFacadeAdapter tested;
