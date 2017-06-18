@@ -28,7 +28,7 @@ import java.io.Serializable;
 public abstract class JobInfo
         implements Serializable
 {
-    private String id;
+    private Long id;
 
     private String jobId;
 
@@ -42,12 +42,12 @@ public abstract class JobInfo
 
     private String stackTrace;
 
-    public String getId()
+    public Long getId()
     {
         return id;
     }
 
-    public void setId( String id )
+    public void setId( Long id )
     {
         this.id = id;
     }
