@@ -19,7 +19,7 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import org.ctoolkit.restapi.client.SingleUploadMediaRequest;
-import org.ctoolkit.restapi.client.UploadMediaRequestProvider;
+import org.ctoolkit.restapi.client.UploadMediaProvider;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -32,8 +32,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-class InputStreamMediaRequestProvider<T>
-        implements UploadMediaRequestProvider<T>
+class InputStreamUploadMediaRequestProvider<T>
+        implements UploadMediaProvider<T>
 {
     private final RestFacadeAdapter adapter;
 
@@ -45,34 +45,34 @@ class InputStreamMediaRequestProvider<T>
      * @param adapter  the adapter to callback execute method
      * @param resource the resource instance to associate with media content
      */
-    InputStreamMediaRequestProvider( @Nonnull RestFacadeAdapter adapter, @Nonnull T resource )
+    InputStreamUploadMediaRequestProvider( @Nonnull RestFacadeAdapter adapter, @Nonnull T resource )
     {
         this.adapter = checkNotNull( adapter );
         this.resource = checkNotNull( resource );
     }
 
     @Override
-    public SingleUploadMediaRequest<T> data( File file, String type )
+    public SingleUploadMediaRequest<T> data( @Nonnull File file )
     {
-        return data( new InputStreamMediaProvider( file, type ) );
+        return data( new InputStreamMediaProvider( file ) );
     }
 
     @Override
-    public SingleUploadMediaRequest<T> data( InputStream inputStream, String type )
+    public SingleUploadMediaRequest<T> data( @Nonnull InputStream inputStream )
     {
-        return data( new InputStreamMediaProvider( inputStream, type ) );
+        return data( new InputStreamMediaProvider( inputStream ) );
     }
 
     @Override
-    public SingleUploadMediaRequest<T> data( byte[] media, String type )
+    public SingleUploadMediaRequest<T> data( @Nonnull byte[] array )
     {
-        return data( new InputStreamMediaProvider( media, type ) );
+        return data( new InputStreamMediaProvider( array ) );
     }
 
     @Override
-    public SingleUploadMediaRequest<T> data( byte[] array, int offset, int length, String type )
+    public SingleUploadMediaRequest<T> data( @Nonnull byte[] array, int offset, int length )
     {
-        return data( new InputStreamMediaProvider( array, offset, length, type ) );
+        return data( new InputStreamMediaProvider( array, offset, length ) );
     }
 
     private SingleUploadMediaRequest<T> data( InputStreamMediaProvider provider )

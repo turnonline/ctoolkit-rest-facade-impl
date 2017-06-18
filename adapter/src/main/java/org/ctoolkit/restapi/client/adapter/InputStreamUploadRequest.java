@@ -67,6 +67,20 @@ class InputStreamUploadRequest<T>
     }
 
     @Override
+    public SingleUploadMediaRequest<T> ofType( @Nonnull String type )
+    {
+        this.provider.setType( checkNotNull( type ) );
+        return this;
+    }
+
+    @Override
+    public SingleUploadMediaRequest<T> closeStreamAtTheEnd( boolean closeStream )
+    {
+        this.provider.setCloseInputStream( closeStream );
+        return this;
+    }
+
+    @Override
     public SingleUploadMediaRequest<T> identifiedBy( @Nonnull Identifier identifier )
     {
         this.identifier = checkNotNull( identifier );
@@ -92,7 +106,7 @@ class InputStreamUploadRequest<T>
     {
         if ( identifier == null )
         {
-            throw new IllegalArgumentException( "For update operation identifier is being required!" );
+            throw new IllegalArgumentException( "For update operation the identifier is being required!" );
         }
 
         return adapter.internalUpdate( resource, identifier, provider );

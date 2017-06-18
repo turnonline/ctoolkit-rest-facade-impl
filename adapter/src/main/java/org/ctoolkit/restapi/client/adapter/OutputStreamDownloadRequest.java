@@ -23,6 +23,7 @@ import org.ctoolkit.restapi.client.SingleDownloadMediaRequest;
 import org.ctoolkit.restapi.client.SingleRequest;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.OutputStream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,7 +42,7 @@ class OutputStreamDownloadRequest
 
     private final OutputStream output;
 
-    private final String type;
+    private String type;
 
     /**
      * Creates an instance based on the given input.
@@ -54,25 +55,9 @@ class OutputStreamDownloadRequest
                                  @Nonnull Class resource,
                                  @Nonnull OutputStream output )
     {
-        this( adapter, resource, output, null );
-    }
-
-    /**
-     * Creates an instance based on the given input.
-     *
-     * @param adapter  the resource facade adapter instance
-     * @param resource the type of resource to download as a media
-     * @param output   the output stream where desired content will be downloaded to.
-     */
-    OutputStreamDownloadRequest( @Nonnull RestFacadeAdapter adapter,
-                                 @Nonnull Class resource,
-                                 @Nonnull OutputStream output,
-                                 String type )
-    {
         this.adapter = checkNotNull( adapter );
         this.resource = checkNotNull( resource );
         this.output = checkNotNull( output );
-        this.type = type;
     }
 
 
@@ -95,5 +80,12 @@ class OutputStreamDownloadRequest
     {
         checkNotNull( identifier );
         return identifiedBy( new Identifier( identifier ) );
+    }
+
+    @Override
+    public SingleDownloadMediaRequest ofType( @Nullable String type )
+    {
+        this.type = type;
+        return this;
     }
 }

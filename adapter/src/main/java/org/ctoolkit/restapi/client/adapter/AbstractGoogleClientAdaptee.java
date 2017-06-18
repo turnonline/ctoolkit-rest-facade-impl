@@ -140,6 +140,6 @@ public class AbstractGoogleClientAdaptee<C, M>
             return null;
         }
 
-        return ( AbstractInputStreamContent ) provider.media();
+        return ( AbstractInputStreamContent ) provider.getMedia();
     }
 }

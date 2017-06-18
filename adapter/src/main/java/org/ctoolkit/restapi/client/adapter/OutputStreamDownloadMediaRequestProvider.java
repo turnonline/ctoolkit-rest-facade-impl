@@ -18,7 +18,7 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
-import org.ctoolkit.restapi.client.DownloadMediaRequestProvider;
+import org.ctoolkit.restapi.client.DownloadMediaProvider;
 import org.ctoolkit.restapi.client.SingleDownloadMediaRequest;
 
 import javax.annotation.Nonnull;
@@ -31,14 +31,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-class OutputStreamMediaRequestProvider
-        implements DownloadMediaRequestProvider
+class OutputStreamDownloadMediaRequestProvider
+        implements DownloadMediaProvider
 {
     private final RestFacadeAdapter adapter;
 
     private final Class resource;
 
-    OutputStreamMediaRequestProvider( RestFacadeAdapter adapter, Class resource )
+    OutputStreamDownloadMediaRequestProvider( @Nonnull RestFacadeAdapter adapter, @Nonnull Class resource )
     {
         this.adapter = checkNotNull( adapter );
         this.resource = checkNotNull( resource );
@@ -47,13 +47,6 @@ class OutputStreamMediaRequestProvider
     @Override
     public SingleDownloadMediaRequest to( @Nonnull OutputStream output )
     {
-        return to( output, null );
-    }
-
-    @Override
-    public SingleDownloadMediaRequest to( @Nonnull OutputStream output, String type )
-    {
-        checkNotNull( output );
-        return new OutputStreamDownloadRequest( adapter, resource, output, type );
+        return new OutputStreamDownloadRequest( adapter, resource, output );
     }
 }

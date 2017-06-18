@@ -24,6 +24,7 @@ import com.google.api.client.http.FileContent;
 import com.google.api.client.http.InputStreamContent;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
 
@@ -40,38 +41,50 @@ class InputStreamMediaProvider
     /**
      * Creates an input stream content instance from the given input.
      */
-    InputStreamMediaProvider( File file, String type )
+    InputStreamMediaProvider( File file )
     {
-        this.content = new FileContent( type, file );
+        this.content = new FileContent( null, file );
     }
 
     /**
      * Creates an input stream content instance from the given input.
      */
-    InputStreamMediaProvider( InputStream inputStream, String type )
+    InputStreamMediaProvider( InputStream inputStream )
     {
-        this.content = new InputStreamContent( type, inputStream );
+        this.content = new InputStreamContent( null, inputStream );
     }
 
     /**
      * Creates an input stream content instance from the given input.
      */
-    InputStreamMediaProvider( byte[] media, String type )
+    InputStreamMediaProvider( byte[] array )
     {
-        this.content = new ByteArrayContent( type, media );
+        this.content = new ByteArrayContent( null, array );
     }
 
     /**
      * Creates an input stream content instance from the given input.
      */
-    InputStreamMediaProvider( byte[] array, int offset, int length, String type )
+    InputStreamMediaProvider( byte[] array, int offset, int length )
     {
-        this.content = new ByteArrayContent( type, array, offset, length );
+        this.content = new ByteArrayContent( null, array, offset, length );
     }
 
     @Override
-    public AbstractInputStreamContent media()
+    public AbstractInputStreamContent getMedia()
     {
         return content;
+    }
+
+    @Override
+    public void setType( @Nullable String type )
+    {
+        content.setType( type );
+    }
+
+    @Override
+    public void setCloseInputStream( boolean closeInputStream )
+    {
+        content.setCloseInputStream( closeInputStream );
     }
 }

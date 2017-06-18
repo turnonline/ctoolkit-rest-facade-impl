@@ -32,7 +32,7 @@ import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 import org.ctoolkit.restapi.client.ClientErrorException;
-import org.ctoolkit.restapi.client.DownloadMediaRequestProvider;
+import org.ctoolkit.restapi.client.DownloadMediaProvider;
 import org.ctoolkit.restapi.client.HttpFailureException;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.NotFoundException;
@@ -45,7 +45,7 @@ import org.ctoolkit.restapi.client.SingleRequest;
 import org.ctoolkit.restapi.client.SingleRetrievalRequest;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.UnderlyingRequest;
-import org.ctoolkit.restapi.client.UploadMediaRequestProvider;
+import org.ctoolkit.restapi.client.UploadMediaProvider;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
@@ -277,17 +277,17 @@ public class RestFacadeAdapter
     }
 
     @Override
-    public <T> UploadMediaRequestProvider<T> upload( @Nonnull T resource )
+    public <T> UploadMediaProvider<T> upload( @Nonnull T resource )
     {
         checkNotNull( resource );
-        return new InputStreamMediaRequestProvider<>( this, resource );
+        return new InputStreamUploadMediaRequestProvider<>( this, resource );
     }
 
     @Override
-    public <T> DownloadMediaRequestProvider download( @Nonnull Class<T> resource )
+    public <T> DownloadMediaProvider download( @Nonnull Class<T> resource )
     {
         checkNotNull( resource );
-        return new OutputStreamMediaRequestProvider( this, resource );
+        return new OutputStreamDownloadMediaRequestProvider( this, resource );
     }
 
     <R> R callbackNewInstance( @Nonnull NewExecutorAdaptee adaptee,

@@ -126,7 +126,7 @@ public class AdapterAppEngineTest
 
         ByteArrayOutputStream content = new ByteArrayOutputStream();
         String type = "application/pdf";
-        Request dr = resources.download( Foo.class ).to( content, type ).identifiedBy( 1L );
+        Request dr = resources.download( Foo.class ).to( content ).ofType( type ).identifiedBy( 1L );
         assertNull( dr.finish( Locale.GERMANY ) );
         String errorMessage = "Output stream has expected to be populated by downloaded content!";
         assertTrue( content.size() > 0, errorMessage );
