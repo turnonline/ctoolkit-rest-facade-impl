@@ -129,7 +129,7 @@ public class RestFacadeAdapterTest
             }
         };
 
-        tested.get( ResourceNoMapping.class, new Identifier( 1L ) ).finish();
+        tested.get( ResourceNoMapping.class ).identifiedBy( new Identifier( 1L ) ).finish();
 
         new NoMappingVerifications();
     }
@@ -241,7 +241,7 @@ public class RestFacadeAdapterTest
             }
         };
 
-        tested.update( inputResource, new Identifier( 1L ) ).finish();
+        tested.update( inputResource ).identifiedBy( new Identifier( 1L ) ).finish();
 
         new NoMappingVerifications();
     }
@@ -287,7 +287,7 @@ public class RestFacadeAdapterTest
             }
         };
 
-        tested.delete( ResourceNoMapping.class, new Identifier( 1L ) ).finish();
+        tested.delete( ResourceNoMapping.class ).identifiedBy( new Identifier( 1L ) ).finish();
 
         new NoMappingVerifications();
     }
@@ -335,7 +335,7 @@ public class RestFacadeAdapterTest
             }
         };
 
-        assertNull( tested.update( inputResource, new Identifier( 1L ) ).finish() );
+        assertNull( tested.update( inputResource ).identifiedBy( new Identifier( 1L ) ).finish() );
     }
 
     @Test

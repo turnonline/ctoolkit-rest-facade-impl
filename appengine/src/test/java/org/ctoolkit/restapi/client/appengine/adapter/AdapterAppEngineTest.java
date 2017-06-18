@@ -104,7 +104,7 @@ public class AdapterAppEngineTest
     @Test
     public void facadeEndToEnd() throws IOException
     {
-        SingleRetrievalRequest<RemoteOnly> request = resources.get( RemoteOnly.class, new Identifier( 1L ) );
+        SingleRetrievalRequest<RemoteOnly> request = resources.get( RemoteOnly.class ).identifiedBy( new Identifier( 1L ) );
         assertNotNull( request );
         assertNotNull( request.finish() );
 
@@ -112,15 +112,15 @@ public class AdapterAppEngineTest
         assertNotNull( payloadRequest );
         assertNotNull( payloadRequest.finish() );
 
-        SingleRetrievalRequest singleRetrievalRequest = resources.get( Foo.class, new Identifier( 1L ) );
+        SingleRetrievalRequest singleRetrievalRequest = resources.get( Foo.class ).identifiedBy( new Identifier( 1L ) );
         assertNotNull( singleRetrievalRequest );
         assertNotNull( singleRetrievalRequest.finish() );
 
-        singleRetrievalRequest = resources.get( Foo.class, 1L );
+        singleRetrievalRequest = resources.get( Foo.class ).identifiedBy( 1L );
         assertNotNull( singleRetrievalRequest );
         assertNotNull( singleRetrievalRequest.finish() );
 
-        singleRetrievalRequest = resources.get( Foo.class, "identifier" );
+        singleRetrievalRequest = resources.get( Foo.class ).identifiedBy( "identifier" );
         assertNotNull( singleRetrievalRequest );
         assertNotNull( singleRetrievalRequest.finish() );
 
@@ -139,29 +139,29 @@ public class AdapterAppEngineTest
 
         foo = new Foo();
         foo.setName( "Michal Foo" );
-        payloadRequest = resources.update( foo, new Identifier( 1L ) );
+        payloadRequest = resources.update( foo ).identifiedBy( new Identifier( 1L ) );
         assertNotNull( payloadRequest );
         assertNotNull( payloadRequest.finish() );
 
-        payloadRequest = resources.update( foo, 1L );
+        payloadRequest = resources.update( foo ).identifiedBy( 1L );
         assertNotNull( payloadRequest );
         assertNotNull( payloadRequest.finish() );
 
-        payloadRequest = resources.update( foo, "identifier" );
+        payloadRequest = resources.update( foo ).identifiedBy( "identifier" );
         assertNotNull( payloadRequest );
         assertNotNull( payloadRequest.finish() );
 
         resources.underlying( UnderlyingRequest.class ).identifiedBy( new Identifier( 1L ) ).build().export().execute();
 
-        SingleRequest singleRequest = resources.delete( Foo.class, new Identifier( 1L ) );
+        SingleRequest singleRequest = resources.delete( Foo.class ).identifiedBy( new Identifier( 1L ) );
         assertNotNull( singleRequest );
         singleRequest.finish();
 
-        singleRequest = resources.delete( Foo.class, 1L );
+        singleRequest = resources.delete( Foo.class ).identifiedBy( 1L );
         assertNotNull( singleRequest );
         singleRequest.finish();
 
-        singleRequest = resources.delete( Foo.class, "identifier" );
+        singleRequest = resources.delete( Foo.class ).identifiedBy( "identifier" );
         assertNotNull( singleRequest );
         singleRequest.finish();
     }

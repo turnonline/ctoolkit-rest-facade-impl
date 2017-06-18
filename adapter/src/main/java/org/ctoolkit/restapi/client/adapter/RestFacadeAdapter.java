@@ -32,6 +32,7 @@ import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 import org.ctoolkit.restapi.client.ClientErrorException;
+import org.ctoolkit.restapi.client.DeleteIdentification;
 import org.ctoolkit.restapi.client.DownloadMediaProvider;
 import org.ctoolkit.restapi.client.HttpFailureException;
 import org.ctoolkit.restapi.client.Identifier;
@@ -42,9 +43,11 @@ import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.RequestTimeoutException;
 import org.ctoolkit.restapi.client.RestFacade;
 import org.ctoolkit.restapi.client.SingleRequest;
+import org.ctoolkit.restapi.client.SingleRetrievalIdentification;
 import org.ctoolkit.restapi.client.SingleRetrievalRequest;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.UnderlyingRequest;
+import org.ctoolkit.restapi.client.UpdateIdentification;
 import org.ctoolkit.restapi.client.UploadMediaProvider;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
@@ -252,21 +255,13 @@ public class RestFacadeAdapter
     @Override
     public <T> PayloadRequest<T> newInstance( @Nonnull Class<T> resource )
     {
-        return newInstance( resource, null, null );
-    }
-
-    @Override
-    public <T> PayloadRequest<T> newInstance( @Nonnull Class<T> resource,
-                                              @Nullable Map<String, Object> parameters,
-                                              @Nullable Locale locale )
-    {
         checkNotNull( resource );
 
         NewExecutorAdaptee adaptee = adaptee( NewExecutorAdaptee.class, resource );
         Object remoteRequest;
         try
         {
-            remoteRequest = adaptee.prepareNew( resource.getSimpleName(), parameters, locale );
+            remoteRequest = adaptee.prepareNew( resource.getSimpleName(), null, null );
         }
         catch ( IOException e )
         {
@@ -327,10 +322,15 @@ public class RestFacadeAdapter
     }
 
     @Override
-    public <T> SingleRetrievalRequest<T> get( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
+    public <T> SingleRetrievalIdentification<T> get( @Nonnull Class<T> resource )
+    {
+        return new SingleRetrievalIdentificationImpl<>( this, resource );
+    }
+
+    <T> SingleRetrievalRequest<T> internalGet( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
         checkNotNull( resource );
-        checkNotNull( identifier );
+        checkNotNull( identifier, Identifier.class.getSimpleName() + " for GET operation cannot be null." );
 
         GetExecutorAdaptee adaptee = adaptee( GetExecutorAdaptee.class, resource );
         Object remoteRequest;
@@ -345,18 +345,6 @@ public class RestFacadeAdapter
         }
 
         return new GetRequest<>( resource, identifier, this, adaptee, remoteRequest );
-    }
-
-    @Override
-    public <T> SingleRetrievalRequest<T> get( @Nonnull Class<T> resource, @Nonnull String identifier )
-    {
-        return get( resource, new Identifier( identifier ) );
-    }
-
-    @Override
-    public <T> SingleRetrievalRequest<T> get( @Nonnull Class<T> resource, @Nonnull Long identifier )
-    {
-        return get( resource, new Identifier( identifier ) );
     }
 
     <R> R callbackExecuteGet( @Nonnull GetExecutorAdaptee adaptee,
@@ -571,7 +559,7 @@ public class RestFacadeAdapter
     <R> R callbackExecuteInsert( @Nonnull InsertExecutorAdaptee adaptee,
                                  @Nonnull Object remoteRequest,
                                  @Nonnull Class<R> responseType,
-                                 @Nullable Object parentKey,
+                                 @Nullable Identifier parentKey,
                                  @Nullable Map<String, Object> parameters,
                                  @Nullable Locale locale )
     {
@@ -606,21 +594,9 @@ public class RestFacadeAdapter
     }
 
     @Override
-    public <T> PayloadRequest<T> update( @Nonnull T resource, @Nonnull Identifier identifier )
+    public <T> UpdateIdentification<T> update( @Nonnull T resource )
     {
-        return internalUpdate( resource, identifier, null );
-    }
-
-    @Override
-    public <T> PayloadRequest<T> update( @Nonnull T resource, @Nonnull String identifier )
-    {
-        return update( resource, new Identifier( identifier ) );
-    }
-
-    @Override
-    public <T> PayloadRequest<T> update( @Nonnull T resource, @Nonnull Long identifier )
-    {
-        return update( resource, new Identifier( identifier ) );
+        return new UpdateIdentificationImpl<>( this, resource );
     }
 
     <T> PayloadRequest<T> internalUpdate( @Nonnull T resource,
@@ -628,7 +604,7 @@ public class RestFacadeAdapter
                                           @Nullable MediaProvider provider )
     {
         checkNotNull( resource );
-        checkNotNull( identifier );
+        checkNotNull( identifier, Identifier.class.getSimpleName() + " for UPDATE operation cannot be null." );
 
         Class<?> remoteResource = evaluateRemoteResource( resource.getClass() );
         Object source;
@@ -761,8 +737,13 @@ public class RestFacadeAdapter
     }
 
     @Override
+    public <T> DeleteIdentification<T> delete( @Nonnull Class<T> resource )
+    {
+        return new DeleteIdentificationImpl<>( this, resource );
+    }
+
     @SuppressWarnings( "unchecked" )
-    public <T> SingleRequest<T> delete( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
+    <T> SingleRequest<T> internalDelete( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
         checkNotNull( resource );
         checkNotNull( identifier );
@@ -779,18 +760,6 @@ public class RestFacadeAdapter
         }
 
         return ( SingleRequest ) new DeleteRequest( resource, identifier, this, adaptee, remoteRequest );
-    }
-
-    @Override
-    public <T> SingleRequest<T> delete( @Nonnull Class<T> resource, @Nonnull String identifier )
-    {
-        return delete( resource, new Identifier( identifier ) );
-    }
-
-    @Override
-    public <T> SingleRequest<T> delete( @Nonnull Class<T> resource, @Nonnull Long identifier )
-    {
-        return delete( resource, new Identifier( identifier ) );
     }
 
     Void callbackExecuteDelete( @Nonnull DeleteExecutorAdaptee adaptee,

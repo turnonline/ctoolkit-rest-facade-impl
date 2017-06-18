@@ -143,7 +143,7 @@ class UpdateRequest<T>
     }
 
     @Override
-    public <R> R finish( @Nullable Class<R> type )
+    public <R> R finish( @Nonnull Class<R> type )
     {
         return answerBy( type ).finish();
     }

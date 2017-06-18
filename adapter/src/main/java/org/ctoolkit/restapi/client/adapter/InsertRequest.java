@@ -18,6 +18,7 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
@@ -47,7 +48,7 @@ class InsertRequest<T>
 
     private final Object remoteRequest;
 
-    private Object parentKey;
+    private Identifier parentKey;
 
     private RequestCredential credential;
 
@@ -56,7 +57,7 @@ class InsertRequest<T>
     private Locale withLocale;
 
     InsertRequest( @Nonnull Class<T> resource,
-                   @Nullable Object parentKey,
+                   @Nullable Identifier parentKey,
                    @Nonnull RestFacadeAdapter adapter,
                    @Nonnull InsertExecutorAdaptee adaptee,
                    @Nonnull Object remoteRequest )
