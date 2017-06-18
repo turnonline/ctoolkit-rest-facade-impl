@@ -261,7 +261,7 @@ public class RestFacadeAdapter
         Object remoteRequest;
         try
         {
-            remoteRequest = adaptee.prepareNew( resource.getSimpleName(), null, null );
+            remoteRequest = adaptee.prepareNew( resource.getSimpleName() );
         }
         catch ( IOException e )
         {

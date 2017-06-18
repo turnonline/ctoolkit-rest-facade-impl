@@ -43,9 +43,7 @@ public class FooNewAdaptee
     }
 
     @Override
-    public Object prepareNew( @Nullable String type,
-                              @Nullable Map<String, Object> parameters,
-                              @Nullable Locale locale )
+    public Object prepareNew( @Nullable String type )
             throws IOException
     {
         return new FakeClient();

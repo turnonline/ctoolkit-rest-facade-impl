@@ -93,7 +93,7 @@ public class RestFacadeAdapterTest
                 injector.getExecutorAdaptee( NewExecutorAdaptee.class, ResourceNoMapping.class );
                 result = adaptee;
 
-                adaptee.prepareNew( anyString, ( Map<String, Object> ) any, ( Locale ) any );
+                adaptee.prepareNew( anyString );
                 result = request;
 
                 adaptee.executeNew( any, ( Map<String, Object> ) any, ( Locale ) any );
