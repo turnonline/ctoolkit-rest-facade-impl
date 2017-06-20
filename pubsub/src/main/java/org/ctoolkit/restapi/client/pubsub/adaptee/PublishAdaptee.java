@@ -41,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class PublishAdaptee
-        extends AbstractGoogleClientAdaptee<Pubsub, PublishRequest>
+        extends AbstractGoogleClientAdaptee<Pubsub>
         implements InsertExecutorAdaptee<PublishRequest>
 {
     @Inject
@@ -67,9 +67,6 @@ public class PublishAdaptee
                                           @Nullable Locale locale )
             throws IOException
     {
-        checkNotNull( request );
-
-        fill( get( request ), parameters, locale );
-        return PublishResponse.class.cast( execute( request ) );
+        return PublishResponse.class.cast( execute( request, parameters, locale ) );
     }
 }

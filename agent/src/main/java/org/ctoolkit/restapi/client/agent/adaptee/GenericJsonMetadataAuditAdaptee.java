@@ -40,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonMetadataAuditAdaptee
-        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent, MetadataAudit>
+        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent>
         implements ListExecutorAdaptee<MetadataAudit>
 
 {
@@ -70,7 +70,7 @@ public class GenericJsonMetadataAuditAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.Audit.List ) request ).execute( credential ).getItems();
     }
 }

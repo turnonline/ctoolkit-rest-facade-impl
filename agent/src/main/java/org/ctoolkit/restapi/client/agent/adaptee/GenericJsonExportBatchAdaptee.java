@@ -46,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonExportBatchAdaptee
-        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent, ExportBatch>
+        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent>
         implements
         GetExecutorAdaptee<ExportBatch>,
         InsertExecutorAdaptee<ExportBatch>,
@@ -80,7 +80,7 @@ public class GenericJsonExportBatchAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ExportBatch.Get ) request ).execute( credential );
     }
 
@@ -105,7 +105,7 @@ public class GenericJsonExportBatchAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ExportBatch.Insert ) request ).execute( credential );
     }
 
@@ -132,7 +132,7 @@ public class GenericJsonExportBatchAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ExportBatch.Update ) request ).execute( credential );
     }
 
@@ -177,7 +177,7 @@ public class GenericJsonExportBatchAdaptee
         credential.fillInFrom( parameters, true );
 
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ExportBatch.List ) request ).execute( credential ).getItems();
     }
 }

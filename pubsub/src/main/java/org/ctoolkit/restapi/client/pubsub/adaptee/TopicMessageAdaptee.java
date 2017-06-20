@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class TopicMessageAdaptee
-        extends AbstractGoogleClientAdaptee<Pubsub, TopicMessage>
+        extends AbstractGoogleClientAdaptee<Pubsub>
         implements InsertExecutorAdaptee<TopicMessage>
 {
     @Inject
@@ -71,9 +71,6 @@ public class TopicMessageAdaptee
                                  @Nullable Locale locale )
             throws IOException
     {
-        checkNotNull( request );
-
-        fill( get( request ), parameters, locale );
-        return PublishResponse.class.cast( execute( request ) );
+        return PublishResponse.class.cast( execute( request, parameters, locale ) );
     }
 }

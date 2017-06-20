@@ -35,10 +35,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * The base adaptee implementation.
  *
  * @param <C> the concrete type of the client instance
- * @param <M> the concrete type of request's model object to work with
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class AbstractGoogleClientAdaptee<C, M>
+public class AbstractGoogleClientAdaptee<C>
 {
     private final C client;
 
@@ -52,26 +51,16 @@ public class AbstractGoogleClientAdaptee<C, M>
         return client;
     }
 
-    protected final AbstractGoogleJsonClientRequest get( Object request )
-    {
-        return ( AbstractGoogleJsonClientRequest ) request;
-    }
-
-    protected final Object execute( Object request ) throws IOException
-    {
-        return get( request ).execute();
-    }
-
     /**
      * Accept optional language.
      *
      * @param request the Google API client request
      * @param locale  the optional locale to be set
      */
-    protected final void acceptLanguage( @Nonnull AbstractGoogleJsonClientRequest request, @Nullable Locale locale )
+    protected final void acceptLanguage( @Nonnull Object request, @Nullable Locale locale )
     {
         checkNotNull( request );
-        acceptLanguage( request.getRequestHeaders(), locale );
+        acceptLanguage( ( ( AbstractGoogleJsonClientRequest ) request ).getRequestHeaders(), locale );
     }
 
     /**
@@ -80,7 +69,7 @@ public class AbstractGoogleClientAdaptee<C, M>
      * @param headers the Google API client HTTP headers
      * @param locale  the optional locale to be set
      */
-    protected final void acceptLanguage( @Nonnull HttpHeaders headers, @Nullable Locale locale )
+    private void acceptLanguage( @Nonnull HttpHeaders headers, @Nullable Locale locale )
     {
         checkNotNull( headers );
 
@@ -97,8 +86,8 @@ public class AbstractGoogleClientAdaptee<C, M>
      * @param request  the Google API client request
      * @param criteria the optional resource parameters
      */
-    protected final void fillCriteria( @Nonnull AbstractGoogleJsonClientRequest request,
-                                       @Nullable Map<String, Object> criteria )
+    private void fillCriteria( @Nonnull AbstractGoogleJsonClientRequest request,
+                               @Nullable Map<String, Object> criteria )
     {
         checkNotNull( request );
 
@@ -119,17 +108,17 @@ public class AbstractGoogleClientAdaptee<C, M>
     /**
      * Fill {@link #fillCriteria(AbstractGoogleJsonClientRequest, Map)} and {@link #acceptLanguage(HttpHeaders, Locale)}
      *
-     * @param request  the Google API client request
-     * @param criteria the optional resource parameters
-     * @param locale   the optional locale to be set
+     * @param request    the Google API client request
+     * @param parameters the optional resource parameters
+     * @param locale     the optional locale to be set
      */
-    protected final void fill( @Nonnull AbstractGoogleJsonClientRequest request,
-                               @Nullable Map<String, Object> criteria,
-                               @Nullable Locale locale )
+    protected void fill( @Nonnull Object request,
+                         @Nullable Map<String, Object> parameters,
+                         @Nullable Locale locale )
     {
         checkNotNull( request );
 
-        fillCriteria( request, criteria );
+        fillCriteria( ( AbstractGoogleJsonClientRequest ) request, parameters );
         acceptLanguage( request, locale );
     }
 
@@ -141,5 +130,25 @@ public class AbstractGoogleClientAdaptee<C, M>
         }
 
         return ( AbstractInputStreamContent ) provider.getMedia();
+    }
+
+    /**
+     * Fills request parameters and locale and then executes a remote call.
+     *
+     * @param request    the Google API client request
+     * @param parameters the optional resource parameters
+     * @param locale     the optional locale to be set
+     * @return the response of the remote call
+     * @throws IOException might be thrown during remote call execution
+     */
+    public Object execute( @Nonnull Object request,
+                           @Nullable Map<String, Object> parameters,
+                           @Nullable Locale locale )
+            throws IOException
+    {
+        checkNotNull( request );
+
+        fill( request, parameters, locale );
+        return ( ( AbstractGoogleJsonClientRequest ) request ).execute();
     }
 }

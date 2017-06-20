@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class GenericJsonExportItemAdaptee
-        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent, ExportItem>
+        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent>
         implements
         GetExecutorAdaptee<ExportItem>,
         InsertExecutorAdaptee<ExportItem>,
@@ -79,7 +79,7 @@ public class GenericJsonExportItemAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ExportBatch.Item.Get ) request ).execute( credential );
     }
 
@@ -106,7 +106,7 @@ public class GenericJsonExportItemAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ExportBatch.Item.Insert ) request ).execute( credential );
     }
 
@@ -136,7 +136,7 @@ public class GenericJsonExportItemAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ExportBatch.Item.Update ) request ).execute( credential );
     }
 

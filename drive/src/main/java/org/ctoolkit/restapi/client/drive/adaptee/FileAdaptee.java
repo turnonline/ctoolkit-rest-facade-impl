@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class FileAdaptee
-        extends AbstractGoogleClientAdaptee<Drive, File>
+        extends AbstractGoogleClientAdaptee<Drive>
         implements InsertExecutorAdaptee<File>, DeleteExecutorAdaptee<File>, UnderlyingExecutorAdaptee<Drive.Files>
 {
     @Inject
@@ -78,10 +78,7 @@ public class FileAdaptee
                                  @Nullable Locale locale )
             throws IOException
     {
-        checkNotNull( request );
-
-        fill( get( request ), parameters, locale );
-        return execute( request );
+        return execute( request, parameters, locale );
     }
 
     @Override
@@ -98,10 +95,7 @@ public class FileAdaptee
                                  @Nullable Locale locale )
             throws IOException
     {
-        checkNotNull( request );
-
-        acceptLanguage( get( request ), locale );
-        execute( request );
+        execute( request, parameters, locale );
         return null;
     }
 

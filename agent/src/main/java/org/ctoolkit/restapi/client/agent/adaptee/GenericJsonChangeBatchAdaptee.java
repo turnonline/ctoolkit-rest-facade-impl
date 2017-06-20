@@ -46,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonChangeBatchAdaptee
-        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent, ChangeBatch>
+        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent>
         implements
         GetExecutorAdaptee<ChangeBatch>,
         InsertExecutorAdaptee<ChangeBatch>,
@@ -80,7 +80,7 @@ public class GenericJsonChangeBatchAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ChangeBatch.Get ) request ).execute( credential );
     }
 
@@ -105,7 +105,7 @@ public class GenericJsonChangeBatchAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ChangeBatch.Insert ) request ).execute( credential );
     }
 
@@ -132,7 +132,7 @@ public class GenericJsonChangeBatchAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ChangeBatch.Update ) request ).execute( credential );
     }
 
@@ -176,7 +176,7 @@ public class GenericJsonChangeBatchAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ChangeBatch.List ) request ).execute( credential ).getItems();
     }
 }

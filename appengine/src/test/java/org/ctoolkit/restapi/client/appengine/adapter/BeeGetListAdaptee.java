@@ -37,7 +37,7 @@ import java.util.Map;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class BeeGetListAdaptee
-        extends AbstractGoogleClientAdaptee<FakeClient, RemoteBee>
+        extends AbstractGoogleClientAdaptee<FakeClient>
         implements GetExecutorAdaptee<RemoteBee>, ListExecutorAdaptee<RemoteBee>
 {
     @Inject

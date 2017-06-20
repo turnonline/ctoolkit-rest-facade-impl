@@ -35,7 +35,7 @@ import java.util.Map;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class FooUpdateAdaptee
-        extends AbstractGoogleClientAdaptee<FakeClient, RemoteFoo>
+        extends AbstractGoogleClientAdaptee<FakeClient>
         implements UpdateExecutorAdaptee<RemoteFoo>
 {
     @Inject

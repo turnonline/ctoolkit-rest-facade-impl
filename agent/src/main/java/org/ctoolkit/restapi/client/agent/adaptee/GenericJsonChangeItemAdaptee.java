@@ -44,7 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonChangeItemAdaptee
-        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent, ChangeItem>
+        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent>
         implements
         GetExecutorAdaptee<ChangeItem>,
         InsertExecutorAdaptee<ChangeItem>,
@@ -80,7 +80,7 @@ public class GenericJsonChangeItemAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ChangeBatch.Item.Get ) request ).execute( credential );
     }
 
@@ -107,7 +107,7 @@ public class GenericJsonChangeItemAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ChangeBatch.Item.Insert ) request ).execute( credential );
     }
 
@@ -137,7 +137,7 @@ public class GenericJsonChangeItemAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ChangeBatch.Item.Update ) request ).execute( credential );
     }
 

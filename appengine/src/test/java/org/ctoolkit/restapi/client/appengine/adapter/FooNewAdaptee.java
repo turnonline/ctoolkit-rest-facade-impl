@@ -33,7 +33,7 @@ import java.util.Map;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class FooNewAdaptee
-        extends AbstractGoogleClientAdaptee<FakeClient, RemoteFoo>
+        extends AbstractGoogleClientAdaptee<FakeClient>
         implements NewExecutorAdaptee<RemoteFoo>
 {
     @Inject

@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonPropertyMetaDataAdaptee
-        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent, PropertyMetaData>
+        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent>
         implements ListExecutorAdaptee<PropertyMetaData>
 {
     @Inject
@@ -68,7 +68,7 @@ public class GenericJsonPropertyMetaDataAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.Metadata.Kind.Property.List ) request ).execute( credential ).getItems();
     }
 }

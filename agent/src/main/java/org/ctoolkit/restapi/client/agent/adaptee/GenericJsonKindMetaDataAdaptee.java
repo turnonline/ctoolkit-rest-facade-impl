@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class GenericJsonKindMetaDataAdaptee
-        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent, KindMetaData>
+        extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent>
         implements ListExecutorAdaptee<KindMetaData>
 {
     @Inject
@@ -67,7 +67,7 @@ public class GenericJsonKindMetaDataAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( get( request ), parameters, locale );
+        fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.Metadata.Kind.List ) request ).execute( credential ).getItems();
     }
 }
