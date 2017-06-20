@@ -32,6 +32,8 @@ public abstract class JobInfo
 
     private String jobId;
 
+    private String jobUrl;
+
     private int totalItems;
 
     private int processedItems;
@@ -60,6 +62,16 @@ public abstract class JobInfo
     public void setJobId( String jobId )
     {
         this.jobId = jobId;
+    }
+
+    public String getJobUrl()
+    {
+        return jobUrl;
+    }
+
+    public void setJobUrl( String jobUrl )
+    {
+        this.jobUrl = jobUrl;
     }
 
     public int getTotalItems()
@@ -116,8 +128,9 @@ public abstract class JobInfo
     public String toString()
     {
         return "JobInfo{" +
-                "id='" + id + '\'' +
+                "id=" + id +
                 ", jobId='" + jobId + '\'' +
+                ", jobUrl='" + jobUrl + '\'' +
                 ", totalItems=" + totalItems +
                 ", processedItems=" + processedItems +
                 ", processedErrorItems=" + processedErrorItems +
