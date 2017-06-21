@@ -25,30 +25,24 @@ package org.ctoolkit.restapi.client.agent.model;
  */
 public enum JobState
 {
-    /**
-     * Job is currently executing.
-     */
+    /** The job state could not be obtained or was not specified. */
+    UNKNOWN,
+
+    /** The job has been paused, or has not yet started. */
+    STOPPED,
+
+    /** The job is currently running. */
     RUNNING,
-    /**
-     * Job has completed successfully.
-     */
-    COMPLETED_SUCCESSFULLY,
-    /**
-     * Job was stopped through PipelineService#stopPipeline(String).
-     */
-    STOPPED_BY_REQUEST,
-    /**
-     * Job execution was stopped due to unhandled failure.
-     */
-    STOPPED_BY_ERROR,
-    /**
-     * Job has failed and is going to retry later.
-     */
-    WAITING_TO_RETRY,
-    /**
-     * Job was cancelled either through
-     * PipelineService#cancelPipeline(String) or due to unhandled
-     * failure in a sibling job.
-     */
-    CANCELED_BY_REQUEST
+
+    /** The job has successfully completed. */
+    DONE,
+
+    /** The job has failed. */
+    FAILED,
+
+    /** The job has been explicitly cancelled. */
+    CANCELLED,
+
+    /** The job has been updated. */
+    UPDATED;
 }
