@@ -22,7 +22,7 @@ import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
-import org.ctoolkit.restapi.client.SingleRequest;
+import org.ctoolkit.restapi.client.SimpleRequest;
 import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 
 import javax.annotation.Nonnull;
@@ -40,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 class DownloadRequest
-        implements SingleRequest<Void>
+        implements SimpleRequest<Void>
 {
     private final RestFacadeAdapter adapter;
 

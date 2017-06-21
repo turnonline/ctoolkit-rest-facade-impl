@@ -67,6 +67,12 @@ class NewInstanceRequest<T>
     }
 
     @Override
+    public <U> U underlying( Class<U> type )
+    {
+        return ( U ) remoteRequest;
+    }
+
+    @Override
     public T finish()
     {
         return finish( null, withLocale );

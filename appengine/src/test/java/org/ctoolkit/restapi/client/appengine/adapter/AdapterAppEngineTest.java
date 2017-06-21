@@ -23,12 +23,12 @@ import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RestFacade;
-import org.ctoolkit.restapi.client.SingleRequest;
-import org.ctoolkit.restapi.client.SingleRetrievalRequest;
+import org.ctoolkit.restapi.client.RetrievalRequest;
+import org.ctoolkit.restapi.client.SimpleRequest;
 import org.ctoolkit.restapi.client.appengine.GuiceTestCase;
 import org.ctoolkit.restapi.client.appengine.adapter.model.Foo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
-import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingRequest;
+import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingClient;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.testng.annotations.Test;
 
@@ -104,7 +104,7 @@ public class AdapterAppEngineTest
     @Test
     public void facadeEndToEnd() throws IOException
     {
-        SingleRetrievalRequest<RemoteOnly> request = resources.get( RemoteOnly.class ).identifiedBy( new Identifier( 1L ) );
+        RetrievalRequest<RemoteOnly> request = resources.get( RemoteOnly.class ).identifiedBy( new Identifier( 1L ) );
         assertNotNull( request );
         assertNotNull( request.finish() );
 
@@ -112,7 +112,7 @@ public class AdapterAppEngineTest
         assertNotNull( payloadRequest );
         assertNotNull( payloadRequest.finish() );
 
-        SingleRetrievalRequest singleRetrievalRequest = resources.get( Foo.class ).identifiedBy( new Identifier( 1L ) );
+        RetrievalRequest singleRetrievalRequest = resources.get( Foo.class ).identifiedBy( new Identifier( 1L ) );
         assertNotNull( singleRetrievalRequest );
         assertNotNull( singleRetrievalRequest.finish() );
 
@@ -151,9 +151,9 @@ public class AdapterAppEngineTest
         assertNotNull( payloadRequest );
         assertNotNull( payloadRequest.finish() );
 
-        resources.underlying( UnderlyingRequest.class ).identifiedBy( new Identifier( 1L ) ).build().export().execute();
+        resources.client( UnderlyingClient.class ).export().execute();
 
-        SingleRequest singleRequest = resources.delete( Foo.class ).identifiedBy( new Identifier( 1L ) );
+        SimpleRequest singleRequest = resources.delete( Foo.class ).identifiedBy( new Identifier( 1L ) );
         assertNotNull( singleRequest );
         singleRequest.finish();
 

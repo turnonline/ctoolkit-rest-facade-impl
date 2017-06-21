@@ -18,47 +18,28 @@
 
 package org.ctoolkit.restapi.client.appengine.adapter;
 
-import org.ctoolkit.restapi.client.Identifier;
-import org.ctoolkit.restapi.client.adaptee.UnderlyingExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
-import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
-import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingRequest;
+import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingClient;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.io.IOException;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class FooPatchAdaptee
+public class FooClientAdaptee
         extends AbstractGoogleClientAdaptee<FakeClient>
-        implements UnderlyingExecutorAdaptee<UnderlyingRequest>
+        implements UnderlyingClientAdaptee<UnderlyingClient>
 {
     @Inject
-    public FooPatchAdaptee( FakeClient client )
+    public FooClientAdaptee( FakeClient client )
     {
         super( client );
     }
 
     @Override
-    public UnderlyingRequest prepareUnderlying( @Nullable Object resource,
-                                                @Nullable Identifier identifier,
-                                                @Nullable Map<String, Object> parameters )
-            throws IOException
+    public UnderlyingClient getUnderlyingClient()
     {
-        return new UnderlyingRequest();
-    }
-
-    @Override
-    public Object executeUnderlying( @Nonnull UnderlyingRequest request,
-                                     @Nullable Map<String, Object> parameters,
-                                     @Nullable Locale locale )
-            throws IOException
-    {
-        return new RemoteFoo();
+        return new UnderlyingClient();
     }
 }

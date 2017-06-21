@@ -38,7 +38,6 @@ import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
-import org.ctoolkit.restapi.client.adaptee.UnderlyingExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.testng.annotations.Test;
@@ -148,7 +147,8 @@ public class RestFacadeAdapterTest
                 adaptee.prepareList( ( Identifier ) any );
                 result = request;
 
-                adaptee.executeList( any, ( Map<String, Object> ) any, ( Locale ) any, -1, -1 );
+                adaptee.executeList( any, ( Map<String, Object> ) any, ( Locale ) any, -1, -1,
+                        anyString, anyBoolean );
                 result = new ArrayList<>();
 
                 // returns null to make sure no provider is being injected
@@ -180,7 +180,8 @@ public class RestFacadeAdapterTest
                 adaptee.prepareList( ( Identifier ) any );
                 result = request;
 
-                adaptee.executeList( any, ( Map<String, Object> ) any, ( Locale ) any, -1, -1 );
+                adaptee.executeList( any, ( Map<String, Object> ) any, ( Locale ) any, -1, -1,
+                        anyString, anyBoolean );
                 result = resources;
 
                 // returns null to make sure no provider is being injected
@@ -242,31 +243,6 @@ public class RestFacadeAdapterTest
         };
 
         tested.update( inputResource ).identifiedBy( new Identifier( 1L ) ).finish();
-
-        new NoMappingVerifications();
-    }
-
-    @Test
-    public void noResourceMappingUnderlying( @Mocked final UnderlyingExecutorAdaptee adaptee,
-                                             @Mocked final RemoteRequest request,
-                                             @Mocked final ResourceNoMapping responseResource )
-            throws IOException
-    {
-        new Expectations()
-        {
-            {
-                injector.getExecutorAdaptee( UnderlyingExecutorAdaptee.class, UnderlyingRequest.class );
-                result = adaptee;
-
-                adaptee.prepareUnderlying( any, ( Identifier ) any, ( Map<String, Object> ) any );
-                result = request;
-
-                adaptee.executeUnderlying( any, ( Map<String, Object> ) any, ( Locale ) any );
-                result = responseResource;
-            }
-        };
-
-        tested.underlying( UnderlyingRequest.class ).answerBy( ResourceNoMapping.class ).finish();
 
         new NoMappingVerifications();
     }
@@ -336,29 +312,6 @@ public class RestFacadeAdapterTest
         };
 
         assertNull( tested.update( inputResource ).identifiedBy( new Identifier( 1L ) ).finish() );
-    }
-
-    @Test
-    public void underlyingReturnsNoContent( @Mocked final UnderlyingExecutorAdaptee adaptee,
-                                            @Mocked final RemoteRequest request,
-                                            @Mocked final ResourceNoMapping inputResource )
-            throws IOException
-    {
-        new Expectations()
-        {
-            {
-                injector.getExecutorAdaptee( UnderlyingExecutorAdaptee.class, UnderlyingRequest.class );
-                result = adaptee;
-
-                adaptee.prepareUnderlying( any, ( Identifier ) any, ( Map<String, Object> ) any );
-                result = request;
-
-                adaptee.executeUnderlying( any, ( Map<String, Object> ) any, ( Locale ) any );
-                result = null;
-            }
-        };
-
-        assertNull( tested.underlying( UnderlyingRequest.class ).withPayload( inputResource ).finish() );
     }
 
     @Test

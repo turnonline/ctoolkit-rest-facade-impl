@@ -42,11 +42,10 @@ import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.RequestTimeoutException;
 import org.ctoolkit.restapi.client.RestFacade;
-import org.ctoolkit.restapi.client.SingleRequest;
+import org.ctoolkit.restapi.client.RetrievalRequest;
+import org.ctoolkit.restapi.client.SimpleRequest;
 import org.ctoolkit.restapi.client.SingleRetrievalIdentification;
-import org.ctoolkit.restapi.client.SingleRetrievalRequest;
 import org.ctoolkit.restapi.client.UnauthorizedException;
-import org.ctoolkit.restapi.client.UnderlyingRequest;
 import org.ctoolkit.restapi.client.UpdateIdentification;
 import org.ctoolkit.restapi.client.UploadMediaProvider;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
@@ -56,7 +55,7 @@ import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
-import org.ctoolkit.restapi.client.adaptee.UnderlyingExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
@@ -327,7 +326,7 @@ public class RestFacadeAdapter
         return new SingleRetrievalIdentificationImpl<>( this, resource );
     }
 
-    <T> SingleRetrievalRequest<T> internalGet( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
+    <T> RetrievalRequest<T> internalGet( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
         checkNotNull( resource );
         checkNotNull( identifier, Identifier.class.getSimpleName() + " for GET operation cannot be null." );
@@ -443,7 +442,9 @@ public class RestFacadeAdapter
                                      @Nullable Map<String, Object> criteria,
                                      @Nullable Locale locale,
                                      int start,
-                                     int length )
+                                     int length,
+                                     @Nullable String orderBy,
+                                     @Nullable Boolean ascending )
     {
         checkNotNull( responseType );
 
@@ -469,7 +470,7 @@ public class RestFacadeAdapter
             List<?> remoteList;
             try
             {
-                remoteList = adaptee.executeList( remoteRequest, criteria, locale, start, length );
+                remoteList = adaptee.executeList( remoteRequest, criteria, locale, start, length, orderBy, ascending );
             }
             catch ( IOException e )
             {
@@ -673,77 +674,22 @@ public class RestFacadeAdapter
         }
     }
 
-    <R, U> R callbackExecuteUnderlying( @Nonnull UnderlyingExecutorAdaptee<U> adaptee,
-                                        @Nonnull U remoteRequest,
-                                        @Nonnull Class<R> responseType,
-                                        @Nullable Map<String, Object> parameters,
-                                        @Nullable Locale locale )
-    {
-        checkNotNull( adaptee );
-        checkNotNull( remoteRequest );
-        checkNotNull( responseType );
-
-        Object source;
-        try
-        {
-            source = adaptee.executeUnderlying( remoteRequest, parameters, locale );
-        }
-        catch ( IOException e )
-        {
-            throw prepareUpdateException( e, responseType, null );
-        }
-
-        if ( source == null )
-        {
-            return null;
-        }
-
-        if ( source.getClass() == responseType )
-        {
-            //noinspection unchecked
-            return ( R ) source;
-        }
-        else
-        {
-            return mapper.map( source, responseType );
-        }
-    }
-
-    @Override
-    public <U> UnderlyingRequest<U> underlying( @Nonnull Class<U> resource )
-    {
-        @SuppressWarnings( "unchecked" )
-        UnderlyingExecutorAdaptee<U> adaptee = adaptee( UnderlyingExecutorAdaptee.class, resource );
-
-        return new UnderlyingRequestPreparation<>( this, adaptee );
-    }
-
-    <U> U callbackPrepareUnderlying( @Nonnull UnderlyingExecutorAdaptee<U> adaptee,
-                                     @Nullable Object resource,
-                                     @Nullable Identifier identifier,
-                                     @Nullable Map<String, Object> parameters )
-    {
-        U remoteRequest;
-        try
-        {
-            remoteRequest = adaptee.prepareUnderlying( resource, identifier, parameters );
-        }
-        catch ( IOException e )
-        {
-            throw new ClientErrorException( 400, e.getMessage() );
-        }
-
-        return remoteRequest;
-    }
-
     @Override
     public <T> DeleteIdentification<T> delete( @Nonnull Class<T> resource )
     {
         return new DeleteIdentificationImpl<>( this, resource );
     }
 
+    @Override
+    public <C> C client( @Nonnull Class<C> type )
+    {
+        @SuppressWarnings( "unchecked" )
+        UnderlyingClientAdaptee<C> adaptee = adaptee( UnderlyingClientAdaptee.class, type );
+        return adaptee.getUnderlyingClient();
+    }
+
     @SuppressWarnings( "unchecked" )
-    <T> SingleRequest<T> internalDelete( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
+    <T> SimpleRequest<T> internalDelete( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
         checkNotNull( resource );
         checkNotNull( identifier );
@@ -759,7 +705,7 @@ public class RestFacadeAdapter
             throw new ClientErrorException( 400, e.getMessage() );
         }
 
-        return ( SingleRequest ) new DeleteRequest( resource, identifier, this, adaptee, remoteRequest );
+        return ( SimpleRequest ) new DeleteRequest( resource, identifier, this, adaptee, remoteRequest );
     }
 
     Void callbackExecuteDelete( @Nonnull DeleteExecutorAdaptee adaptee,

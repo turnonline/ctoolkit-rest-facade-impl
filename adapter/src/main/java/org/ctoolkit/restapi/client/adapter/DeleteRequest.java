@@ -20,7 +20,7 @@ package org.ctoolkit.restapi.client.adapter;
 
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
-import org.ctoolkit.restapi.client.SingleRequest;
+import org.ctoolkit.restapi.client.SimpleRequest;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 
 import javax.annotation.Nonnull;
@@ -37,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 class DeleteRequest
-        implements SingleRequest<Void>
+        implements SimpleRequest<Void>
 {
     private final Class resource;
 

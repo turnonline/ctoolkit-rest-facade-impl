@@ -18,9 +18,9 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.ListRetrievalRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
-import org.ctoolkit.restapi.client.RetrievalRequest;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 
 import javax.annotation.Nonnull;
@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 class ListRequest<T>
-        implements RetrievalRequest<T>
+        implements ListRetrievalRequest<T>
 {
     private final Class<T> resource;
 
@@ -58,6 +58,10 @@ class ListRequest<T>
 
     private int length = -1;
 
+    private String orderBy;
+
+    private Boolean ascending;
+
     ListRequest( @Nonnull Class<T> resource,
                  @Nonnull RestFacadeAdapter adapter,
                  @Nonnull ListExecutorAdaptee adaptee,
@@ -68,6 +72,13 @@ class ListRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
         this.params = new HashMap<>();
+    }
+
+    @SuppressWarnings( "unchecked" )
+    @Override
+    public <U> U underlying( Class<U> type )
+    {
+        return ( U ) remoteRequest;
     }
 
     @Override
@@ -113,18 +124,19 @@ class ListRequest<T>
             params.putAll( parameters );
         }
 
-        return adapter.callbackExecuteList( adaptee, remoteRequest, resource, params, locale, start, length );
+        return adapter.callbackExecuteList( adaptee, remoteRequest, resource, params, locale, start, length,
+                orderBy, ascending );
     }
 
     @Override
-    public ListRequest<T> configWith( @Nonnull RequestCredential credential )
+    public ListRetrievalRequest<T> configWith( @Nonnull RequestCredential credential )
     {
         this.credential = checkNotNull( credential );
         return this;
     }
 
     @Override
-    public RetrievalRequest<T> forLang( @Nonnull Locale locale )
+    public ListRetrievalRequest<T> forLang( @Nonnull Locale locale )
     {
         this.withLocale = checkNotNull( locale );
         return this;
@@ -151,7 +163,7 @@ class ListRequest<T>
     }
 
     @Override
-    public ListRequest<T> start( int start )
+    public ListRetrievalRequest<T> start( int start )
     {
         if ( start < 0 )
         {
@@ -164,7 +176,7 @@ class ListRequest<T>
     }
 
     @Override
-    public ListRequest<T> length( int length )
+    public ListRetrievalRequest<T> length( int length )
     {
         if ( length < 0 )
         {
@@ -172,6 +184,20 @@ class ListRequest<T>
             throw new IllegalArgumentException( msg );
         }
         this.length = length;
+        return this;
+    }
+
+    @Override
+    public ListRetrievalRequest<T> orderBy( @Nullable String property )
+    {
+        this.orderBy = property;
+        return this;
+    }
+
+    @Override
+    public ListRetrievalRequest<T> sortAscending( boolean ascending )
+    {
+        this.ascending = ascending;
         return this;
     }
 }

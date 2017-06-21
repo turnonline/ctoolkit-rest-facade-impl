@@ -19,8 +19,8 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.SimpleRequest;
 import org.ctoolkit.restapi.client.SingleDownloadMediaRequest;
-import org.ctoolkit.restapi.client.SingleRequest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -62,21 +62,21 @@ class OutputStreamDownloadRequest
 
 
     @Override
-    public SingleRequest identifiedBy( @Nonnull Identifier identifier )
+    public SimpleRequest identifiedBy( @Nonnull Identifier identifier )
     {
         checkNotNull( identifier );
         return adapter.prepareDownloadRequest( resource, identifier, output, type );
     }
 
     @Override
-    public SingleRequest identifiedBy( @Nonnull String identifier )
+    public SimpleRequest identifiedBy( @Nonnull String identifier )
     {
         checkNotNull( identifier );
         return identifiedBy( new Identifier( identifier ) );
     }
 
     @Override
-    public SingleRequest identifiedBy( @Nonnull Long identifier )
+    public SimpleRequest identifiedBy( @Nonnull Long identifier )
     {
         checkNotNull( identifier );
         return identifiedBy( new Identifier( identifier ) );

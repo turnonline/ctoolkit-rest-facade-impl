@@ -168,7 +168,9 @@ public class GenericJsonChangeBatchAdaptee
     @SuppressWarnings( "unchecked" )
     public List<ChangeBatch> executeList( @Nonnull Object request,
                                           @Nullable Map<String, Object> parameters,
-                                          @Nullable Locale locale, int start, int length )
+                                          @Nullable Locale locale, int start, int length,
+                                          @Nullable String orderBy,
+                                          @Nullable Boolean ascending )
             throws IOException
     {
         checkNotNull( request );

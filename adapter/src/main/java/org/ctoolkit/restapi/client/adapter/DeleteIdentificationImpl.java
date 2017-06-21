@@ -20,7 +20,7 @@ package org.ctoolkit.restapi.client.adapter;
 
 import org.ctoolkit.restapi.client.DeleteIdentification;
 import org.ctoolkit.restapi.client.Identifier;
-import org.ctoolkit.restapi.client.SingleRequest;
+import org.ctoolkit.restapi.client.SimpleRequest;
 
 import javax.annotation.Nonnull;
 
@@ -45,19 +45,19 @@ class DeleteIdentificationImpl<T>
     }
 
     @Override
-    public SingleRequest<T> identifiedBy( @Nonnull Identifier identifier )
+    public SimpleRequest<T> identifiedBy( @Nonnull Identifier identifier )
     {
         return adapter.internalDelete( resource, identifier );
     }
 
     @Override
-    public SingleRequest<T> identifiedBy( @Nonnull String identifier )
+    public SimpleRequest<T> identifiedBy( @Nonnull String identifier )
     {
         return adapter.internalDelete( resource, new Identifier( identifier ) );
     }
 
     @Override
-    public SingleRequest<T> identifiedBy( @Nonnull Long identifier )
+    public SimpleRequest<T> identifiedBy( @Nonnull Long identifier )
     {
         return adapter.internalDelete( resource, new Identifier( identifier ) );
     }

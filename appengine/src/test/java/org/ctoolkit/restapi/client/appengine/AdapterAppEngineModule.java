@@ -30,15 +30,15 @@ import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
-import org.ctoolkit.restapi.client.adaptee.UnderlyingExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.BeeGetListAdaptee;
+import org.ctoolkit.restapi.client.appengine.adapter.FooClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.FooDeleteAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.FooGetAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.FooInsertAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.FooListAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.FooNewAdaptee;
-import org.ctoolkit.restapi.client.appengine.adapter.FooPatchAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.FooUpdateAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.RemoteOnlyAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.Bee;
@@ -46,7 +46,7 @@ import org.ctoolkit.restapi.client.appengine.adapter.model.Foo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteBee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
-import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingRequest;
+import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingClient;
 
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
@@ -85,9 +85,9 @@ public class AdapterAppEngineModule
         {
         } ).to( FooUpdateAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<UnderlyingExecutorAdaptee<UnderlyingRequest>>()
+        bind( new TypeLiteral<UnderlyingClientAdaptee<UnderlyingClient>>()
         {
-        } ).to( FooPatchAdaptee.class ).in( Singleton.class );
+        } ).to( FooClientAdaptee.class ).in( Singleton.class );
 
         bind( new TypeLiteral<DeleteExecutorAdaptee<RemoteFoo>>()
         {

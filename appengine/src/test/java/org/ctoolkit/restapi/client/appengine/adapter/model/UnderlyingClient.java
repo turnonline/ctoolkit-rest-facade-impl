@@ -25,7 +25,7 @@ import java.io.IOException;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class UnderlyingRequest
+public class UnderlyingClient
 {
     public Export export() throws IOException
     {

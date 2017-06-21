@@ -169,7 +169,9 @@ public class GenericJsonImportBatchAdaptee
                                           @Nullable Map<String, Object> parameters,
                                           @Nullable Locale locale,
                                           int start,
-                                          int length )
+                                          int length,
+                                          @Nullable String orderBy,
+                                          @Nullable Boolean ascending )
             throws IOException
     {
         checkNotNull( request );

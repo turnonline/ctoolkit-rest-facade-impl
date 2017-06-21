@@ -19,8 +19,8 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.RetrievalRequest;
 import org.ctoolkit.restapi.client.SingleRetrievalIdentification;
-import org.ctoolkit.restapi.client.SingleRetrievalRequest;
 
 import javax.annotation.Nonnull;
 
@@ -45,19 +45,19 @@ class SingleRetrievalIdentificationImpl<T>
     }
 
     @Override
-    public SingleRetrievalRequest<T> identifiedBy( @Nonnull Identifier identifier )
+    public RetrievalRequest<T> identifiedBy( @Nonnull Identifier identifier )
     {
         return adapter.internalGet( resource, identifier );
     }
 
     @Override
-    public SingleRetrievalRequest<T> identifiedBy( @Nonnull String identifier )
+    public RetrievalRequest<T> identifiedBy( @Nonnull String identifier )
     {
         return adapter.internalGet( resource, new Identifier( identifier ) );
     }
 
     @Override
-    public SingleRetrievalRequest<T> identifiedBy( @Nonnull Long identifier )
+    public RetrievalRequest<T> identifiedBy( @Nonnull Long identifier )
     {
         return adapter.internalGet( resource, new Identifier( identifier ) );
     }

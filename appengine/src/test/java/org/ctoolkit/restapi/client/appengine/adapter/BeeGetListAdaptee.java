@@ -74,7 +74,9 @@ public class BeeGetListAdaptee
                                         @Nullable Map<String, Object> criteria,
                                         @Nullable Locale locale,
                                         int start,
-                                        int length )
+                                        int length,
+                                        @Nullable String orderBy,
+                                        @Nullable Boolean ascending )
             throws IOException
     {
         List<RemoteBee> bees = new ArrayList<>();

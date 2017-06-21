@@ -70,6 +70,13 @@ class InsertRequest<T>
         this.params = new HashMap<>();
     }
 
+    @SuppressWarnings( "unchecked" )
+    @Override
+    public <U> U underlying( Class<U> type )
+    {
+        return ( U ) remoteRequest;
+    }
+
     @Override
     public T finish()
     {
