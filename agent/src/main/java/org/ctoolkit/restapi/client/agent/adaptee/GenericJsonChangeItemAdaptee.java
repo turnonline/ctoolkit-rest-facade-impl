@@ -62,10 +62,10 @@ public class GenericJsonChangeItemAdaptee
             throws IOException
     {
         checkNotNull( identifier, "Parent identifier cannot be null" );
-        checkNotNull( identifier.getChild(), "Item identifier cannot be null" );
+        checkNotNull( identifier.child(), "Item identifier cannot be null" );
 
         String metadataId = identifier.getString();
-        String id = identifier.getChild().getString();
+        String id = identifier.child().getString();
         return client().changeBatch().item().get( metadataId, id );
     }
 
@@ -119,10 +119,10 @@ public class GenericJsonChangeItemAdaptee
     {
         checkNotNull( resource );
         checkNotNull( identifier, "Parent identifier cannot be null" );
-        checkNotNull( identifier.getChild(), "Item identifier cannot be null" );
+        checkNotNull( identifier.child(), "Item identifier cannot be null" );
 
         String metadataId = identifier.getString();
-        String id = identifier.getChild().getString();
+        String id = identifier.child().getString();
         return client().changeBatch().item().update( metadataId, id, resource );
     }
 
@@ -145,15 +145,17 @@ public class GenericJsonChangeItemAdaptee
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
         checkNotNull( identifier, "Parent identifier cannot be null" );
-        checkNotNull( identifier.getChild(), "Item identifier cannot be null" );
+        checkNotNull( identifier.child(), "Item identifier cannot be null" );
 
         String metadataId = identifier.getString();
-        String id = identifier.getChild().getString();
+        String id = identifier.child().getString();
         return client().changeBatch().item().delete( metadataId, id );
     }
 
     @Override
-    public Object executeDelete( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public void executeDelete( @Nonnull Object request,
+                               @Nullable Map<String, Object> parameters,
+                               @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -162,6 +164,5 @@ public class GenericJsonChangeItemAdaptee
         credential.fillInFrom( parameters, true );
 
         ( ( CustomizedCtoolkitAgent.ChangeBatch.Item.Delete ) request ).execute( credential );
-        return null;
     }
 }

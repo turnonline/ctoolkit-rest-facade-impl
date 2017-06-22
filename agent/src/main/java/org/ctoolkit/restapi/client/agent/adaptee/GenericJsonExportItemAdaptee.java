@@ -61,10 +61,10 @@ public class GenericJsonExportItemAdaptee
             throws IOException
     {
         checkNotNull( identifier, "Parent identifier cannot be null" );
-        checkNotNull( identifier.getChild(), "Item identifier cannot be null" );
+        checkNotNull( identifier.child(), "Item identifier cannot be null" );
 
         String metadataId = identifier.getString();
-        String id = identifier.getChild().getString();
+        String id = identifier.child().getString();
         return client().exportBatch().item().get( metadataId, id );
     }
 
@@ -118,10 +118,10 @@ public class GenericJsonExportItemAdaptee
     {
         checkNotNull( resource );
         checkNotNull( identifier, "Parent identifier cannot be null" );
-        checkNotNull( identifier.getChild(), "Item identifier cannot be null" );
+        checkNotNull( identifier.child(), "Item identifier cannot be null" );
 
         String metadataId = identifier.getString();
-        String id = identifier.getChild().getString();
+        String id = identifier.child().getString();
         return client().exportBatch().item().update( metadataId, id, resource );
     }
 
@@ -144,17 +144,17 @@ public class GenericJsonExportItemAdaptee
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
         checkNotNull( identifier, "Parent identifier cannot be null" );
-        checkNotNull( identifier.getChild(), "Item identifier cannot be null" );
+        checkNotNull( identifier.child(), "Item identifier cannot be null" );
 
         String metadataId = identifier.getString();
-        String id = identifier.getChild().getString();
+        String id = identifier.child().getString();
         return client().exportBatch().item().delete( metadataId, id );
     }
 
     @Override
-    public Object executeDelete( @Nonnull Object request,
-                                 @Nullable Map<String, Object> parameters,
-                                 @Nullable Locale locale ) throws IOException
+    public void executeDelete( @Nonnull Object request,
+                               @Nullable Map<String, Object> parameters,
+                               @Nullable Locale locale ) throws IOException
     {
         checkNotNull( request );
 
@@ -162,6 +162,5 @@ public class GenericJsonExportItemAdaptee
         credential.fillInFrom( parameters, true );
 
         ( ( CustomizedCtoolkitAgent.ExportBatch.Item.Delete ) request ).execute( credential );
-        return null;
     }
 }

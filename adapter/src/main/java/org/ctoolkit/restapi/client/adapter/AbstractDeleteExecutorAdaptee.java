@@ -26,11 +26,11 @@ public abstract class AbstractDeleteExecutorAdaptee<C, M>
     }
 
     @Override
-    public Object executeDelete( @Nonnull Object request,
-                                 @Nullable Map<String, Object> parameters,
-                                 @Nullable Locale locale )
+    public void executeDelete( @Nonnull Object request,
+                               @Nullable Map<String, Object> parameters,
+                               @Nullable Locale locale )
             throws IOException
     {
-        return execute( request, parameters, locale );
+        execute( request, parameters, locale );
     }
 }

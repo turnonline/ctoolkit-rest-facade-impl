@@ -62,7 +62,7 @@ public class GenericJsonImportItemAdaptee
     {
         checkNotNull( identifier, "Identifier cannot be null" );
 
-        return client().importBatch().item().get( identifier.getString(), identifier.getChild().getString() );
+        return client().importBatch().item().get( identifier.getString(), identifier.child().getString() );
     }
 
     @Override
@@ -116,7 +116,7 @@ public class GenericJsonImportItemAdaptee
         checkNotNull( resource );
         checkNotNull( identifier, "Identifier cannot be null" );
 
-        return client().importBatch().item().update( identifier.getString(), identifier.getChild().getString(),
+        return client().importBatch().item().update( identifier.getString(), identifier.child().getString(),
                 resource );
     }
 
@@ -139,13 +139,13 @@ public class GenericJsonImportItemAdaptee
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
         checkNotNull( identifier, "Identifier cannot be null" );
-        return client().importBatch().item().delete( identifier.getString(), identifier.getChild().getString() );
+        return client().importBatch().item().delete( identifier.getString(), identifier.child().getString() );
     }
 
     @Override
-    public Object executeDelete( @Nonnull Object request,
-                                 @Nullable Map<String, Object> parameters,
-                                 @Nullable Locale locale ) throws IOException
+    public void executeDelete( @Nonnull Object request,
+                               @Nullable Map<String, Object> parameters,
+                               @Nullable Locale locale ) throws IOException
     {
         checkNotNull( request );
 
@@ -153,6 +153,5 @@ public class GenericJsonImportItemAdaptee
         credential.fillInFrom( parameters, true );
 
         ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Delete ) request ).execute( credential );
-        return null;
     }
 }

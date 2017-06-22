@@ -143,7 +143,9 @@ public class GenericJsonChangeJobAdaptee
     }
 
     @Override
-    public Object executeDelete( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public void executeDelete( @Nonnull Object request,
+                               @Nullable Map<String, Object> parameters,
+                               @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -152,6 +154,5 @@ public class GenericJsonChangeJobAdaptee
         credential.fillInFrom( parameters, true );
 
         ( ( CustomizedCtoolkitAgent.ChangeBatch.Job.Delete ) request ).execute( credential );
-        return null;
     }
 }
