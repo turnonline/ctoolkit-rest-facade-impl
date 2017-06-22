@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.ctoolkit.api</groupId>
             <artifactId>ctoolkit-agent-gen-lib</artifactId>
-            <version>1.0</version>
+            <version>${ctoolkit.agent.gen.lib.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.api-client</groupId>
@@ -107,6 +107,7 @@
 
     <properties>
         <gwt.version>2.7.0</gwt.version>
+        <ctoolkit.agent.gen.lib.version>1.1-20170622.191731-2</ctoolkit.agent.gen.lib.version>
     </properties>
 
 </project>
