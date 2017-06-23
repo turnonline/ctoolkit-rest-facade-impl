@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -48,8 +49,6 @@ class UpdateRequest<T>
     private final UpdateExecutorAdaptee adaptee;
 
     private final Object remoteRequest;
-
-    private RequestCredential credential;
 
     private Map<String, Object> params;
 
@@ -83,6 +82,14 @@ class UpdateRequest<T>
     }
 
     @Override
+    public T finish( @Nonnull RequestCredential credential )
+    {
+        checkNotNull( credential );
+        credential.populate( this.params );
+        return finish();
+    }
+
+    @Override
     public T finish( @Nullable Map<String, Object> parameters )
     {
         return finish( parameters, withLocale );
@@ -97,10 +104,6 @@ class UpdateRequest<T>
     @Override
     public T finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
     {
-        if ( credential != null )
-        {
-            parameters = credential.populate( parameters );
-        }
         if ( parameters != null )
         {
             params.putAll( parameters );
@@ -110,9 +113,10 @@ class UpdateRequest<T>
     }
 
     @Override
-    public Request<T> configWith( @Nonnull RequestCredential credential )
+    public Request<T> configWith( @Nonnull Properties properties )
     {
-        this.credential = checkNotNull( credential );
+        checkNotNull( properties );
+        RequestCredential.populate( properties, this.params );
         return this;
     }
 

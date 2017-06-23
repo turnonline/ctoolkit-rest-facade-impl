@@ -31,6 +31,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -55,8 +56,6 @@ class DownloadRequest
     private final OutputStream output;
 
     private final String type;
-
-    private RequestCredential credential;
 
     private Map<String, Object> params;
 
@@ -98,6 +97,14 @@ class DownloadRequest
     }
 
     @Override
+    public Void finish( @Nonnull RequestCredential credential )
+    {
+        checkNotNull( credential );
+        credential.populate( this.params );
+        return finish();
+    }
+
+    @Override
     public Void finish( @Nullable Map<String, Object> parameters )
     {
         return finish( parameters, withLocale );
@@ -112,10 +119,6 @@ class DownloadRequest
     @Override
     public Void finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
     {
-        if ( credential != null )
-        {
-            parameters = credential.populate( parameters );
-        }
         if ( parameters != null )
         {
             params.putAll( parameters );
@@ -125,9 +128,10 @@ class DownloadRequest
     }
 
     @Override
-    public Request<Void> configWith( RequestCredential credential )
+    public Request<Void> configWith( @Nonnull Properties properties )
     {
-        this.credential = checkNotNull( credential );
+        checkNotNull( properties );
+        RequestCredential.populate( properties, this.params );
         return this;
     }
 

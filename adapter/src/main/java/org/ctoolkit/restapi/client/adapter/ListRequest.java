@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -47,8 +48,6 @@ class ListRequest<T>
     private final ListExecutorAdaptee adaptee;
 
     private final Object remoteRequest;
-
-    private RequestCredential credential;
 
     private Map<String, Object> params;
 
@@ -88,6 +87,14 @@ class ListRequest<T>
     }
 
     @Override
+    public List<T> finish( @Nonnull RequestCredential credential )
+    {
+        checkNotNull( credential );
+        credential.populate( this.params );
+        return finish();
+    }
+
+    @Override
     public List<T> finish( int start, int length )
     {
         if ( start < 0 || length < 0 )
@@ -115,10 +122,6 @@ class ListRequest<T>
     @Override
     public List<T> finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
     {
-        if ( credential != null )
-        {
-            parameters = credential.populate( parameters );
-        }
         if ( parameters != null )
         {
             params.putAll( parameters );
@@ -129,9 +132,10 @@ class ListRequest<T>
     }
 
     @Override
-    public ListRetrievalRequest<T> configWith( @Nonnull RequestCredential credential )
+    public ListRetrievalRequest<T> configWith( @Nonnull Properties properties )
     {
-        this.credential = checkNotNull( credential );
+        checkNotNull( properties );
+        RequestCredential.populate( properties, this.params );
         return this;
     }
 
