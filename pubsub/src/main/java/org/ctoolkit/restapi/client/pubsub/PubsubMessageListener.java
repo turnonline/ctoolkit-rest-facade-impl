@@ -26,16 +26,20 @@ import java.io.Serializable;
 /**
  * The {@link PubsubMessage} listener interface.
  *
- * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
+ * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public interface PubsubMessageListener
         extends Serializable
 {
     /**
-     * The method called once a message has been received for given subscription.
+     * Called once a message has been received for given subscription.
+     * In case of message processing failure it throws exception to signal re-try.
+     * The implementation must be idempotent to correctly process on re-try.
      *
-     * @param message      the published message
+     * @param message      the published message to be processed
      * @param subscription the subscription that received push message
+     * @throws Exception the exception thrown in case of failure
      */
-    void onMessage( @Nonnull PubsubMessage message, @Nonnull String subscription );
+    void onMessage( @Nonnull PubsubMessage message, @Nonnull String subscription )
+            throws Exception;
 }

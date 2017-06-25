@@ -86,7 +86,7 @@ public class SubscriptionsListenerTest
                                        @Mocked final PubsubMessageListener listener,
                                        @Mocked final PubsubMessage message,
                                        @Mocked final JsonParser parser )
-            throws IOException
+            throws Exception
     {
         final String subscription = "content.delete";
         listeners.put( subscription, listener );

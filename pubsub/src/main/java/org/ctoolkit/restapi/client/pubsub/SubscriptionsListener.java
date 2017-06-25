@@ -55,19 +55,19 @@ public class SubscriptionsListener
     {
         String subscription = getSubscriptionSuffix( request );
 
+        PubsubMessageListener listener = listeners.get( subscription );
+        if ( listener == null )
+        {
+            response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+            response.getWriter().close();
+
+            String message = PubsubMessageListener.class.getSimpleName() + " not found for '" + subscription + "'";
+            throw new IllegalArgumentException( message );
+        }
+
         try
         {
             ServletInputStream inputStream = request.getInputStream();
-
-            PubsubMessageListener listener = listeners.get( subscription );
-            if ( listener == null )
-            {
-                response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-                response.getWriter().close();
-
-                String message = PubsubMessageListener.class.getSimpleName() + " not found for '" + subscription + "'";
-                throw new IllegalArgumentException( message );
-            }
 
             // Parse the JSON message to the POJO model class
             JsonParser parser = JacksonFactory.getDefaultInstance().createJsonParser( inputStream );
@@ -79,9 +79,9 @@ public class SubscriptionsListener
             response.setStatus( HttpServletResponse.SC_NO_CONTENT );
             response.getWriter().close();
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
-            logger.error( "Receiving of the message for subscription " + subscription + " has failed.", e );
+            logger.error( "Processing of the message for subscription " + subscription + " has failed.", e );
             response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
             response.getWriter().close();
         }
