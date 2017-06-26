@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>
  * It acts as a resource and it's associated with adaptee {@link org.ctoolkit.restapi.client.pubsub.adaptee.TopicMessageAdaptee}
  * implementation. The instance of this class might be used directly via
- * {@link org.ctoolkit.restapi.client.ResourceFacade}.
+ * {@link org.ctoolkit.restapi.client.RestFacade}.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
@@ -143,6 +143,15 @@ public class TopicMessage
             messages = new ArrayList<>();
         }
 
+        private PubsubMessage last()
+        {
+            if ( messages.size() > 0 )
+            {
+                return messages.get( messages.size() - 1 );
+            }
+            return null;
+        }
+
         /**
          * Set the project ID.
          *
@@ -212,7 +221,7 @@ public class TopicMessage
          */
         public Builder addMessage( @Nonnull String data, @Nonnull String key, @Nonnull String value )
         {
-            Map<String, String> attributes = buildAttributes( key, value );
+            Map<String, String> attributes = buildAttributes( key, value, null );
             return addMessage( data, attributes );
         }
 
@@ -260,7 +269,7 @@ public class TopicMessage
          */
         public Builder addMessage( @Nonnull byte[] bytes, @Nonnull String key, @Nonnull String value )
         {
-            Map<String, String> attributes = buildAttributes( key, value );
+            Map<String, String> attributes = buildAttributes( key, value, null );
             return addMessage( bytes, attributes );
         }
 
@@ -284,12 +293,36 @@ public class TopicMessage
             return this;
         }
 
-        private Map<String, String> buildAttributes( @Nonnull String key, @Nonnull String value )
+        /**
+         * Adds attribute to the last {@link PubsubMessage}.
+         *
+         * @param key   the attribute key
+         * @param value the attribute value
+         * @return the builder
+         */
+        public Builder addAttribute( @Nonnull String key, @Nonnull String value )
+        {
+            PubsubMessage message = last();
+            if ( message == null )
+            {
+                throw new IllegalArgumentException( "No " + PubsubMessage.class.getSimpleName() + " message added yet." );
+            }
+
+            buildAttributes( key, value, message.getAttributes() );
+            return this;
+        }
+
+        private Map<String, String> buildAttributes( @Nonnull String key,
+                                                     @Nonnull String value,
+                                                     @Nullable Map<String, String> attributes )
         {
             checkArgument( !Strings.isNullOrEmpty( key ), "Key must be non empty string." );
             checkArgument( !Strings.isNullOrEmpty( value ), "Value must be non empty string." );
 
-            Map<String, String> attributes = new HashMap<>();
+            if ( attributes == null )
+            {
+                attributes = new HashMap<>();
+            }
             attributes.put( key, value );
             return attributes;
         }
