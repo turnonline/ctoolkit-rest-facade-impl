@@ -35,15 +35,12 @@ public class ResourcesMapper
     {
         factory.classMap( ImportBatch.class, org.ctoolkit.api.agent.model.ImportBatch.class ).byDefault().register();
         factory.classMap( ExportBatch.class, org.ctoolkit.api.agent.model.ExportBatch.class ).byDefault().register();
-        factory.classMap( ChangeBatch.class, org.ctoolkit.api.agent.model.ChangeBatch.class ).byDefault().register();
 
         factory.classMap( ImportBatch.ImportItem.class, org.ctoolkit.api.agent.model.ImportItem.class ).byDefault().register();
         factory.classMap( ExportBatch.ExportItem.class, org.ctoolkit.api.agent.model.ExportItem.class ).byDefault().register();
-        factory.classMap( ChangeBatch.ChangeItem.class, org.ctoolkit.api.agent.model.ChangeItem.class ).byDefault().register();
 
         factory.classMap( ImportJobInfo.class, org.ctoolkit.api.agent.model.ImportJob.class ).byDefault().register();
         factory.classMap( ExportJobInfo.class, org.ctoolkit.api.agent.model.ExportJob.class ).byDefault().register();
-        factory.classMap( ChangeJobInfo.class, org.ctoolkit.api.agent.model.ChangeJob.class ).byDefault().register();
 
         factory.classMap( MetadataAudit.class, org.ctoolkit.api.agent.model.MetadataAudit.class ).byDefault().register();
         factory.classMap( KindMetaData.class, org.ctoolkit.api.agent.model.KindMetaData.class ).byDefault().register();

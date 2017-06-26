@@ -63,8 +63,8 @@ public class GenericJsonExportItemAdaptee
         checkNotNull( identifier, "Parent identifier cannot be null" );
         checkNotNull( identifier.child(), "Item identifier cannot be null" );
 
-        String metadataId = identifier.getString();
-        String id = identifier.child().getString();
+        Long metadataId = identifier.getLong();
+        Long id = identifier.child().getLong();
         return client().exportBatch().item().get( metadataId, id );
     }
 
@@ -120,8 +120,8 @@ public class GenericJsonExportItemAdaptee
         checkNotNull( identifier, "Parent identifier cannot be null" );
         checkNotNull( identifier.child(), "Item identifier cannot be null" );
 
-        String metadataId = identifier.getString();
-        String id = identifier.child().getString();
+        Long metadataId = identifier.getLong();
+        Long id = identifier.child().getLong();
         return client().exportBatch().item().update( metadataId, id, resource );
     }
 
@@ -146,8 +146,8 @@ public class GenericJsonExportItemAdaptee
         checkNotNull( identifier, "Parent identifier cannot be null" );
         checkNotNull( identifier.child(), "Item identifier cannot be null" );
 
-        String metadataId = identifier.getString();
-        String id = identifier.child().getString();
+        Long metadataId = identifier.getLong();
+        Long id = identifier.child().getLong();
         return client().exportBatch().item().delete( metadataId, id );
     }
 

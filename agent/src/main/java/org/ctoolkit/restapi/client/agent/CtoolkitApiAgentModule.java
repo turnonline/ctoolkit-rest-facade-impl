@@ -26,9 +26,6 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import org.ctoolkit.api.agent.Agent;
 import org.ctoolkit.api.agent.AgentScopes;
-import org.ctoolkit.api.agent.model.ChangeBatch;
-import org.ctoolkit.api.agent.model.ChangeItem;
-import org.ctoolkit.api.agent.model.ChangeJob;
 import org.ctoolkit.api.agent.model.ExportBatch;
 import org.ctoolkit.api.agent.model.ExportItem;
 import org.ctoolkit.api.agent.model.ExportJob;
@@ -46,9 +43,6 @@ import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.CustomizedCtoolkitAgent;
-import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeBatchAdaptee;
-import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeItemAdaptee;
-import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonChangeJobAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportBatchAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportItemAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportJobAdaptee;
@@ -137,65 +131,6 @@ public class CtoolkitApiAgentModule
         {
         } ).to( GenericJsonImportJobAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<DeleteExecutorAdaptee<ImportJob>>()
-        {
-        } ).to( GenericJsonImportJobAdaptee.class ).in( Singleton.class );
-
-        // ChangeBatch
-        bind( new TypeLiteral<GetExecutorAdaptee<ChangeBatch>>()
-        {
-        } ).to( GenericJsonChangeBatchAdaptee.class ).in( Singleton.class );
-
-        bind( new TypeLiteral<ListExecutorAdaptee<ChangeBatch>>()
-        {
-        } ).to( GenericJsonChangeBatchAdaptee.class ).in( Singleton.class );
-
-        bind( new TypeLiteral<InsertExecutorAdaptee<ChangeBatch>>()
-        {
-        } ).to( GenericJsonChangeBatchAdaptee.class ).in( Singleton.class );
-
-        bind( new TypeLiteral<UpdateExecutorAdaptee<ChangeBatch>>()
-        {
-        } ).to( GenericJsonChangeBatchAdaptee.class ).in( Singleton.class );
-
-        bind( new TypeLiteral<DeleteExecutorAdaptee<ChangeBatch>>()
-        {
-        } ).to( GenericJsonChangeBatchAdaptee.class ).in( Singleton.class );
-
-        // ChangeItem
-        bind( new TypeLiteral<GetExecutorAdaptee<ChangeItem>>()
-        {
-        } ).to( GenericJsonChangeItemAdaptee.class ).in( Singleton.class );
-
-        bind( new TypeLiteral<InsertExecutorAdaptee<ChangeItem>>()
-        {
-        } ).to( GenericJsonChangeItemAdaptee.class ).in( Singleton.class );
-
-        bind( new TypeLiteral<UpdateExecutorAdaptee<ChangeItem>>()
-        {
-        } ).to( GenericJsonChangeItemAdaptee.class ).in( Singleton.class );
-
-        bind( new TypeLiteral<DeleteExecutorAdaptee<ChangeItem>>()
-        {
-        } ).to( GenericJsonChangeItemAdaptee.class ).in( Singleton.class );
-
-        // ChangeJobInfo
-        bind( new TypeLiteral<GetExecutorAdaptee<ChangeJob>>()
-        {
-        } ).to( GenericJsonChangeJobAdaptee.class ).in( Singleton.class );
-
-        bind( new TypeLiteral<InsertExecutorAdaptee<ChangeJob>>()
-        {
-        } ).to( GenericJsonChangeJobAdaptee.class ).in( Singleton.class );
-
-        bind( new TypeLiteral<UpdateExecutorAdaptee<ChangeJob>>()
-        {
-        } ).to( GenericJsonChangeJobAdaptee.class ).in( Singleton.class );
-
-        bind( new TypeLiteral<DeleteExecutorAdaptee<ChangeJob>>()
-        {
-        } ).to( GenericJsonChangeJobAdaptee.class ).in( Singleton.class );
-
         // ExportBatch
         bind( new TypeLiteral<GetExecutorAdaptee<ExportBatch>>()
         {
@@ -244,10 +179,6 @@ public class CtoolkitApiAgentModule
         } ).to( GenericJsonExportJobAdaptee.class ).in( Singleton.class );
 
         bind( new TypeLiteral<UpdateExecutorAdaptee<ExportJob>>()
-        {
-        } ).to( GenericJsonExportJobAdaptee.class ).in( Singleton.class );
-
-        bind( new TypeLiteral<DeleteExecutorAdaptee<ExportJob>>()
         {
         } ).to( GenericJsonExportJobAdaptee.class ).in( Singleton.class );
 

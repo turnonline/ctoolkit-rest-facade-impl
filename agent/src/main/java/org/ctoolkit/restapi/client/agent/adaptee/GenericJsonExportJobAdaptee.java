@@ -22,7 +22,6 @@ import org.ctoolkit.api.agent.model.ExportJob;
 import org.ctoolkit.api.agent.model.ImportBatch;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.RequestCredential;
-import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
@@ -48,8 +47,7 @@ public class GenericJsonExportJobAdaptee
         implements
         GetExecutorAdaptee<ExportJob>,
         InsertExecutorAdaptee<ExportJob>,
-        UpdateExecutorAdaptee<ExportJob>,
-        DeleteExecutorAdaptee<ExportJob>
+        UpdateExecutorAdaptee<ExportJob>
 {
     @Inject
     public GenericJsonExportJobAdaptee( CustomizedCtoolkitAgent ctoolkitAgent )
@@ -63,7 +61,7 @@ public class GenericJsonExportJobAdaptee
     {
         checkNotNull( identifier, "Identifier cannot be null" );
 
-        return client().exportBatch().job().progress( identifier.getString() );
+        return client().exportBatch().job().progress( identifier.getLong() );
     }
 
     @Override
@@ -90,7 +88,7 @@ public class GenericJsonExportJobAdaptee
         checkNotNull( resource );
         checkNotNull( parentKey, "Parent identifier cannot be null" );
 
-        return client().exportBatch().job().start( parentKey.getString(), resource );
+        return client().exportBatch().job().start( parentKey.getLong(), resource );
     }
 
     @Override
@@ -117,7 +115,7 @@ public class GenericJsonExportJobAdaptee
         checkNotNull( resource );
         checkNotNull( identifier, "Parent identifier cannot be null" );
 
-        return client().exportBatch().job().cancel( identifier.getString(), resource );
+        return client().exportBatch().job().cancel( identifier.getLong(), resource );
     }
 
     @Override
@@ -133,26 +131,5 @@ public class GenericJsonExportJobAdaptee
 
         fill( request, parameters, locale );
         return ( ( CustomizedCtoolkitAgent.ExportBatch.Job.Cancel ) request ).execute( credential );
-    }
-
-    @Override
-    public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
-    {
-        checkNotNull( identifier, "Identifier cannot be null" );
-        return client().exportBatch().job().delete( identifier.getString() );
-    }
-
-    @Override
-    public void executeDelete( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale )
-            throws IOException
-    {
-        checkNotNull( request );
-
-        RequestCredential credential = new RequestCredential();
-        credential.fillInFrom( parameters, true );
-
-        ( ( CustomizedCtoolkitAgent.ExportBatch.Job.Delete ) request ).execute( credential );
     }
 }
