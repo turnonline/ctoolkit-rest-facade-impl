@@ -18,6 +18,7 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.RetrievalRequest;
@@ -42,7 +43,7 @@ class GetRequest<T>
 {
     private final Class<T> resource;
 
-    private final Object identifier;
+    private final Identifier identifier;
 
     private final RestFacadeAdapter adapter;
 
@@ -55,7 +56,7 @@ class GetRequest<T>
     private Locale withLocale;
 
     GetRequest( @Nonnull Class<T> resource,
-                @Nonnull Object identifier,
+                @Nonnull Identifier identifier,
                 @Nonnull RestFacadeAdapter adapter,
                 @Nonnull GetExecutorAdaptee adaptee,
                 @Nonnull Object remoteRequest )

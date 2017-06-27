@@ -349,7 +349,7 @@ public class RestFacadeAdapter
     <R> R callbackExecuteGet( @Nonnull GetExecutorAdaptee adaptee,
                               @Nonnull Object remoteRequest,
                               @Nonnull Class<R> responseType,
-                              @Nonnull Object identifier,
+                              @Nonnull Identifier identifier,
                               @Nullable Map<String, Object> parameters,
                               @Nullable Locale locale )
     {
@@ -368,7 +368,7 @@ public class RestFacadeAdapter
         if ( provider != null )
         {
             // retrieve requested local resource
-            response = provider.get( identifier, parameters, locale, null );
+            response = provider.get( identifier, parameters, locale );
             requestForPersist = response == null;
         }
 
@@ -404,8 +404,9 @@ public class RestFacadeAdapter
 
         if ( requestForPersist && response != null )
         {
+            // TODO resource provider lastFor not implemented yet
             // provide remote resource instance to be either persisted or cached
-            provider.persist( response, identifier, parameters, locale );
+            provider.persist( response, identifier, parameters, locale, null );
         }
         return response;
     }
@@ -505,7 +506,7 @@ public class RestFacadeAdapter
         if ( requestForPersist && response != null && !response.isEmpty() )
         {
             // provide remote list of resource to be either persisted or cached
-            provider.persistList( response, criteria, locale );
+            provider.persistList( response, criteria, locale, null );
         }
         return response;
     }

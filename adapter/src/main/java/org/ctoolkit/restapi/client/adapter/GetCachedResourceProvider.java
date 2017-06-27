@@ -19,6 +19,7 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import net.sf.jsr107cache.Cache;
+import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +35,7 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The resource provider that caches the instance where instance identifier
- * is being treated as a string type cache key + optional locale.
+ * The provider caching the resource.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see Cache
@@ -55,7 +55,9 @@ public class GetCachedResourceProvider<T>
 
     @SuppressWarnings( "unchecked" )
     @Override
-    public final T get( Object identifier, Map<String, Object> parameters, Locale locale, Date lastModifiedDate )
+    public final T get( @Nonnull Identifier identifier,
+                        @Nullable Map<String, Object> parameters,
+                        @Nullable Locale locale )
     {
         checkNotNull( identifier );
 
@@ -71,7 +73,11 @@ public class GetCachedResourceProvider<T>
 
     @SuppressWarnings( "unchecked" )
     @Override
-    public final void persist( @Nonnull T instance, Object identifier, Map<String, Object> parameters, Locale locale )
+    public final void persist( @Nonnull T instance,
+                               @Nonnull Identifier identifier,
+                               @Nullable Map<String, Object> parameters,
+                               @Nullable Locale locale,
+                               @Nullable Long lastFor )
     {
         checkNotNull( instance );
         checkNotNull( identifier );
@@ -82,21 +88,26 @@ public class GetCachedResourceProvider<T>
     }
 
     @Override
-    public final List<T> list( Map<String, Object> parameters, Locale locale, Date lastModifiedDate )
+    public final List<T> list( @Nullable Map<String, Object> parameters,
+                               @Nullable Locale locale,
+                               @Nullable Date lastModifiedDate )
     {
         return null;
     }
 
     @Override
-    public final void persistList( @Nonnull List<T> instance, Map<String, Object> parameters, Locale locale )
+    public final void persistList( @Nonnull List<T> list,
+                                   @Nullable Map<String, Object> parameters,
+                                   @Nullable Locale locale,
+                                   @Nullable Long lastFor )
     {
     }
 
-    private String composeKey( @Nonnull Object identifier, @Nullable Locale locale )
+    private String composeKey( @Nonnull Identifier identifier, @Nullable Locale locale )
     {
         checkNotNull( identifier );
 
-        StringBuilder builder = new StringBuilder( identifier.toString() );
+        StringBuilder builder = new StringBuilder( identifier.key() );
 
         if ( locale != null )
         {
