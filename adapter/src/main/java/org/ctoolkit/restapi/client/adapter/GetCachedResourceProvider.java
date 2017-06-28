@@ -84,7 +84,7 @@ public class GetCachedResourceProvider<T>
 
         Object key = composeKey( identifier, locale );
         cache.put( key, instance );
-        logger.info( "The " + instance.getClass().getSimpleName() + " has cached with key: " + key );
+        logger.info( "The " + instance.getClass().getSimpleName() + " has been cached with key: " + key );
     }
 
     @Override
@@ -107,7 +107,17 @@ public class GetCachedResourceProvider<T>
     {
         checkNotNull( identifier );
 
-        StringBuilder builder = new StringBuilder( identifier.key() );
+        String prefix = keyPrefix();
+        if ( prefix == null )
+        {
+            prefix = identifier.key();
+        }
+        else
+        {
+            prefix = prefix + ":" + identifier.key();
+        }
+
+        StringBuilder builder = new StringBuilder( prefix );
 
         if ( locale != null )
         {
@@ -118,5 +128,16 @@ public class GetCachedResourceProvider<T>
         }
 
         return builder.toString();
+    }
+
+    /**
+     * Returns a prefix to be prepended to the cache key.
+     * By default returns {@code null}, override to provide your own prefix.
+     *
+     * @return the key prefix
+     */
+    protected String keyPrefix()
+    {
+        return null;
     }
 }
