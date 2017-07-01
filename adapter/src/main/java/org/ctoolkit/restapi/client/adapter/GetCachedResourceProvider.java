@@ -35,7 +35,7 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The provider caching the resource.
+ * The provider caching the single (GET) resource.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see Cache
@@ -61,14 +61,22 @@ public class GetCachedResourceProvider<T>
     {
         checkNotNull( identifier );
 
-        String key = composeKey( identifier, locale );
+        String key = composeKey( identifier, parameters, locale );
 
-        if ( !cache.containsKey( key ) )
+        try
         {
+            if ( !cache.containsKey( key ) )
+            {
+                return null;
+            }
+
+            return ( T ) cache.get( key );
+        }
+        catch ( Exception e )
+        {
+            logger.warn( "Retrieval of the resource with key: " + key + " has failed.", e );
             return null;
         }
-
-        return ( T ) cache.get( key );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -82,28 +90,38 @@ public class GetCachedResourceProvider<T>
         checkNotNull( instance );
         checkNotNull( identifier );
 
-        Object key = composeKey( identifier, locale );
-        cache.put( key, instance );
-        logger.info( "The " + instance.getClass().getSimpleName() + " has been cached with key: " + key );
+        Object key = null;
+        try
+        {
+            key = composeKey( identifier, parameters, locale );
+            cache.put( key, instance );
+            logger.info( "The " + instance.getClass().getSimpleName() + " has been cached with key: " + key );
+        }
+        catch ( Exception e )
+        {
+            logger.warn( "Caching of the value with key: " + key + " has failed.", e );
+        }
     }
 
     @Override
-    public final List<T> list( @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale,
-                               @Nullable Date lastModifiedDate )
+    public List<T> list( @Nullable Map<String, Object> parameters,
+                         @Nullable Locale locale,
+                         @Nullable Date lastModifiedDate )
     {
         return null;
     }
 
     @Override
-    public final void persistList( @Nonnull List<T> list,
-                                   @Nullable Map<String, Object> parameters,
-                                   @Nullable Locale locale,
-                                   @Nullable Long lastFor )
+    public void persistList( @Nonnull List<T> list,
+                             @Nullable Map<String, Object> parameters,
+                             @Nullable Locale locale,
+                             @Nullable Long lastFor )
     {
     }
 
-    private String composeKey( @Nonnull Identifier identifier, @Nullable Locale locale )
+    protected String composeKey( @Nonnull Identifier identifier,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
     {
         checkNotNull( identifier );
 
@@ -122,9 +140,7 @@ public class GetCachedResourceProvider<T>
         if ( locale != null )
         {
             builder.append( "." );
-            builder.append( locale.getLanguage() );
-            builder.append( "_" );
-            builder.append( locale.getCountry() );
+            builder.append( locale.getLanguage().toLowerCase() );
         }
 
         return builder.toString();
@@ -139,5 +155,35 @@ public class GetCachedResourceProvider<T>
     protected String keyPrefix()
     {
         return null;
+    }
+
+    /**
+     * Removes a resource from the cache identified by the input arguments (GET).
+     *
+     * @param identifier the unique identifier of the resource
+     * @param parameters the optional resource parameters of the retrieval
+     * @param locale     the language the client has configured
+     * @return <tt>true</tt> if the resource has been deleted from the cache
+     */
+    public boolean removeFromCache( @Nonnull Identifier identifier,
+                                    @Nullable Map<String, Object> parameters,
+                                    @Nullable Locale locale )
+    {
+        Object key = composeKey( identifier, parameters, locale );
+
+        try
+        {
+            if ( cache.containsKey( key ) )
+            {
+                cache.remove( key );
+                return true;
+            }
+            return false;
+        }
+        catch ( Exception e )
+        {
+            logger.warn( "Removing of the resource from the cache with key: " + key + " has failed.", e );
+            return false;
+        }
     }
 }
