@@ -17,8 +17,7 @@
   ~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
   -->
 
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.ctoolkit.maven</groupId>
@@ -29,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ctoolkit.restapi</groupId>
     <artifactId>ctoolkit-rest-facade-impl</artifactId>
-    <version>0.23-SNAPSHOT</version>
+    <version>0.23</version>
     <packaging>pom</packaging>
     <name>CtoolkiT REST Client Parent Project</name>
     <description>
@@ -42,7 +41,7 @@
         <developerConnection>scm:git:[push=]git@github.com:turnonline/ctoolkit-rest-facade-impl.git
         </developerConnection>
         <url>https://github.com/turnonline/ctoolkit-rest-facade-impl</url>
-        <tag>HEAD</tag>
+        <tag>ctoolkit-rest-facade-impl-0.23</tag>
     </scm>
 
     <issueManagement>
