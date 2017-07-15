@@ -35,6 +35,7 @@ import org.ctoolkit.api.agent.model.ImportJob;
 import org.ctoolkit.api.agent.model.KindMetaData;
 import org.ctoolkit.api.agent.model.MetadataAudit;
 import org.ctoolkit.api.agent.model.PropertyMetaData;
+import org.ctoolkit.restapi.client.AccessToken;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
@@ -54,6 +55,7 @@ import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMetadataAuditAdaptee
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonPropertyMetaDataAdaptee;
 import org.ctoolkit.restapi.client.agent.model.ResourcesMapper;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
+import org.ctoolkit.restapi.client.googleapis.Initialized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +75,8 @@ public class CtoolkitApiAgentModule
     public static final String API_PREFIX = "ctoolkit-agent";
 
     private static final Logger logger = LoggerFactory.getLogger( CtoolkitApiAgentModule.class );
+
+    private Initialized initialized;
 
     @Override
     protected void configure()
@@ -211,9 +215,10 @@ public class CtoolkitApiAgentModule
         try
         {
             HttpTransport httpTransport = factory.getHttpTransport();
-            HttpRequestInitializer initializer = factory.authorize( scopes, null, API_PREFIX );
+            initialized = factory.authorize( scopes, null, API_PREFIX );
+            HttpRequestInitializer credential = initialized.getCredential();
 
-            builder = new CustomizedCtoolkitAgent.Builder( httpTransport, factory.getJsonFactory(), initializer );
+            builder = new CustomizedCtoolkitAgent.Builder( httpTransport, factory.getJsonFactory(), credential );
             builder.setApplicationName( applicationName )
                     .setRootUrl( endpointUrl )
                     .setServicePath( Agent.DEFAULT_SERVICE_PATH );
@@ -236,5 +241,12 @@ public class CtoolkitApiAgentModule
         }
 
         return builder.build();
+    }
+
+    @Provides
+    @AccessToken( apiName = API_PREFIX )
+    String provideCtoolkitAgentAccessToken( CustomizedCtoolkitAgent client )
+    {
+        return initialized.getAccessToken();
     }
 }

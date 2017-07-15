@@ -26,10 +26,12 @@ import com.google.api.services.pubsub.model.PublishRequest;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import org.ctoolkit.restapi.client.AccessToken;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
+import org.ctoolkit.restapi.client.googleapis.Initialized;
 import org.ctoolkit.restapi.client.pubsub.adaptee.PublishAdaptee;
 import org.ctoolkit.restapi.client.pubsub.adaptee.TopicMessageAdaptee;
 import org.slf4j.Logger;
@@ -51,6 +53,8 @@ public class GoogleApiPubSubModule
     public static final String API_PREFIX = "pubsub";
 
     private static final Logger logger = LoggerFactory.getLogger( GoogleApiPubSubModule.class );
+
+    private Initialized initialized;
 
     @Override
     protected void configure()
@@ -75,7 +79,8 @@ public class GoogleApiPubSubModule
 
         try
         {
-            HttpRequestInitializer credential = factory.authorize( scopes, null, API_PREFIX );
+            initialized = factory.authorize( scopes, null, API_PREFIX );
+            HttpRequestInitializer credential = initialized.getCredential();
             builder = new Pubsub.Builder( factory.getHttpTransport(), factory.getJsonFactory(), credential );
             builder.setApplicationName( factory.getApplicationName( API_PREFIX ) );
         }
@@ -96,5 +101,12 @@ public class GoogleApiPubSubModule
         }
 
         return builder.build();
+    }
+
+    @Provides
+    @AccessToken( apiName = API_PREFIX )
+    String providePubsubAccessToken( Pubsub client )
+    {
+        return initialized.getAccessToken();
     }
 }

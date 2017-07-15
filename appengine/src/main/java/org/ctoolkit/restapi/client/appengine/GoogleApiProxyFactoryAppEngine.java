@@ -20,11 +20,11 @@ package org.ctoolkit.restapi.client.appengine;
 
 import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
 import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.common.eventbus.EventBus;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
 import org.ctoolkit.restapi.client.googleapis.Credential;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
+import org.ctoolkit.restapi.client.googleapis.Initialized;
 import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 
 import javax.inject.Inject;
@@ -53,19 +53,17 @@ class GoogleApiProxyFactoryAppEngine
     }
 
     @Override
-    public HttpRequestInitializer authorize( Collection<String> scopes, String userAccount, final String prefix )
+    public Initialized authorize( Collection<String> scopes, String userAccount, final String prefix )
             throws GeneralSecurityException, IOException
     {
-        HttpRequestInitializer credential;
-
         if ( super.isCredentialOn( prefix ) )
         {
             // for local development (outside of the AppEngine) call standard authorization
-            credential = super.authorize( scopes, userAccount, prefix );
+            return super.authorize( scopes, userAccount, prefix );
         }
         else
         {
-            credential = new AppIdentityCredential( scopes )
+            AppIdentityCredential credential = new AppIdentityCredential( scopes )
             {
                 @Override
                 public void intercept( HttpRequest request ) throws IOException
@@ -81,9 +79,8 @@ class GoogleApiProxyFactoryAppEngine
                     request.setNumberOfRetries( getNumberOfRetries( prefix ) );
                 }
             };
+            return new AppIdentityCredentialInitialized( credential );
         }
-
-        return credential;
     }
 
     static class FacadeApiInit

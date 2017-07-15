@@ -400,15 +400,17 @@ public abstract class GoogleApiProxyFactory
      * @return the thread-safe credential instance
      * @throws GeneralSecurityException, IOException
      */
-    public HttpRequestInitializer authorize( Collection<String> scopes, String userAccount, String prefix )
+    public Initialized authorize( Collection<String> scopes, String userAccount, String prefix )
             throws GeneralSecurityException, IOException
     {
+        GoogleCredential googleCredential;
+
         if ( isJsonConfiguration( prefix ) )
         {
             // json file load right before usage
             InputStream json = getServiceAccountJsonStream( prefix );
 
-            return new ConfiguredByJsonGoogleCredential( json )
+            googleCredential = new ConfiguredByJsonGoogleCredential( json )
                     .setTransport( getHttpTransport() )
                     .setJsonFactory( getJsonFactory() )
                     .setServiceAccountScopes( scopes )
@@ -427,7 +429,7 @@ public abstract class GoogleApiProxyFactory
             // p12 file load right before usage
             URL resource = getServiceAccountPrivateKeyP12Resource( prefix );
 
-            return new ConfiguredGoogleCredential()
+            googleCredential = new ConfiguredGoogleCredential()
                     .setTransport( getHttpTransport() )
                     .setJsonFactory( getJsonFactory() )
                     .setServiceAccountId( serviceAccountEmail )
@@ -437,6 +439,8 @@ public abstract class GoogleApiProxyFactory
                     .setRequestInitializer( newRequestConfig( prefix ) )
                     .build();
         }
+
+        return new CredentialInitialized( googleCredential );
     }
 
     public boolean isJsonConfiguration( String prefix )
