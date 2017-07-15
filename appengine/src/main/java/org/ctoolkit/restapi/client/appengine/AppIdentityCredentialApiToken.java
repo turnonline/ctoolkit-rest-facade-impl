@@ -19,28 +19,35 @@
 package org.ctoolkit.restapi.client.appengine;
 
 import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
-import org.ctoolkit.restapi.client.googleapis.Initialized;
+import com.google.appengine.api.appidentity.AppIdentityService;
+import org.ctoolkit.restapi.client.googleapis.ApiToken;
 
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * {@link AppIdentityCredential} credential wrapper.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class AppIdentityCredentialInitialized
-        extends Initialized<AppIdentityCredential>
+public class AppIdentityCredentialApiToken
+        extends ApiToken<AppIdentityCredential>
 {
-    public AppIdentityCredentialInitialized( AppIdentityCredential initializer )
+    public AppIdentityCredentialApiToken( AppIdentityCredential initializer )
     {
         super( initializer );
     }
 
     @Override
-    public String getAccessToken()
+    public Data getTokenData()
     {
         AppIdentityCredential credential = getCredential();
         Collection<String> scopes = credential.getScopes();
-        return credential.getAppIdentityService().getAccessToken( scopes ).getAccessToken();
+
+        AppIdentityService.GetAccessTokenResult result = credential.getAppIdentityService().getAccessToken( scopes );
+        String accessToken = result.getAccessToken();
+        Date expirationTime = result.getExpirationTime();
+
+        return new Data( accessToken, expirationTime );
     }
 }

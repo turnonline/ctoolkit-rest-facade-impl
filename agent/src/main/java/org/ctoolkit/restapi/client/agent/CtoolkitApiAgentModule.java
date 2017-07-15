@@ -54,8 +54,8 @@ import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonKindMetaDataAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMetadataAuditAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonPropertyMetaDataAdaptee;
 import org.ctoolkit.restapi.client.agent.model.ResourcesMapper;
+import org.ctoolkit.restapi.client.googleapis.ApiToken;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
-import org.ctoolkit.restapi.client.googleapis.Initialized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +76,7 @@ public class CtoolkitApiAgentModule
 
     private static final Logger logger = LoggerFactory.getLogger( CtoolkitApiAgentModule.class );
 
-    private Initialized initialized;
+    private ApiToken initialized;
 
     @Override
     protected void configure()
@@ -245,8 +245,8 @@ public class CtoolkitApiAgentModule
 
     @Provides
     @AccessToken( apiName = API_PREFIX )
-    String provideCtoolkitAgentAccessToken( CustomizedCtoolkitAgent client )
+    ApiToken.Data provideCtoolkitAgentTokenData( CustomizedCtoolkitAgent client )
     {
-        return initialized.getAccessToken();
+        return initialized.getTokenData();
     }
 }

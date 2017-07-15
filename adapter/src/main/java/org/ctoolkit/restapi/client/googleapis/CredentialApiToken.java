@@ -18,23 +18,26 @@
 
 package org.ctoolkit.restapi.client.googleapis;
 
+import com.google.common.base.Strings;
+
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * {@link com.google.api.client.auth.oauth2.Credential} credential wrapper.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class CredentialInitialized
-        extends Initialized<com.google.api.client.auth.oauth2.Credential>
+public class CredentialApiToken
+        extends ApiToken<com.google.api.client.auth.oauth2.Credential>
 {
-    public CredentialInitialized( com.google.api.client.auth.oauth2.Credential initializer )
+    public CredentialApiToken( com.google.api.client.auth.oauth2.Credential initializer )
     {
         super( initializer );
     }
 
     @Override
-    public String getAccessToken()
+    public Data getTokenData()
     {
         com.google.api.client.auth.oauth2.Credential credential;
         credential = getCredential();
@@ -62,6 +65,18 @@ public class CredentialInitialized
             return null;
         }
 
-        return accessToken;
+        if ( Strings.isNullOrEmpty( accessToken ) )
+        {
+            return null;
+        }
+
+        Date expirationTime = null;
+        Long expirationTimeMilliseconds = credential.getExpirationTimeMilliseconds();
+        if ( expirationTimeMilliseconds != null )
+        {
+            expirationTime = new Date( expirationTimeMilliseconds );
+        }
+
+        return new Data( accessToken, expirationTime );
     }
 }

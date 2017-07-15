@@ -22,9 +22,9 @@ import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIden
 import com.google.api.client.http.HttpRequest;
 import com.google.common.eventbus.EventBus;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
+import org.ctoolkit.restapi.client.googleapis.ApiToken;
 import org.ctoolkit.restapi.client.googleapis.Credential;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
-import org.ctoolkit.restapi.client.googleapis.Initialized;
 import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 
 import javax.inject.Inject;
@@ -53,7 +53,7 @@ class GoogleApiProxyFactoryAppEngine
     }
 
     @Override
-    public Initialized authorize( Collection<String> scopes, String userAccount, final String prefix )
+    public ApiToken authorize( Collection<String> scopes, String userAccount, final String prefix )
             throws GeneralSecurityException, IOException
     {
         if ( super.isCredentialOn( prefix ) )
@@ -79,7 +79,7 @@ class GoogleApiProxyFactoryAppEngine
                     request.setNumberOfRetries( getNumberOfRetries( prefix ) );
                 }
             };
-            return new AppIdentityCredentialInitialized( credential );
+            return new AppIdentityCredentialApiToken( credential );
         }
     }
 

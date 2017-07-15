@@ -30,8 +30,8 @@ import org.ctoolkit.restapi.client.AccessToken;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
+import org.ctoolkit.restapi.client.googleapis.ApiToken;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
-import org.ctoolkit.restapi.client.googleapis.Initialized;
 import org.ctoolkit.restapi.client.pubsub.adaptee.PublishAdaptee;
 import org.ctoolkit.restapi.client.pubsub.adaptee.TopicMessageAdaptee;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ public class GoogleApiPubSubModule
 
     private static final Logger logger = LoggerFactory.getLogger( GoogleApiPubSubModule.class );
 
-    private Initialized initialized;
+    private ApiToken initialized;
 
     @Override
     protected void configure()
@@ -105,8 +105,8 @@ public class GoogleApiPubSubModule
 
     @Provides
     @AccessToken( apiName = API_PREFIX )
-    String providePubsubAccessToken( Pubsub client )
+    ApiToken.Data providePubsubTokenData( Pubsub client )
     {
-        return initialized.getAccessToken();
+        return initialized.getTokenData();
     }
 }

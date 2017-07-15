@@ -27,8 +27,8 @@ import com.google.inject.Provides;
 import org.ctoolkit.restapi.client.AccessToken;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
+import org.ctoolkit.restapi.client.googleapis.ApiToken;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
-import org.ctoolkit.restapi.client.googleapis.Initialized;
 import org.ctoolkit.restapi.client.identity.verifier.IdentityVerifierModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class GoogleApiIdentityToolkitModule
 
     private static final String IDENTITY_SCOPE = "https://www.googleapis.com/auth/identitytoolkit";
 
-    private Initialized initialized;
+    private ApiToken initialized;
 
     @Override
     protected void configure()
@@ -135,8 +135,8 @@ public class GoogleApiIdentityToolkitModule
 
     @Provides
     @AccessToken( apiName = API_PREFIX )
-    String provideIdentityToolkitAccessToken( IdentityToolkit client )
+    ApiToken.Data provideIdentityToolkitTokenData( IdentityToolkit client )
     {
-        return initialized.getAccessToken();
+        return initialized.getTokenData();
     }
 }

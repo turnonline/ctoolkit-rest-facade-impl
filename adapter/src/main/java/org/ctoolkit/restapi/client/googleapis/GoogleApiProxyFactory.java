@@ -400,7 +400,7 @@ public abstract class GoogleApiProxyFactory
      * @return the thread-safe credential instance
      * @throws GeneralSecurityException, IOException
      */
-    public Initialized authorize( Collection<String> scopes, String userAccount, String prefix )
+    public ApiToken authorize( Collection<String> scopes, String userAccount, String prefix )
             throws GeneralSecurityException, IOException
     {
         GoogleCredential googleCredential;
@@ -440,7 +440,7 @@ public abstract class GoogleApiProxyFactory
                     .build();
         }
 
-        return new CredentialInitialized( googleCredential );
+        return new CredentialApiToken( googleCredential );
     }
 
     public boolean isJsonConfiguration( String prefix )

@@ -33,8 +33,8 @@ import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
 import org.ctoolkit.restapi.client.drive.adaptee.FileAdaptee;
+import org.ctoolkit.restapi.client.googleapis.ApiToken;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
-import org.ctoolkit.restapi.client.googleapis.Initialized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public class GoogleApiDriveModule
 
     private static final Logger logger = LoggerFactory.getLogger( GoogleApiDriveModule.class );
 
-    private Initialized initialized;
+    private ApiToken initialized;
 
     @Override
     protected void configure()
@@ -108,8 +108,8 @@ public class GoogleApiDriveModule
 
     @Provides
     @AccessToken( apiName = API_PREFIX )
-    String provideDriveAccessToken( Drive client )
+    ApiToken.Data provideDriveTokenData( Drive client )
     {
-        return initialized.getAccessToken();
+        return initialized.getTokenData();
     }
 }
