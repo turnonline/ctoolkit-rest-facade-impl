@@ -247,6 +247,7 @@ public class CtoolkitApiAgentModule
     @AccessToken( apiName = API_PREFIX )
     ApiToken.Data provideCtoolkitAgentTokenData( CustomizedCtoolkitAgent client )
     {
+        initialized.setServiceUrl( client.getBaseUrl() );
         return initialized.getTokenData();
     }
 }

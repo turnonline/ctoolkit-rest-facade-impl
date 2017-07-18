@@ -107,6 +107,7 @@ public class GoogleApiPubSubModule
     @AccessToken( apiName = API_PREFIX )
     ApiToken.Data providePubsubTokenData( Pubsub client )
     {
+        initialized.setServiceUrl( client.getBaseUrl() );
         return initialized.getTokenData();
     }
 }

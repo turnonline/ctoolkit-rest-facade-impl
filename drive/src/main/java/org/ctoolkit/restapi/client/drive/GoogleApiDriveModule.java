@@ -110,6 +110,7 @@ public class GoogleApiDriveModule
     @AccessToken( apiName = API_PREFIX )
     ApiToken.Data provideDriveTokenData( Drive client )
     {
+        initialized.setServiceUrl( client.getBaseUrl() );
         return initialized.getTokenData();
     }
 }

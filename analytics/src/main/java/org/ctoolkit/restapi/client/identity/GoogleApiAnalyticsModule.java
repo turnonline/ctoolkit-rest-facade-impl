@@ -93,6 +93,7 @@ public class GoogleApiAnalyticsModule
     @AccessToken( apiName = API_PREFIX )
     ApiToken.Data provideAnalyticsTokenData( Analytics client )
     {
+        initialized.setServiceUrl( client.getBaseUrl() );
         return initialized.getTokenData();
     }
 }

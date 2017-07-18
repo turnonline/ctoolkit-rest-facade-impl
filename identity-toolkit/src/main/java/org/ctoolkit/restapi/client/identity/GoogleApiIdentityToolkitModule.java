@@ -137,6 +137,7 @@ public class GoogleApiIdentityToolkitModule
     @AccessToken( apiName = API_PREFIX )
     ApiToken.Data provideIdentityToolkitTokenData( IdentityToolkit client )
     {
+        initialized.setServiceUrl( client.getBaseUrl() );
         return initialized.getTokenData();
     }
 }

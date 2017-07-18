@@ -20,7 +20,6 @@ package org.ctoolkit.restapi.client.googleapis;
 
 import com.google.api.client.http.HttpRequestInitializer;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -33,6 +32,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class ApiToken<T extends HttpRequestInitializer>
 {
     private final T initializer;
+
+    private String serviceUrl;
 
     public ApiToken( T initializer )
     {
@@ -50,6 +51,16 @@ public abstract class ApiToken<T extends HttpRequestInitializer>
     public abstract Data getTokenData();
 
     /**
+     * Updates service endpoint URL.
+     *
+     * @param serviceUrl the service URL to be set for associated {@link Data}.
+     */
+    public void setServiceUrl( String serviceUrl )
+    {
+        this.serviceUrl = serviceUrl;
+    }
+
+    /**
      * Returns the credential instance specific to concrete API.
      *
      * @return the credential
@@ -60,13 +71,10 @@ public abstract class ApiToken<T extends HttpRequestInitializer>
     }
 
     /**
-     * The access token and token expiration time wrapper.
+     * The access token, token expiration time and service endpoint URL wrapper.
      */
-    public static class Data
-            implements Serializable
+    public class Data
     {
-        private static final long serialVersionUID = 7167727815990334365L;
-
         private final String accessToken;
 
         private final Date expirationTime;
@@ -95,6 +103,17 @@ public abstract class ApiToken<T extends HttpRequestInitializer>
         public Date getExpirationTime()
         {
             return expirationTime;
+        }
+
+        /**
+         * Returns the URL-encoded base URL of the service incl. service path for which is the access token valid.
+         * For example {@code "https://www.googleapis.com/tasks/v1/"}.
+         *
+         * @return the service endpoint URL
+         */
+        public String getServiceUrl()
+        {
+            return serviceUrl;
         }
     }
 }
