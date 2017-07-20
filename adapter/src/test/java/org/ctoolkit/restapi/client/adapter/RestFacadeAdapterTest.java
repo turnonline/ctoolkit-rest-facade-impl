@@ -40,11 +40,13 @@ import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
+import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -438,6 +440,201 @@ public class RestFacadeAdapterTest
             {
                 downloader.download( new GenericUrl( url ), headers, content );
                 times = 1;
+            }
+        };
+    }
+
+    @Test
+    public void prepareDownloadRequestRootIdentifier( @Mocked final DownloadRequest request,
+                                                      @Mocked final OutputStream output,
+                                                      @Mocked final MediaHttpDownloader downloader,
+                                                      @Mocked final DownloadExecutorAdaptee adaptee )
+    {
+        final Identifier identifier = new Identifier( 1L, 99L ).leaf();
+        tested.prepareDownloadRequest( ResourceNoMapping.class, identifier, output, null );
+
+        new Verifications()
+        {
+            {
+                new DownloadRequest( ( RestFacadeAdapter ) any, ( DownloadExecutorAdaptee ) any,
+                        ( MediaHttpDownloader ) any, ResourceNoMapping.class,
+                        withSameInstance( identifier.root() ), ( OutputStream ) any, null );
+            }
+        };
+    }
+
+    @Test
+    public void executeDownloadRootIdentifier( @Mocked final MediaHttpDownloader downloader,
+                                               @Mocked final DownloadExecutorAdaptee adaptee,
+                                               @Mocked final OutputStream output )
+            throws MalformedURLException
+    {
+        final Identifier identifier = new Identifier( 1L, 99L ).leaf();
+        new Expectations()
+        {
+            {
+                adaptee.prepareDownloadUrl( ( Identifier ) any, anyString, null, null );
+                result = new URL( "http://localhost/download" );
+            }
+        };
+
+        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, identifier, output,
+                null, null, null );
+
+        new Verifications()
+        {
+            {
+                Identifier root;
+                adaptee.prepareDownloadUrl( root = withCapture(), null, null, null );
+                assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
+            }
+        };
+    }
+
+    @Test
+    public void internalGetRequestRootIdentifier( @Mocked final GetRequest request )
+    {
+        final Identifier identifier = new Identifier( 1L, 99L ).leaf();
+        tested.internalGet( ResourceNoMapping.class, identifier );
+
+        new Verifications()
+        {
+            {
+                new GetRequest( ( Class ) any, withSameInstance( identifier.root() ), ( RestFacadeAdapter ) any,
+                        ( GetExecutorAdaptee ) any, any );
+            }
+        };
+    }
+
+    @Test
+    public void callbackExecuteGetRootIdentifier( @Mocked final GetExecutorAdaptee adaptee,
+                                                  @Mocked final LocalResourceProvider provider )
+    {
+        final Identifier identifier = new Identifier( 1L, 99L ).leaf();
+        new Expectations()
+        {
+            {
+                injector.getExistingResourceProvider( ( Class<Object> ) any );
+                result = provider;
+
+                provider.get( ( Identifier ) any, null, null );
+                result = null;
+            }
+        };
+
+        tested.callbackExecuteGet( adaptee, new Object(), ResourceNoMapping.class, identifier, null, null );
+
+        new Verifications()
+        {
+            {
+                Identifier root;
+                provider.get( root = withCapture(), null, null );
+                assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
+
+                provider.persist( any, root = withCapture(), null, null, null );
+                assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
+            }
+        };
+    }
+
+    @Test
+    public void listRequestRootIdentifier( @Mocked final ListExecutorAdaptee adaptee )
+            throws IOException
+    {
+        final Identifier identifier = new Identifier( 1L, 99L ).leaf();
+        new Expectations()
+        {
+            {
+                adaptee.prepareList( ( Identifier ) any );
+                result = new Object();
+            }
+        };
+
+        tested.list( ResourceNoMapping.class, identifier );
+
+        new Verifications()
+        {
+            {
+                Identifier root;
+                adaptee.prepareList( root = withCapture() );
+                assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
+            }
+        };
+    }
+
+    @Test
+    public void internalInsertRequestRootIdentifier( @Mocked final ResourceNoMapping resource,
+                                                     @Mocked final InsertExecutorAdaptee adaptee )
+            throws IOException
+    {
+        final Identifier identifier = new Identifier( 1L, 99L ).leaf();
+        new Expectations()
+        {
+            {
+                adaptee.prepareInsert( any, null, null );
+                result = new Object();
+            }
+        };
+
+        tested.internalInsert( resource, identifier, null );
+
+        new Verifications()
+        {
+            {
+                Identifier root;
+                adaptee.prepareInsert( any, root = withCapture(), null );
+                assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
+            }
+        };
+    }
+
+    @Test
+    public void internalUpdateRequestRootIdentifier( @Mocked final ResourceNoMapping resource,
+                                                     @Mocked final UpdateExecutorAdaptee adaptee )
+            throws IOException
+    {
+        final Identifier identifier = new Identifier( 1L, 99L ).leaf();
+        new Expectations()
+        {
+            {
+                adaptee.prepareUpdate( any, ( Identifier ) any, null );
+                result = new Object();
+            }
+        };
+
+        tested.internalUpdate( resource, identifier, null );
+
+        new Verifications()
+        {
+            {
+                Identifier root;
+                adaptee.prepareUpdate( any, root = withCapture(), null );
+                assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
+            }
+        };
+    }
+
+    @Test
+    public void internalDeleteRequestRootIdentifier( @Mocked final DeleteExecutorAdaptee adaptee )
+            throws IOException
+    {
+        final Identifier identifier = new Identifier( 1L, 99L ).leaf();
+        new Expectations()
+        {
+            {
+                adaptee.prepareDelete( ( Identifier ) any );
+                result = new Object();
+            }
+        };
+
+        tested.internalDelete( ResourceNoMapping.class, identifier );
+
+        new Verifications()
+        {
+            {
+                Identifier root;
+                adaptee.prepareDelete( root = withCapture() );
+                assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
             }
         };
     }

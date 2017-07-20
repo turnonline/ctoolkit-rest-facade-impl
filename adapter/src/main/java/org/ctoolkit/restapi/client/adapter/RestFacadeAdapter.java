@@ -155,7 +155,7 @@ public class RestFacadeAdapter
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( params, false );
 
-        URL path = adaptee.prepareDownloadUrl( identifier, type, params, locale );
+        URL path = adaptee.prepareDownloadUrl( identifier.root(), type, params, locale );
         if ( path == null )
         {
             String msg = "URL to download a resource content cannot be null. Identifier: ";
@@ -248,7 +248,7 @@ public class RestFacadeAdapter
             throw new RemoteServerErrorException( HttpStatusCodes.STATUS_CODE_SERVER_ERROR, e.getMessage() );
         }
 
-        return new DownloadRequest( this, adaptee, downloader, resource, identifier, output, type );
+        return new DownloadRequest( this, adaptee, downloader, resource, identifier.root(), output, type );
     }
 
     @Override
@@ -343,7 +343,7 @@ public class RestFacadeAdapter
             throw new ClientErrorException( 400, e.getMessage() );
         }
 
-        return new GetRequest<>( resource, identifier, this, adaptee, remoteRequest );
+        return new GetRequest<>( resource, identifier.root(), this, adaptee, remoteRequest );
     }
 
     <R> R callbackExecuteGet( @Nonnull GetExecutorAdaptee adaptee,
@@ -368,7 +368,7 @@ public class RestFacadeAdapter
         if ( provider != null )
         {
             // retrieve requested local resource
-            response = provider.get( identifier, parameters, locale );
+            response = provider.get( identifier.root(), parameters, locale );
             requestForPersist = response == null;
         }
 
@@ -406,7 +406,7 @@ public class RestFacadeAdapter
         {
             // TODO resource provider lastFor not implemented yet
             // provide remote resource instance to be either persisted or cached
-            provider.persist( response, identifier, parameters, locale, null );
+            provider.persist( response, identifier.root(), parameters, locale, null );
         }
         return response;
     }
@@ -427,7 +427,7 @@ public class RestFacadeAdapter
         try
         {
             //noinspection unchecked
-            remoteRequest = adaptee.prepareList( parent );
+            remoteRequest = adaptee.prepareList( parent == null ? null : parent.root() );
         }
         catch ( IOException e )
         {
@@ -546,7 +546,7 @@ public class RestFacadeAdapter
         Object remoteRequest;
         try
         {
-            remoteRequest = adaptee.prepareInsert( source, parentKey, provider );
+            remoteRequest = adaptee.prepareInsert( source, parentKey == null ? null : parentKey.root(), provider );
         }
         catch ( IOException e )
         {
@@ -625,7 +625,7 @@ public class RestFacadeAdapter
         Object remoteRequest;
         try
         {
-            remoteRequest = adaptee.prepareUpdate( source, identifier, provider );
+            remoteRequest = adaptee.prepareUpdate( source, identifier.root(), provider );
         }
         catch ( IOException e )
         {
@@ -699,7 +699,7 @@ public class RestFacadeAdapter
         Object remoteRequest;
         try
         {
-            remoteRequest = adaptee.prepareDelete( identifier );
+            remoteRequest = adaptee.prepareDelete( identifier.root() );
         }
         catch ( IOException e )
         {
