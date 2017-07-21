@@ -58,8 +58,8 @@ public class GenericJsonKindMetaDataAdaptee
     public List<KindMetaData> executeList( @Nonnull Object request,
                                            @Nullable Map<String, Object> parameters,
                                            @Nullable Locale locale,
-                                           int start,
-                                           int length,
+                                           @Nullable Integer start,
+                                           @Nullable Integer length,
                                            @Nullable String orderBy,
                                            @Nullable Boolean ascending )
             throws IOException

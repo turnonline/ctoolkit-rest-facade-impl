@@ -73,8 +73,8 @@ public class BeeGetListAdaptee
     public List<RemoteBee> executeList( @Nonnull Object request,
                                         @Nullable Map<String, Object> criteria,
                                         @Nullable Locale locale,
-                                        int start,
-                                        int length,
+                                        @Nullable Integer start,
+                                        @Nullable Integer length,
                                         @Nullable String orderBy,
                                         @Nullable Boolean ascending )
             throws IOException
