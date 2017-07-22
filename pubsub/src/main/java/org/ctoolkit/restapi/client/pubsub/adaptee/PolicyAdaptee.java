@@ -19,13 +19,14 @@
 package org.ctoolkit.restapi.client.pubsub.adaptee;
 
 import com.google.api.services.pubsub.Pubsub;
-import com.google.api.services.pubsub.model.PublishRequest;
-import com.google.api.services.pubsub.model.PublishResponse;
+import com.google.api.services.pubsub.model.Policy;
+import com.google.api.services.pubsub.model.SetIamPolicyRequest;
+import com.google.common.base.Strings;
 import org.ctoolkit.restapi.client.Identifier;
+import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
-import org.ctoolkit.restapi.client.pubsub.TopicMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,36 +36,55 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
- * The Pub/Sub's {@link TopicMessage} adaptee implementation.
+ * The Pub/Sub's {@link Policy} adaptee implementation.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Singleton
-public class TopicMessageAdaptee
+public class PolicyAdaptee
         extends AbstractGoogleClientAdaptee<Pubsub>
-        implements InsertExecutorAdaptee<TopicMessage>
+        implements GetExecutorAdaptee<Policy>, InsertExecutorAdaptee<Policy>
 {
     @Inject
-    public TopicMessageAdaptee( Pubsub client )
+    public PolicyAdaptee( Pubsub client )
     {
         super( client );
     }
 
     @Override
-    public Object prepareInsert( @Nonnull TopicMessage resource,
+    public Object prepareGet( @Nonnull Identifier identifier ) throws IOException
+    {
+        return client().projects().subscriptions().getIamPolicy( identifier.getString() );
+    }
+
+    @Override
+    public Policy executeGet( @Nonnull Object request,
+                              @Nullable Map<String, Object> parameters,
+                              @Nullable Locale locale )
+            throws IOException
+    {
+        return Policy.class.cast( execute( request, parameters, locale ) );
+    }
+
+    @Override
+    public Object prepareInsert( @Nonnull Policy resource,
                                  @Nullable Identifier parentKey,
                                  @Nullable MediaProvider provider )
             throws IOException
     {
-        checkNotNull( resource );
+        if ( parentKey == null || Strings.isNullOrEmpty( parentKey.getString() ) )
+        {
+            String message = "REQUIRED: The 'resource' for which the policy is being specified." +
+                    " See the operation documentation for the appropriate value for this field."
+                    + " Use parent Identifier in order to setup 'resource'.";
+            throw new IOException( message );
+        }
 
-        PublishRequest request = new PublishRequest();
-        request.setMessages( resource.getMessages() );
+        SetIamPolicyRequest policyRequest = new SetIamPolicyRequest();
+        policyRequest.setPolicy( resource );
 
-        return client().projects().topics().publish( resource.getTopic(), request );
+        return client().projects().subscriptions().setIamPolicy( parentKey.getString(), policyRequest );
     }
 
     @Override
@@ -73,6 +93,6 @@ public class TopicMessageAdaptee
                                  @Nullable Locale locale )
             throws IOException
     {
-        return PublishResponse.class.cast( execute( request, parameters, locale ) );
+        return execute( request, parameters, locale );
     }
 }

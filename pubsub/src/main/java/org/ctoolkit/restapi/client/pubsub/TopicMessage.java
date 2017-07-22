@@ -21,6 +21,7 @@ package org.ctoolkit.restapi.client.pubsub;
 import com.google.api.services.pubsub.model.PubsubMessage;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import org.ctoolkit.restapi.client.Identifier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -44,7 +45,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TopicMessage
 {
-    private static final String TOPIC_PATH_TEMPLATE = "projects/{0}/topics/{1}";
+    static final String TOPIC_PATH_TEMPLATE = "projects/{0}/topics/{1}";
 
     private final String topic;
 
@@ -71,6 +72,32 @@ public class TopicMessage
     public static TopicMessage create( @Nonnull String projectId, @Nonnull String topicId, @Nonnull byte[] data )
     {
         return newBuilder().setProjectId( projectId ).setTopicId( topicId ).addMessage( data ).build();
+    }
+
+    /**
+     * Creates a topic represented by {@link Identifier}.
+     *
+     * @param projectId the unique project identifier (publisher) of the content
+     * @param topicId   the target topic where messages will be published
+     * @return the topic represented by identifier
+     */
+    public static Identifier create( @Nonnull String projectId, @Nonnull String topicId )
+    {
+        TopicMessage build = newBuilder().setProjectId( projectId ).setTopicId( topicId ).build();
+        return new Identifier( build.getTopic() );
+    }
+
+    /**
+     * Creates a topic name in its full formatted form {@link #TOPIC_PATH_TEMPLATE}.
+     *
+     * @param projectId the unique project identifier (publisher) of the content
+     * @param topicId   the target topic where messages will be published
+     * @return the topic name
+     */
+    public static String createName( @Nonnull String projectId, @Nonnull String topicId )
+    {
+        TopicMessage build = newBuilder().setProjectId( projectId ).setTopicId( topicId ).build();
+        return build.getTopic();
     }
 
     /**

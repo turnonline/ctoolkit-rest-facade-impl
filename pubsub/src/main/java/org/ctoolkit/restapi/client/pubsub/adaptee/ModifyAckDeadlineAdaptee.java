@@ -19,13 +19,11 @@
 package org.ctoolkit.restapi.client.pubsub.adaptee;
 
 import com.google.api.services.pubsub.Pubsub;
-import com.google.api.services.pubsub.model.PublishRequest;
-import com.google.api.services.pubsub.model.PublishResponse;
+import com.google.api.services.pubsub.model.ModifyAckDeadlineRequest;
 import org.ctoolkit.restapi.client.Identifier;
-import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
+import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
-import org.ctoolkit.restapi.client.pubsub.TopicMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,44 +33,39 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
- * The Pub/Sub's {@link TopicMessage} adaptee implementation.
+ * The Pub/Sub's {@link ModifyAckDeadlineRequest} adaptee implementation.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Singleton
-public class TopicMessageAdaptee
+public class ModifyAckDeadlineAdaptee
         extends AbstractGoogleClientAdaptee<Pubsub>
-        implements InsertExecutorAdaptee<TopicMessage>
+        implements UpdateExecutorAdaptee<ModifyAckDeadlineRequest>
 {
     @Inject
-    public TopicMessageAdaptee( Pubsub client )
+    public ModifyAckDeadlineAdaptee( Pubsub client )
     {
         super( client );
     }
 
     @Override
-    public Object prepareInsert( @Nonnull TopicMessage resource,
-                                 @Nullable Identifier parentKey,
+    public Object prepareUpdate( @Nonnull ModifyAckDeadlineRequest resource,
+                                 @Nonnull Identifier identifier,
                                  @Nullable MediaProvider provider )
             throws IOException
     {
-        checkNotNull( resource );
-
-        PublishRequest request = new PublishRequest();
-        request.setMessages( resource.getMessages() );
-
-        return client().projects().topics().publish( resource.getTopic(), request );
+        return client().projects().subscriptions().modifyAckDeadline( identifier.getString(), resource );
     }
 
     @Override
-    public Object executeInsert( @Nonnull Object request,
+    public Object executeUpdate( @Nonnull Object request,
                                  @Nullable Map<String, Object> parameters,
                                  @Nullable Locale locale )
             throws IOException
     {
-        return PublishResponse.class.cast( execute( request, parameters, locale ) );
+        execute( request, parameters, locale );
+        // means if successful, the response body will be empty
+        return null;
     }
 }

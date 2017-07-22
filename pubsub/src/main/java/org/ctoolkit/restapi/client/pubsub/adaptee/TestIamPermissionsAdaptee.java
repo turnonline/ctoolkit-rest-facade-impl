@@ -19,60 +19,47 @@
 package org.ctoolkit.restapi.client.pubsub.adaptee;
 
 import com.google.api.services.pubsub.Pubsub;
-import com.google.api.services.pubsub.model.PublishRequest;
-import com.google.api.services.pubsub.model.PublishResponse;
+import com.google.api.services.pubsub.model.TestIamPermissionsRequest;
+import com.google.common.base.Strings;
 import org.ctoolkit.restapi.client.Identifier;
-import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
-import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
-import org.ctoolkit.restapi.client.pubsub.TopicMessage;
+import org.ctoolkit.restapi.client.adapter.AbstractInsertExecutorAdaptee;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
-import java.util.Locale;
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The Pub/Sub's {@link TopicMessage} adaptee implementation.
+ * The Pub/Sub's {@link TestIamPermissionsRequest} adaptee implementation.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Singleton
-public class TopicMessageAdaptee
-        extends AbstractGoogleClientAdaptee<Pubsub>
-        implements InsertExecutorAdaptee<TopicMessage>
+public class TestIamPermissionsAdaptee
+        extends AbstractInsertExecutorAdaptee<Pubsub, TestIamPermissionsRequest>
 {
     @Inject
-    public TopicMessageAdaptee( Pubsub client )
+    public TestIamPermissionsAdaptee( Pubsub client )
     {
         super( client );
     }
 
     @Override
-    public Object prepareInsert( @Nonnull TopicMessage resource,
+    public Object prepareInsert( @Nonnull TestIamPermissionsRequest resource,
                                  @Nullable Identifier parentKey,
                                  @Nullable MediaProvider provider )
             throws IOException
     {
-        checkNotNull( resource );
+        if ( parentKey == null || Strings.isNullOrEmpty( parentKey.getString() ) )
+        {
+            String message = "REQUIRED: The 'resource' for which the policy detail is being requested." +
+                    " See the operation documentation for the appropriate value for this field."
+                    + " Use parent Identifier in order to setup 'resource'.";
+            throw new IOException( message );
+        }
 
-        PublishRequest request = new PublishRequest();
-        request.setMessages( resource.getMessages() );
-
-        return client().projects().topics().publish( resource.getTopic(), request );
-    }
-
-    @Override
-    public Object executeInsert( @Nonnull Object request,
-                                 @Nullable Map<String, Object> parameters,
-                                 @Nullable Locale locale )
-            throws IOException
-    {
-        return PublishResponse.class.cast( execute( request, parameters, locale ) );
+        return client().projects().subscriptions().testIamPermissions( parentKey.getString(), resource );
     }
 }

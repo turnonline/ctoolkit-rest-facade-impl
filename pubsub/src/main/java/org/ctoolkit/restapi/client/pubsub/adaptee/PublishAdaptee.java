@@ -29,6 +29,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -40,6 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
+@Singleton
 public class PublishAdaptee
         extends AbstractGoogleClientAdaptee<Pubsub>
         implements InsertExecutorAdaptee<PublishRequest>

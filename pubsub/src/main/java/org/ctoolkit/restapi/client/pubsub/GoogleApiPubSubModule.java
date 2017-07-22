@@ -22,18 +22,13 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpStatusCodes;
 import com.google.api.services.pubsub.Pubsub;
 import com.google.api.services.pubsub.PubsubScopes;
-import com.google.api.services.pubsub.model.PublishRequest;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
 import org.ctoolkit.restapi.client.AccessToken;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
-import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.googleapis.ApiToken;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
-import org.ctoolkit.restapi.client.pubsub.adaptee.PublishAdaptee;
-import org.ctoolkit.restapi.client.pubsub.adaptee.TopicMessageAdaptee;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,15 +54,6 @@ public class GoogleApiPubSubModule
     @Override
     protected void configure()
     {
-        // adaptee for PublishRequest
-        bind( new TypeLiteral<InsertExecutorAdaptee<PublishRequest>>()
-        {
-        } ).to( PublishAdaptee.class ).in( Singleton.class );
-
-        // adaptee for TopicMessage
-        bind( new TypeLiteral<InsertExecutorAdaptee<TopicMessage>>()
-        {
-        } ).to( TopicMessageAdaptee.class ).in( Singleton.class );
     }
 
     @Provides
