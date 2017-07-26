@@ -34,6 +34,9 @@ import org.ctoolkit.api.agent.model.ImportItem;
 import org.ctoolkit.api.agent.model.ImportJob;
 import org.ctoolkit.api.agent.model.KindMetaData;
 import org.ctoolkit.api.agent.model.MetadataAudit;
+import org.ctoolkit.api.agent.model.MigrationBatch;
+import org.ctoolkit.api.agent.model.MigrationItem;
+import org.ctoolkit.api.agent.model.MigrationJob;
 import org.ctoolkit.api.agent.model.PropertyMetaData;
 import org.ctoolkit.restapi.client.AccessToken;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
@@ -52,6 +55,9 @@ import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonImportItemAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonImportJobAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonKindMetaDataAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMetadataAuditAdaptee;
+import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMigrationBatchAdaptee;
+import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMigrationItemAdaptee;
+import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMigrationJobAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonPropertyMetaDataAdaptee;
 import org.ctoolkit.restapi.client.agent.model.ResourcesMapper;
 import org.ctoolkit.restapi.client.googleapis.ApiToken;
@@ -131,7 +137,7 @@ public class CtoolkitApiAgentModule
         {
         } ).to( GenericJsonImportJobAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<UpdateExecutorAdaptee<ImportJob>>()
+        bind( new TypeLiteral<DeleteExecutorAdaptee<ImportJob>>()
         {
         } ).to( GenericJsonImportJobAdaptee.class ).in( Singleton.class );
 
@@ -182,9 +188,60 @@ public class CtoolkitApiAgentModule
         {
         } ).to( GenericJsonExportJobAdaptee.class ).in( Singleton.class );
 
-        bind( new TypeLiteral<UpdateExecutorAdaptee<ExportJob>>()
+        bind( new TypeLiteral<DeleteExecutorAdaptee<ExportJob>>()
         {
         } ).to( GenericJsonExportJobAdaptee.class ).in( Singleton.class );
+
+        // MigrationBatch
+        bind( new TypeLiteral<GetExecutorAdaptee<MigrationBatch>>()
+        {
+        } ).to( GenericJsonMigrationBatchAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<ListExecutorAdaptee<MigrationBatch>>()
+        {
+        } ).to( GenericJsonMigrationBatchAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<InsertExecutorAdaptee<MigrationBatch>>()
+        {
+        } ).to( GenericJsonMigrationBatchAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<UpdateExecutorAdaptee<MigrationBatch>>()
+        {
+        } ).to( GenericJsonMigrationBatchAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<DeleteExecutorAdaptee<MigrationBatch>>()
+        {
+        } ).to( GenericJsonMigrationBatchAdaptee.class ).in( Singleton.class );
+
+        // MigrationItem
+        bind( new TypeLiteral<GetExecutorAdaptee<MigrationItem>>()
+        {
+        } ).to( GenericJsonMigrationItemAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<InsertExecutorAdaptee<MigrationItem>>()
+        {
+        } ).to( GenericJsonMigrationItemAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<UpdateExecutorAdaptee<MigrationItem>>()
+        {
+        } ).to( GenericJsonMigrationItemAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<DeleteExecutorAdaptee<MigrationItem>>()
+        {
+        } ).to( GenericJsonMigrationItemAdaptee.class ).in( Singleton.class );
+
+        // MigrationJobInfo
+        bind( new TypeLiteral<GetExecutorAdaptee<MigrationJob>>()
+        {
+        } ).to( GenericJsonMigrationJobAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<InsertExecutorAdaptee<MigrationJob>>()
+        {
+        } ).to( GenericJsonMigrationJobAdaptee.class ).in( Singleton.class );
+
+        bind( new TypeLiteral<DeleteExecutorAdaptee<MigrationJob>>()
+        {
+        } ).to( GenericJsonMigrationJobAdaptee.class ).in( Singleton.class );
 
         // KindMetaData
         bind( new TypeLiteral<ListExecutorAdaptee<KindMetaData>>()

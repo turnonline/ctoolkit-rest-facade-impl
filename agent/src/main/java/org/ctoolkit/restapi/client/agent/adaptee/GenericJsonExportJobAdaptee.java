@@ -22,10 +22,10 @@ import org.ctoolkit.api.agent.model.ExportJob;
 import org.ctoolkit.api.agent.model.ImportBatch;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.RequestCredential;
+import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
-import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 
 import javax.annotation.Nonnull;
@@ -47,7 +47,7 @@ public class GenericJsonExportJobAdaptee
         implements
         GetExecutorAdaptee<ExportJob>,
         InsertExecutorAdaptee<ExportJob>,
-        UpdateExecutorAdaptee<ExportJob>
+        DeleteExecutorAdaptee<ExportJob>
 {
     @Inject
     public GenericJsonExportJobAdaptee( CustomizedCtoolkitAgent ctoolkitAgent )
@@ -88,7 +88,7 @@ public class GenericJsonExportJobAdaptee
         checkNotNull( resource );
         checkNotNull( parentKey, "Parent identifier cannot be null" );
 
-        return client().exportBatch().job().start( parentKey.getLong(), resource );
+        return client().exportBatch().job().start( parentKey.getLong() );
     }
 
     @Override
@@ -107,21 +107,14 @@ public class GenericJsonExportJobAdaptee
     }
 
     @Override
-    public Object prepareUpdate( @Nonnull ExportJob resource,
-                                 @Nonnull Identifier identifier,
-                                 @Nullable MediaProvider provider )
-            throws IOException
+    public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
-        checkNotNull( resource );
-        checkNotNull( identifier, "Parent identifier cannot be null" );
-
-        return client().exportBatch().job().cancel( identifier.getLong(), resource );
+        checkNotNull( identifier, "Identifier cannot be null" );
+        return client().exportBatch().job().cancel( identifier.getLong() );
     }
 
     @Override
-    public ExportJob executeUpdate( @Nonnull Object request,
-                                    @Nullable Map<String, Object> parameters,
-                                    @Nullable Locale locale )
+    public void executeDelete( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -129,7 +122,6 @@ public class GenericJsonExportJobAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( request, parameters, locale );
-        return ( ( CustomizedCtoolkitAgent.ExportBatch.Job.Cancel ) request ).execute( credential );
+        ( ( CustomizedCtoolkitAgent.ExportBatch.Job.Cancel ) request ).execute( credential );
     }
 }

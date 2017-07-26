@@ -92,7 +92,7 @@ public class GenericJsonExportItemAdaptee
         checkNotNull( resource );
         checkNotNull( parentKey );
 
-        return client().exportBatch().item().insert( parentKey.getString(), resource );
+        return client().exportBatch().item().insert( parentKey.getLong(), resource );
     }
 
     @Override

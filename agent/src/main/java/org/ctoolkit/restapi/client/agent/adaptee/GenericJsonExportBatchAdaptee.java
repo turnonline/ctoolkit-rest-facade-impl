@@ -19,7 +19,6 @@
 package org.ctoolkit.restapi.client.agent.adaptee;
 
 import org.ctoolkit.api.agent.model.ExportBatch;
-import org.ctoolkit.api.agent.model.ImportBatch;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
@@ -41,7 +40,7 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The ImportBatch as {@link ImportBatch} concrete adaptee implementation.
+ * The ExportBatch as {@link ExportBatch} concrete adaptee implementation.
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */

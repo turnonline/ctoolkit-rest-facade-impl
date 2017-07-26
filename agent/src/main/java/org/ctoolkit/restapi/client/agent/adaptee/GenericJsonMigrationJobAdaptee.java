@@ -18,14 +18,14 @@
 
 package org.ctoolkit.restapi.client.agent.adaptee;
 
-import org.ctoolkit.api.agent.model.ImportItem;
+import org.ctoolkit.api.agent.model.MigrationBatch;
+import org.ctoolkit.api.agent.model.MigrationJob;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
-import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 
 import javax.annotation.Nonnull;
@@ -38,20 +38,19 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The ImportItem as {@link ImportItem} concrete adaptee implementation.
+ * The MigrationBatch as {@link MigrationBatch} concrete adaptee implementation.
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
-public class GenericJsonImportItemAdaptee
+public class GenericJsonMigrationJobAdaptee
         extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent>
         implements
-        GetExecutorAdaptee<ImportItem>,
-        InsertExecutorAdaptee<ImportItem>,
-        UpdateExecutorAdaptee<ImportItem>,
-        DeleteExecutorAdaptee<ImportItem>
+        GetExecutorAdaptee<MigrationJob>,
+        InsertExecutorAdaptee<MigrationJob>,
+        DeleteExecutorAdaptee<MigrationJob>
 {
     @Inject
-    public GenericJsonImportItemAdaptee( CustomizedCtoolkitAgent ctoolkitAgent )
+    public GenericJsonMigrationJobAdaptee( CustomizedCtoolkitAgent ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -62,13 +61,13 @@ public class GenericJsonImportItemAdaptee
     {
         checkNotNull( identifier, "Identifier cannot be null" );
 
-        return client().importBatch().item().get( identifier.getLong(), identifier.child().getLong() );
+        return client().exportBatch().job().progress( identifier.getLong() );
     }
 
     @Override
-    public ImportItem executeGet( @Nonnull Object request,
-                                  @Nullable Map<String, Object> parameters,
-                                  @Nullable Locale locale )
+    public MigrationJob executeGet( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -77,25 +76,25 @@ public class GenericJsonImportItemAdaptee
         credential.fillInFrom( parameters, true );
 
         fill( request, parameters, locale );
-        return ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Get ) request ).execute( credential );
+        return ( ( CustomizedCtoolkitAgent.MigrationBatch.Job.Progress ) request ).execute( credential );
     }
 
     @Override
-    public Object prepareInsert( @Nonnull ImportItem resource,
+    public Object prepareInsert( @Nonnull MigrationJob resource,
                                  @Nullable Identifier parentKey,
                                  @Nullable MediaProvider provider )
             throws IOException
     {
         checkNotNull( resource );
-        checkNotNull( parentKey );
+        checkNotNull( parentKey, "Parent identifier cannot be null" );
 
-        return client().importBatch().item().insert( parentKey.getLong(), resource );
+        return client().exportBatch().job().start( parentKey.getLong() );
     }
 
     @Override
-    public ImportItem executeInsert( @Nonnull Object request,
-                                     @Nullable Map<String, Object> parameters,
-                                     @Nullable Locale locale )
+    public MigrationJob executeInsert( @Nonnull Object request,
+                                    @Nullable Map<String, Object> parameters,
+                                    @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -104,54 +103,25 @@ public class GenericJsonImportItemAdaptee
         credential.fillInFrom( parameters, true );
 
         fill( request, parameters, locale );
-        return ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Insert ) request ).execute( credential );
-    }
-
-    @Override
-    public Object prepareUpdate( @Nonnull ImportItem resource,
-                                 @Nonnull Identifier identifier,
-                                 @Nullable MediaProvider provider )
-            throws IOException
-    {
-        checkNotNull( resource );
-        checkNotNull( identifier, "Identifier cannot be null" );
-
-        return client().importBatch().item().update( identifier.getLong(), identifier.child().getLong(),
-                resource );
-    }
-
-    @Override
-    public ImportItem executeUpdate( @Nonnull Object request,
-                                     @Nullable Map<String, Object> parameters,
-                                     @Nullable Locale locale )
-            throws IOException
-    {
-        checkNotNull( request );
-
-        RequestCredential credential = new RequestCredential();
-        credential.fillInFrom( parameters, true );
-
-        fill( request, parameters, locale );
-        return ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Update ) request ).execute( credential );
+        return ( ( CustomizedCtoolkitAgent.MigrationBatch.Job.Start ) request ).execute( credential );
     }
 
     @Override
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
         checkNotNull( identifier, "Identifier cannot be null" );
-        return client().importBatch().item().delete( identifier.getLong(), identifier.child().getLong() );
+        return client().migrationBatch().job().cancel( identifier.getLong() );
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale ) throws IOException
+    public void executeDelete( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+            throws IOException
     {
         checkNotNull( request );
 
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Delete ) request ).execute( credential );
+        ( ( CustomizedCtoolkitAgent.MigrationBatch.Job.Cancel ) request ).execute( credential );
     }
 }

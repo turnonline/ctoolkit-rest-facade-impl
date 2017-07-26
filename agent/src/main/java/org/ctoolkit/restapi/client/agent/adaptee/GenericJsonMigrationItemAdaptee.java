@@ -18,7 +18,7 @@
 
 package org.ctoolkit.restapi.client.agent.adaptee;
 
-import org.ctoolkit.api.agent.model.ImportItem;
+import org.ctoolkit.api.agent.model.MigrationItem;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
@@ -38,20 +38,20 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The ImportItem as {@link ImportItem} concrete adaptee implementation.
+ * The MigrationItem as {@link MigrationItem} concrete adaptee implementation.
  *
- * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
+ * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class GenericJsonImportItemAdaptee
+public class GenericJsonMigrationItemAdaptee
         extends AbstractGoogleClientAdaptee<CustomizedCtoolkitAgent>
         implements
-        GetExecutorAdaptee<ImportItem>,
-        InsertExecutorAdaptee<ImportItem>,
-        UpdateExecutorAdaptee<ImportItem>,
-        DeleteExecutorAdaptee<ImportItem>
+        GetExecutorAdaptee<MigrationItem>,
+        InsertExecutorAdaptee<MigrationItem>,
+        UpdateExecutorAdaptee<MigrationItem>,
+        DeleteExecutorAdaptee<MigrationItem>
 {
     @Inject
-    public GenericJsonImportItemAdaptee( CustomizedCtoolkitAgent ctoolkitAgent )
+    public GenericJsonMigrationItemAdaptee( CustomizedCtoolkitAgent ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }
@@ -60,13 +60,16 @@ public class GenericJsonImportItemAdaptee
     public Object prepareGet( @Nonnull Identifier identifier )
             throws IOException
     {
-        checkNotNull( identifier, "Identifier cannot be null" );
+        checkNotNull( identifier, "Parent identifier cannot be null" );
+        checkNotNull( identifier.child(), "Item identifier cannot be null" );
 
-        return client().importBatch().item().get( identifier.getLong(), identifier.child().getLong() );
+        Long metadataId = identifier.getLong();
+        Long id = identifier.child().getLong();
+        return client().exportBatch().item().get( metadataId, id );
     }
 
     @Override
-    public ImportItem executeGet( @Nonnull Object request,
+    public MigrationItem executeGet( @Nonnull Object request,
                                   @Nullable Map<String, Object> parameters,
                                   @Nullable Locale locale )
             throws IOException
@@ -77,11 +80,11 @@ public class GenericJsonImportItemAdaptee
         credential.fillInFrom( parameters, true );
 
         fill( request, parameters, locale );
-        return ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Get ) request ).execute( credential );
+        return ( ( CustomizedCtoolkitAgent.MigrationBatch.Item.Get ) request ).execute( credential );
     }
 
     @Override
-    public Object prepareInsert( @Nonnull ImportItem resource,
+    public Object prepareInsert( @Nonnull MigrationItem resource,
                                  @Nullable Identifier parentKey,
                                  @Nullable MediaProvider provider )
             throws IOException
@@ -89,11 +92,11 @@ public class GenericJsonImportItemAdaptee
         checkNotNull( resource );
         checkNotNull( parentKey );
 
-        return client().importBatch().item().insert( parentKey.getLong(), resource );
+        return client().migrationBatch().item().insert( parentKey.getLong(), resource );
     }
 
     @Override
-    public ImportItem executeInsert( @Nonnull Object request,
+    public MigrationItem executeInsert( @Nonnull Object request,
                                      @Nullable Map<String, Object> parameters,
                                      @Nullable Locale locale )
             throws IOException
@@ -104,24 +107,26 @@ public class GenericJsonImportItemAdaptee
         credential.fillInFrom( parameters, true );
 
         fill( request, parameters, locale );
-        return ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Insert ) request ).execute( credential );
+        return ( ( CustomizedCtoolkitAgent.MigrationBatch.Item.Insert ) request ).execute( credential );
     }
 
     @Override
-    public Object prepareUpdate( @Nonnull ImportItem resource,
+    public Object prepareUpdate( @Nonnull MigrationItem resource,
                                  @Nonnull Identifier identifier,
                                  @Nullable MediaProvider provider )
             throws IOException
     {
         checkNotNull( resource );
-        checkNotNull( identifier, "Identifier cannot be null" );
+        checkNotNull( identifier, "Parent identifier cannot be null" );
+        checkNotNull( identifier.child(), "Item identifier cannot be null" );
 
-        return client().importBatch().item().update( identifier.getLong(), identifier.child().getLong(),
-                resource );
+        Long metadataId = identifier.getLong();
+        Long id = identifier.child().getLong();
+        return client().migrationBatch().item().update( metadataId, id, resource );
     }
 
     @Override
-    public ImportItem executeUpdate( @Nonnull Object request,
+    public MigrationItem executeUpdate( @Nonnull Object request,
                                      @Nullable Map<String, Object> parameters,
                                      @Nullable Locale locale )
             throws IOException
@@ -132,14 +137,18 @@ public class GenericJsonImportItemAdaptee
         credential.fillInFrom( parameters, true );
 
         fill( request, parameters, locale );
-        return ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Update ) request ).execute( credential );
+        return ( ( CustomizedCtoolkitAgent.MigrationBatch.Item.Update ) request ).execute( credential );
     }
 
     @Override
     public Object prepareDelete( @Nonnull Identifier identifier ) throws IOException
     {
-        checkNotNull( identifier, "Identifier cannot be null" );
-        return client().importBatch().item().delete( identifier.getLong(), identifier.child().getLong() );
+        checkNotNull( identifier, "Parent identifier cannot be null" );
+        checkNotNull( identifier.child(), "Item identifier cannot be null" );
+
+        Long metadataId = identifier.getLong();
+        Long id = identifier.child().getLong();
+        return client().migrationBatch().item().delete( metadataId, id );
     }
 
     @Override
@@ -152,6 +161,6 @@ public class GenericJsonImportItemAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Delete ) request ).execute( credential );
+        ( ( CustomizedCtoolkitAgent.MigrationBatch.Item.Delete ) request ).execute( credential );
     }
 }

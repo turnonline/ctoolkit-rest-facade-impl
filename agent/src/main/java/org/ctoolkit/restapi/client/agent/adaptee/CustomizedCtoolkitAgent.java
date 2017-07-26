@@ -34,6 +34,9 @@ import org.ctoolkit.api.agent.model.ImportItem;
 import org.ctoolkit.api.agent.model.ImportJob;
 import org.ctoolkit.api.agent.model.KindMetaDataCollection;
 import org.ctoolkit.api.agent.model.MetadataAuditCollection;
+import org.ctoolkit.api.agent.model.MigrationBatchCollection;
+import org.ctoolkit.api.agent.model.MigrationItem;
+import org.ctoolkit.api.agent.model.MigrationJob;
 import org.ctoolkit.api.agent.model.PropertyMetaDataCollection;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adapter.Constants;
@@ -73,6 +76,11 @@ public class CustomizedCtoolkitAgent
     public ImportBatch importBatch()
     {
         return new ImportBatch();
+    }
+
+    public MigrationBatch migrationBatch()
+    {
+        return new MigrationBatch();
     }
 
     public Metadata metadata()
@@ -430,7 +438,7 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Insert insert( String metadataId, ExportItem content )
+            public Insert insert( Long metadataId, ExportItem content )
                     throws IOException
             {
                 Insert result = new Insert( metadataId, content );
@@ -521,7 +529,7 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Insert( String metadataId, ExportItem content )
+                Insert( Long metadataId, ExportItem content )
                 {
                     super( metadataId, content );
                 }
@@ -590,9 +598,9 @@ public class CustomizedCtoolkitAgent
         public class Job
                 extends Agent.ExportBatch.Job
         {
-            public Cancel cancel( Long id, ExportJob job ) throws IOException
+            public Cancel cancel( Long id ) throws IOException
             {
-                Cancel result = new Cancel( id, job );
+                Cancel result = new Cancel( id );
                 initialize( result );
                 return result;
             }
@@ -604,9 +612,9 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Start start( Long id, ExportJob job ) throws IOException
+            public Start start( Long id ) throws IOException
             {
-                Start result = new Start( id, job );
+                Start result = new Start( id );
                 initialize( result );
                 return result;
             }
@@ -616,9 +624,9 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Cancel( Long id, ExportJob job )
+                Cancel( Long id )
                 {
-                    super( id, job );
+                    super( id );
                 }
 
                 public ExportJob execute( RequestCredential credential ) throws IOException
@@ -686,9 +694,9 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Start( Long id, ExportJob job )
+                Start( Long id )
                 {
-                    super( id, job );
+                    super( id );
                 }
 
                 public ExportJob execute( RequestCredential credential ) throws IOException
@@ -959,7 +967,7 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Insert insert( String metadataId, ImportItem content )
+            public Insert insert( Long metadataId, ImportItem content )
                     throws IOException
             {
                 Insert result = new Insert( metadataId, content );
@@ -1050,7 +1058,7 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Insert( String metadataId, ImportItem content )
+                Insert( Long metadataId, ImportItem content )
                 {
                     super( metadataId, content );
                 }
@@ -1119,9 +1127,9 @@ public class CustomizedCtoolkitAgent
         public class Job
                 extends Agent.ImportBatch.Job
         {
-            public Cancel cancel( Long id, ImportJob job ) throws IOException
+            public Cancel cancel( Long id ) throws IOException
             {
-                Cancel result = new Cancel( id, job );
+                Cancel result = new Cancel( id );
                 initialize( result );
                 return result;
             }
@@ -1133,10 +1141,10 @@ public class CustomizedCtoolkitAgent
                 return result;
             }
 
-            public Start start( Long id, ImportJob job )
+            public Start start( Long id )
                     throws IOException
             {
-                Start result = new Start( id, job );
+                Start result = new Start( id );
                 initialize( result );
                 return result;
             }
@@ -1146,9 +1154,9 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Cancel( Long id, ImportJob job )
+                Cancel( Long id )
                 {
-                    super( id, job );
+                    super( id );
                 }
 
                 public ImportJob execute( RequestCredential credential ) throws IOException
@@ -1216,9 +1224,9 @@ public class CustomizedCtoolkitAgent
             {
                 private RequestCredential credential;
 
-                Start( Long id, ImportJob job )
+                Start( Long id )
                 {
-                    super( id, job );
+                    super( id );
                 }
 
                 public ImportJob execute( RequestCredential credential ) throws IOException
@@ -1245,6 +1253,536 @@ public class CustomizedCtoolkitAgent
                     }
                 }
             }
+        }
+    }
+
+    public class MigrationBatch
+            extends Agent.MigrationBatch
+    {
+        public Delete delete( Long id ) throws java.io.IOException
+        {
+            Delete result = new Delete( id );
+            initialize( result );
+            return result;
+        }
+
+        public class Delete
+                extends Agent.MigrationBatch.Delete
+        {
+            private RequestCredential credential;
+
+            Delete( Long id )
+            {
+                super( id );
+            }
+
+            public void execute( RequestCredential credential ) throws IOException
+            {
+                this.credential = checkNotNull( credential );
+                setRequestApiKey( this, credential );
+                super.execute();
+            }
+
+            @Override
+            public GenericUrl buildHttpRequestUrl()
+            {
+                String servicePath = this.getAbstractGoogleClient().getServicePath();
+                String uriTemplate = this.getUriTemplate();
+                GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
+
+                if ( url == null )
+                {
+                    return super.buildHttpRequestUrl();
+                }
+                else
+                {
+                    return url;
+                }
+            }
+        }
+
+        public Agent.MigrationBatch.Get get( Long id ) throws java.io.IOException
+        {
+            Get result = new Get( id );
+            initialize( result );
+            return result;
+        }
+
+        public class Get
+                extends Agent.MigrationBatch.Get
+        {
+            private RequestCredential credential;
+
+            Get( Long id )
+            {
+                super( id );
+            }
+
+            public org.ctoolkit.api.agent.model.MigrationBatch execute( RequestCredential credential ) throws IOException
+            {
+                this.credential = checkNotNull( credential );
+                setRequestApiKey( this, credential );
+                return super.execute();
+            }
+
+            @Override
+            public GenericUrl buildHttpRequestUrl()
+            {
+                String servicePath = this.getAbstractGoogleClient().getServicePath();
+                String uriTemplate = this.getUriTemplate();
+                GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
+
+                if ( url == null )
+                {
+                    return super.buildHttpRequestUrl();
+                }
+                else
+                {
+                    return url;
+                }
+            }
+        }
+
+        public Agent.MigrationBatch.Insert insert( org.ctoolkit.api.agent.model.MigrationBatch content )
+                throws java.io.IOException
+        {
+            Insert result = new Insert( content );
+            initialize( result );
+            return result;
+        }
+
+        public class Insert
+                extends Agent.MigrationBatch.Insert
+        {
+            private RequestCredential credential;
+
+            protected Insert( org.ctoolkit.api.agent.model.MigrationBatch content )
+            {
+                super( content );
+            }
+
+            public org.ctoolkit.api.agent.model.MigrationBatch execute( RequestCredential credential ) throws IOException
+            {
+                this.credential = checkNotNull( credential );
+                setRequestApiKey( this, credential );
+                return super.execute();
+            }
+
+            @Override
+            public GenericUrl buildHttpRequestUrl()
+            {
+                String servicePath = this.getAbstractGoogleClient().getServicePath();
+                String uriTemplate = this.getUriTemplate();
+                GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
+
+                if ( url == null )
+                {
+                    return super.buildHttpRequestUrl();
+                }
+                else
+                {
+                    return url;
+                }
+            }
+        }
+
+        public Agent.MigrationBatch.List list() throws java.io.IOException
+        {
+            List result = new List();
+            initialize( result );
+            return result;
+        }
+
+        public class List
+                extends Agent.MigrationBatch.List
+        {
+            private RequestCredential credential;
+
+            protected List()
+            {
+                super( );
+            }
+
+            public MigrationBatchCollection execute( RequestCredential credential ) throws IOException
+            {
+                this.credential = checkNotNull( credential );
+                setRequestApiKey( this, credential );
+                return super.execute();
+            }
+
+            @Override
+            public GenericUrl buildHttpRequestUrl()
+            {
+                String servicePath = this.getAbstractGoogleClient().getServicePath();
+                String uriTemplate = this.getUriTemplate();
+                GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
+
+                if ( url == null )
+                {
+                    return super.buildHttpRequestUrl();
+                }
+                else
+                {
+                    return url;
+                }
+            }
+        }
+
+        public Agent.MigrationBatch.Update update( Long id, org.ctoolkit.api.agent.model.MigrationBatch content )
+                throws java.io.IOException
+        {
+            Update result = new Update( id, content );
+            initialize( result );
+            return result;
+        }
+
+        public class Update
+                extends Agent.MigrationBatch.Update
+        {
+            private RequestCredential credential;
+
+            protected Update( Long id, org.ctoolkit.api.agent.model.MigrationBatch content )
+            {
+                super( id, content );
+            }
+
+            public org.ctoolkit.api.agent.model.MigrationBatch execute( RequestCredential credential ) throws IOException
+            {
+                this.credential = checkNotNull( credential );
+                setRequestApiKey( this, credential );
+                return super.execute();
+            }
+
+            @Override
+            public GenericUrl buildHttpRequestUrl()
+            {
+                String servicePath = this.getAbstractGoogleClient().getServicePath();
+                String uriTemplate = this.getUriTemplate();
+                GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
+
+                if ( url == null )
+                {
+                    return super.buildHttpRequestUrl();
+                }
+                else
+                {
+                    return url;
+                }
+            }
+        }
+
+        public Agent.MigrationBatch.Item item()
+        {
+            return new Item();
+        }
+
+        public class Item extends Agent.MigrationBatch.Item
+        {
+            public Agent.MigrationBatch.Item.Delete delete( Long metadataId, Long id ) throws java.io.IOException
+            {
+                Delete result = new Delete( metadataId, id );
+                initialize( result );
+                return result;
+            }
+
+            public class Delete
+                    extends Agent.MigrationBatch.Item.Delete
+            {
+                private RequestCredential credential;
+
+                protected Delete( Long metadataId, Long id )
+                {
+                    super( metadataId, id );
+                }
+
+                public void execute( RequestCredential credential ) throws IOException
+                {
+                    this.credential = checkNotNull( credential );
+                    setRequestApiKey( this, credential );
+                    super.execute();
+                }
+
+                @Override
+                public GenericUrl buildHttpRequestUrl()
+                {
+                    String servicePath = this.getAbstractGoogleClient().getServicePath();
+                    String uriTemplate = this.getUriTemplate();
+                    GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
+
+                    if ( url == null )
+                    {
+                        return super.buildHttpRequestUrl();
+                    }
+                    else
+                    {
+                        return url;
+                    }
+                }
+            }
+
+            public Agent.MigrationBatch.Item.Get get( Long metadataId, Long id ) throws java.io.IOException
+            {
+                Get result = new Get( metadataId, id );
+                initialize( result );
+                return result;
+            }
+
+            public class Get
+                    extends Agent.MigrationBatch.Item.Get
+            {
+                private RequestCredential credential;
+
+                protected Get( Long metadataId, Long id )
+                {
+                    super( metadataId, id );
+                }
+
+                public MigrationItem execute( RequestCredential credential ) throws IOException
+                {
+                    this.credential = checkNotNull( credential );
+                    setRequestApiKey( this, credential );
+                    return super.execute();
+                }
+
+                @Override
+                public GenericUrl buildHttpRequestUrl()
+                {
+                    String servicePath = this.getAbstractGoogleClient().getServicePath();
+                    String uriTemplate = this.getUriTemplate();
+                    GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
+
+                    if ( url == null )
+                    {
+                        return super.buildHttpRequestUrl();
+                    }
+                    else
+                    {
+                        return url;
+                    }
+                }
+            }
+
+            public Agent.MigrationBatch.Item.Insert insert( Long metadataId, org.ctoolkit.api.agent.model.MigrationItem content )
+                    throws java.io.IOException
+            {
+                Insert result = new Insert( metadataId, content );
+                initialize( result );
+                return result;
+            }
+
+            public class Insert
+                    extends Agent.MigrationBatch.Item.Insert
+            {
+                private RequestCredential credential;
+
+                protected Insert( Long metadataId, org.ctoolkit.api.agent.model.MigrationItem content )
+                {
+                    super( metadataId, content );
+                }
+
+                public MigrationItem execute( RequestCredential credential ) throws IOException
+                {
+                    this.credential = checkNotNull( credential );
+                    setRequestApiKey( this, credential );
+                    return super.execute();
+                }
+
+                @Override
+                public GenericUrl buildHttpRequestUrl()
+                {
+                    String servicePath = this.getAbstractGoogleClient().getServicePath();
+                    String uriTemplate = this.getUriTemplate();
+                    GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
+
+                    if ( url == null )
+                    {
+                        return super.buildHttpRequestUrl();
+                    }
+                    else
+                    {
+                        return url;
+                    }
+                }
+            }
+
+            public Agent.MigrationBatch.Item.Update update( Long metadataId, Long id, org.ctoolkit.api.agent.model.MigrationItem content )
+                    throws java.io.IOException
+            {
+                Update result = new Update( metadataId, id, content );
+                initialize( result );
+                return result;
+            }
+
+            public class Update
+                    extends Agent.MigrationBatch.Item.Update
+            {
+                private RequestCredential credential;
+
+                protected Update( Long metadataId, Long id, org.ctoolkit.api.agent.model.MigrationItem content )
+                {
+                    super( metadataId, id, content);
+                }
+
+                public MigrationItem execute( RequestCredential credential ) throws IOException
+                {
+                    this.credential = checkNotNull( credential );
+                    setRequestApiKey( this, credential );
+                    return super.execute();
+                }
+
+                @Override
+                public GenericUrl buildHttpRequestUrl()
+                {
+                    String servicePath = this.getAbstractGoogleClient().getServicePath();
+                    String uriTemplate = this.getUriTemplate();
+                    GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
+
+                    if ( url == null )
+                    {
+                        return super.buildHttpRequestUrl();
+                    }
+                    else
+                    {
+                        return url;
+                    }
+                }
+            }
+
+        }
+
+        public Agent.MigrationBatch.Job job()
+        {
+            return new Job();
+        }
+
+        public class Job extends Agent.MigrationBatch.Job
+        {
+            public Agent.MigrationBatch.Job.Cancel cancel( Long id ) throws java.io.IOException
+            {
+                Cancel result = new Cancel( id );
+                initialize( result );
+                return result;
+            }
+
+            public class Cancel
+                    extends Agent.MigrationBatch.Job.Cancel
+            {
+                private RequestCredential credential;
+
+                protected Cancel( Long id )
+                {
+                    super( id );
+                }
+
+                public void execute( RequestCredential credential ) throws IOException
+                {
+                    this.credential = checkNotNull( credential );
+                    setRequestApiKey( this, credential );
+                    super.execute();
+                }
+
+                @Override
+                public GenericUrl buildHttpRequestUrl()
+                {
+                    String servicePath = this.getAbstractGoogleClient().getServicePath();
+                    String uriTemplate = this.getUriTemplate();
+                    GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
+
+                    if ( url == null )
+                    {
+                        return super.buildHttpRequestUrl();
+                    }
+                    else
+                    {
+                        return url;
+                    }
+                }
+            }
+
+            public Agent.MigrationBatch.Job.Progress progress( Long id ) throws java.io.IOException
+            {
+                Progress result = new Progress( id );
+                initialize( result );
+                return result;
+            }
+
+            public class Progress
+                    extends Agent.MigrationBatch.Job.Progress
+            {
+                private RequestCredential credential;
+
+                protected Progress( Long id )
+                {
+                    super( id );
+                }
+
+                public MigrationJob execute( RequestCredential credential ) throws IOException
+                {
+                    this.credential = checkNotNull( credential );
+                    setRequestApiKey( this, credential );
+                    return super.execute();
+                }
+
+                @Override
+                public GenericUrl buildHttpRequestUrl()
+                {
+                    String servicePath = this.getAbstractGoogleClient().getServicePath();
+                    String uriTemplate = this.getUriTemplate();
+                    GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
+
+                    if ( url == null )
+                    {
+                        return super.buildHttpRequestUrl();
+                    }
+                    else
+                    {
+                        return url;
+                    }
+                }
+            }
+
+            public Agent.MigrationBatch.Job.Start start( Long id ) throws java.io.IOException
+            {
+                Start result = new Start( id );
+                initialize( result );
+                return result;
+            }
+
+            public class Start
+                    extends Agent.MigrationBatch.Job.Start
+            {
+                private RequestCredential credential;
+
+                protected Start( Long id )
+                {
+                    super( id );
+                }
+
+                public MigrationJob execute( RequestCredential credential ) throws IOException
+                {
+                    this.credential = checkNotNull( credential );
+                    setRequestApiKey( this, credential );
+                    return super.execute();
+                }
+
+                @Override
+                public GenericUrl buildHttpRequestUrl()
+                {
+                    String servicePath = this.getAbstractGoogleClient().getServicePath();
+                    String uriTemplate = this.getUriTemplate();
+                    GenericUrl url = buildCustomizedRequestUrl( credential, servicePath, uriTemplate, this );
+
+                    if ( url == null )
+                    {
+                        return super.buildHttpRequestUrl();
+                    }
+                    else
+                    {
+                        return url;
+                    }
+                }
+            }
+
         }
     }
 
