@@ -34,6 +34,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import org.ctoolkit.restapi.client.ApiCredential;
+import org.ctoolkit.restapi.client.ApiToken;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
 import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 
@@ -401,7 +402,7 @@ public abstract class GoogleApiProxyFactory
      * @return the thread-safe credential instance
      * @throws GeneralSecurityException, IOException
      */
-    public ApiToken authorize( Collection<String> scopes, String userAccount, String prefix )
+    public ApiToken<? extends HttpRequestInitializer> authorize( Collection<String> scopes, String userAccount, String prefix )
             throws GeneralSecurityException, IOException
     {
         GoogleCredential googleCredential;

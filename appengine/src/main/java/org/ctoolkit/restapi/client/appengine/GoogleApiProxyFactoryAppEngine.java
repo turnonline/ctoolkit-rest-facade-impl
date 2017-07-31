@@ -20,9 +20,10 @@ package org.ctoolkit.restapi.client.appengine;
 
 import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
 import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.common.eventbus.EventBus;
+import org.ctoolkit.restapi.client.ApiToken;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
-import org.ctoolkit.restapi.client.googleapis.ApiToken;
 import org.ctoolkit.restapi.client.googleapis.Credential;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
@@ -53,7 +54,9 @@ class GoogleApiProxyFactoryAppEngine
     }
 
     @Override
-    public ApiToken authorize( Collection<String> scopes, String userAccount, final String prefix )
+    public ApiToken<? extends HttpRequestInitializer> authorize( Collection<String> scopes,
+                                                                 String userAccount,
+                                                                 final String prefix )
             throws GeneralSecurityException, IOException
     {
         if ( super.isCredentialOn( prefix ) )

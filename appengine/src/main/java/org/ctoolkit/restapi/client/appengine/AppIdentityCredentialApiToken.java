@@ -20,7 +20,7 @@ package org.ctoolkit.restapi.client.appengine;
 
 import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
 import com.google.appengine.api.appidentity.AppIdentityService;
-import org.ctoolkit.restapi.client.googleapis.ApiToken;
+import org.ctoolkit.restapi.client.ApiToken;
 
 import java.util.Collection;
 import java.util.Date;

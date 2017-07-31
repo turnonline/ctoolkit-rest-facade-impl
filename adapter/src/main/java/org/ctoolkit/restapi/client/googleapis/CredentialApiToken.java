@@ -19,6 +19,7 @@
 package org.ctoolkit.restapi.client.googleapis;
 
 import com.google.common.base.Strings;
+import org.ctoolkit.restapi.client.ApiToken;
 
 import java.io.IOException;
 import java.util.Date;

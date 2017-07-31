@@ -27,13 +27,13 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import org.ctoolkit.restapi.client.AccessToken;
+import org.ctoolkit.restapi.client.ApiToken;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
 import org.ctoolkit.restapi.client.drive.adaptee.FileAdaptee;
-import org.ctoolkit.restapi.client.googleapis.ApiToken;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class GoogleApiDriveModule
 
     private static final Logger logger = LoggerFactory.getLogger( GoogleApiDriveModule.class );
 
-    private ApiToken initialized;
+    private ApiToken<? extends HttpRequestInitializer> initialized;
 
     @Override
     protected void configure()

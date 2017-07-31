@@ -39,6 +39,7 @@ import org.ctoolkit.api.agent.model.MigrationItem;
 import org.ctoolkit.api.agent.model.MigrationJob;
 import org.ctoolkit.api.agent.model.PropertyMetaData;
 import org.ctoolkit.restapi.client.AccessToken;
+import org.ctoolkit.restapi.client.ApiToken;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
@@ -60,7 +61,6 @@ import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMigrationItemAdaptee
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMigrationJobAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonPropertyMetaDataAdaptee;
 import org.ctoolkit.restapi.client.agent.model.ResourcesMapper;
-import org.ctoolkit.restapi.client.googleapis.ApiToken;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +82,7 @@ public class CtoolkitApiAgentModule
 
     private static final Logger logger = LoggerFactory.getLogger( CtoolkitApiAgentModule.class );
 
-    private ApiToken initialized;
+    private ApiToken<? extends HttpRequestInitializer> initialized;
 
     @Override
     protected void configure()
