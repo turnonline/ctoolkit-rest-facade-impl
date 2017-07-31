@@ -22,6 +22,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpResponseInterceptor;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.JsonFactory;
@@ -415,7 +416,7 @@ public abstract class GoogleApiProxyFactory
                     .setJsonFactory( getJsonFactory() )
                     .setServiceAccountScopes( scopes )
                     .setServiceAccountUser( userAccount )
-                    .setRequestInitializer( newRequestConfig( prefix ) )
+                    .setRequestInitializer( newRequestConfig( prefix, null ) )
                     .build();
         }
         else
@@ -436,7 +437,7 @@ public abstract class GoogleApiProxyFactory
                     .setServiceAccountScopes( scopes )
                     .setServiceAccountPrivateKeyFromP12File( new File( resource.getPath() ) )
                     .setServiceAccountUser( userAccount )
-                    .setRequestInitializer( newRequestConfig( prefix ) )
+                    .setRequestInitializer( newRequestConfig( prefix, null ) )
                     .build();
         }
 
@@ -495,9 +496,10 @@ public abstract class GoogleApiProxyFactory
         return GoogleApiProxyFactory.class.getResourceAsStream( fileName );
     }
 
-    public HttpRequestInitializer newRequestConfig( @Nullable String prefix )
+    public HttpRequestInitializer newRequestConfig( @Nullable String prefix,
+                                                    @Nullable HttpResponseInterceptor interceptor )
     {
-        return new RequestConfig( prefix );
+        return new RequestConfig( prefix, interceptor );
     }
 
     private PrivateKey privateKeyFromPkcs8( String privateKeyPem ) throws IOException
@@ -530,16 +532,23 @@ public abstract class GoogleApiProxyFactory
 
         private final int readTimeout;
 
-        private RequestConfig( String prefix )
+        private final HttpResponseInterceptor interceptor;
+
+        private RequestConfig( String prefix, HttpResponseInterceptor interceptor )
         {
             this.numberOfRetries = getNumberOfRetries( prefix );
             this.readTimeout = getReadTimeout( prefix );
+            this.interceptor = interceptor;
         }
 
         public void initialize( HttpRequest request )
         {
             request.setNumberOfRetries( numberOfRetries );
             request.setReadTimeout( readTimeout );
+            if ( interceptor != null )
+            {
+                request.setResponseInterceptor( interceptor );
+            }
         }
     }
 

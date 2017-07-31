@@ -34,6 +34,7 @@ import ma.glasnost.orika.metadata.TypeFactory;
 import org.ctoolkit.restapi.client.ClientErrorException;
 import org.ctoolkit.restapi.client.DeleteIdentification;
 import org.ctoolkit.restapi.client.DownloadMediaProvider;
+import org.ctoolkit.restapi.client.DownloadRequest;
 import org.ctoolkit.restapi.client.HttpFailureException;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.NotFoundException;
@@ -58,6 +59,7 @@ import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
+import org.ctoolkit.restapi.client.provider.LocalListResourceProvider;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,30 +128,33 @@ public class RestFacadeAdapter
     /**
      * Executes download. Call to remote endpoint.
      *
-     * @param downloader the http downloader to interact with
-     * @param adaptee    the download adaptee configured for given resource
-     * @param resource   the type of resource to download as a media
-     * @param identifier the unique identifier of content to download
-     * @param output     the output stream where desired content will be downloaded to.
-     * @param type       the content type or {@code null} to expect default
-     * @param params     the optional resource params
-     * @param locale     the language the client has configured to prefer in results if applicable
+     * @param downloader  the http downloader to interact with
+     * @param adaptee     the download adaptee configured for given resource
+     * @param resource    the type of resource to download as a media
+     * @param identifier  the unique identifier of content to download
+     * @param output      the output stream where desired content will be downloaded to.
+     * @param interceptor the response interceptor
+     * @param type        the content type or {@code null} to expect default
+     * @param params      the optional resource params
+     * @param locale      the language the client has configured to prefer in results if applicable
      * @return Void
      */
-    Void executeDownload( @Nonnull MediaHttpDownloader downloader,
-                          @Nonnull DownloadExecutorAdaptee adaptee,
-                          @Nonnull Class resource,
-                          @Nonnull Identifier identifier,
-                          @Nonnull OutputStream output,
-                          @Nullable String type,
-                          @Nullable Map<String, Object> params,
-                          @Nullable Locale locale )
+    Map<String, Object> executeDownload( @Nonnull MediaHttpDownloader downloader,
+                                         @Nonnull DownloadExecutorAdaptee adaptee,
+                                         @Nonnull Class resource,
+                                         @Nonnull Identifier identifier,
+                                         @Nonnull OutputStream output,
+                                         @Nonnull DownloadResponseInterceptor interceptor,
+                                         @Nullable String type,
+                                         @Nullable Map<String, Object> params,
+                                         @Nullable Locale locale )
     {
         checkNotNull( downloader );
         checkNotNull( adaptee );
         checkNotNull( resource );
         checkNotNull( identifier );
         checkNotNull( output );
+        checkNotNull( interceptor );
 
         //noinspection MismatchedQueryAndUpdateOfCollection
         RequestCredential credential = new RequestCredential();
@@ -198,7 +203,7 @@ public class RestFacadeAdapter
             // Update exception handling is being used. We need to return exception if resource is not found.
             throw prepareUpdateException( e, resource, identifier );
         }
-        return null;
+        return interceptor.getHeaders();
     }
 
     @VisibleForTesting
@@ -225,13 +230,14 @@ public class RestFacadeAdapter
         checkNotNull( identifier );
         checkNotNull( output );
 
+        DownloadResponseInterceptor interceptor = new DownloadResponseInterceptor();
         DownloadExecutorAdaptee adaptee = adaptee( DownloadExecutorAdaptee.class, resource );
         String apiPrefix = adaptee.getApiPrefix();
         MediaHttpDownloader downloader;
 
         try
         {
-            HttpRequestInitializer requestConfig = apiFactory.newRequestConfig( apiPrefix );
+            HttpRequestInitializer requestConfig = apiFactory.newRequestConfig( apiPrefix, interceptor );
             downloader = new MediaHttpDownloader( apiFactory.getHttpTransport(), requestConfig );
         }
         catch ( GeneralSecurityException e )
@@ -248,7 +254,8 @@ public class RestFacadeAdapter
             throw new RemoteServerErrorException( HttpStatusCodes.STATUS_CODE_SERVER_ERROR, e.getMessage() );
         }
 
-        return new DownloadRequest( this, adaptee, downloader, resource, identifier.root(), output, type );
+        Identifier root = identifier.root();
+        return new DownloadRequestImpl( this, adaptee, downloader, resource, root, output, interceptor, type );
     }
 
     @Override
@@ -455,7 +462,7 @@ public class RestFacadeAdapter
         }
 
         // looking for LocalResourceProvider optional implementation for given resource type
-        LocalResourceProvider<R> provider = injector.getExistingResourceProvider( responseType );
+        LocalListResourceProvider<R> provider = injector.getExistingListResourceProvider( responseType );
         List<R> response = null;
 
         boolean requestForPersist = false;

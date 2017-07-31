@@ -18,6 +18,7 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.provider.LocalListResourceProvider;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 
 import javax.annotation.Nonnull;
@@ -37,6 +38,15 @@ public interface ResourceProviderInjector
      * @return the resource provider
      */
     <T> LocalResourceProvider<T> getExistingResourceProvider( @Nonnull Class<T> resource );
+
+    /**
+     * Returns the binding if it already exists, or null if does not exist.
+     *
+     * @param resource the type of resource to get
+     * @param <T>      the concrete type of the resource
+     * @return the resource provider
+     */
+    <T> LocalListResourceProvider<T> getExistingListResourceProvider( @Nonnull Class<T> resource );
 
     /**
      * Returns the binding if it already exists, or null if does not exist.

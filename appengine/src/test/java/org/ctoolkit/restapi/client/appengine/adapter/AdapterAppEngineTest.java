@@ -40,7 +40,6 @@ import java.util.Locale;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -127,7 +126,7 @@ public class AdapterAppEngineTest
         ByteArrayOutputStream content = new ByteArrayOutputStream();
         String type = "application/pdf";
         Request dr = resources.download( Foo.class ).to( content ).ofType( type ).identifiedBy( 1L );
-        assertNull( dr.finish( Locale.GERMANY ) );
+        assertNotNull( dr.finish( Locale.GERMANY ) );
         String errorMessage = "Output stream has expected to be populated by downloaded content!";
         assertTrue( content.size() > 0, errorMessage );
 

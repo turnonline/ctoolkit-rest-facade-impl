@@ -24,6 +24,7 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Types;
 import org.ctoolkit.restapi.client.adapter.ResourceProviderInjector;
+import org.ctoolkit.restapi.client.provider.LocalListResourceProvider;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 
 import javax.annotation.Nonnull;
@@ -58,6 +59,23 @@ class ResourceProviderGuiceInjector
         {
             //noinspection unchecked
             provider = ( LocalResourceProvider<T> ) binding.getProvider().get();
+        }
+
+        return provider;
+    }
+
+    @Override
+    public <T> LocalListResourceProvider<T> getExistingListResourceProvider( @Nonnull Class<T> resource )
+    {
+        LocalListResourceProvider<T> provider = null;
+
+        ParameterizedType pt = Types.newParameterizedType( LocalListResourceProvider.class, resource );
+        Binding<?> binding = injector.getExistingBinding( Key.get( TypeLiteral.get( pt ) ) );
+
+        if ( binding != null )
+        {
+            //noinspection unchecked
+            provider = ( LocalListResourceProvider<T> ) binding.getProvider().get();
         }
 
         return provider;

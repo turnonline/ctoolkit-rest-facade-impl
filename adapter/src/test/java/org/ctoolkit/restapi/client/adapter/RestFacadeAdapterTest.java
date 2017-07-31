@@ -21,6 +21,7 @@ package org.ctoolkit.restapi.client.adapter;
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpHeaders;
+import com.google.api.client.http.HttpResponseInterceptor;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -29,6 +30,7 @@ import mockit.Injectable;
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
+import org.ctoolkit.restapi.client.DownloadRequest;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
@@ -154,7 +156,7 @@ public class RestFacadeAdapterTest
                 result = new ArrayList<>();
 
                 // returns null to make sure no provider is being injected
-                injector.getExistingResourceProvider( ( Class ) any );
+                injector.getExistingListResourceProvider( ( Class ) any );
                 result = null;
             }
         };
@@ -187,7 +189,7 @@ public class RestFacadeAdapterTest
                 result = resources;
 
                 // returns null to make sure no provider is being injected
-                injector.getExistingResourceProvider( ( Class ) any );
+                injector.getExistingListResourceProvider( ( Class ) any );
                 result = null;
             }
         };
@@ -342,7 +344,7 @@ public class RestFacadeAdapterTest
         new Verifications()
         {
             {
-                apiFactory.newRequestConfig( prefix );
+                apiFactory.newRequestConfig( prefix, ( HttpResponseInterceptor ) withNotNull() );
                 times = 1;
 
                 apiFactory.getHttpTransport();
@@ -353,7 +355,8 @@ public class RestFacadeAdapterTest
 
     @Test( expectedExceptions = IllegalArgumentException.class )
     public void executeDownloadNullUrl( @Mocked final MediaHttpDownloader downloader,
-                                        @Mocked final DownloadExecutorAdaptee adaptee )
+                                        @Mocked final DownloadExecutorAdaptee adaptee,
+                                        @Mocked final DownloadResponseInterceptor interceptor )
             throws IOException
     {
         new Expectations()
@@ -367,12 +370,14 @@ public class RestFacadeAdapterTest
         ByteArrayOutputStream content = new ByteArrayOutputStream();
         Identifier id = new Identifier( 1L );
 
-        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, null, null, null );
+        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, interceptor, null,
+                null, null );
     }
 
     @Test( expectedExceptions = RuntimeException.class )
     public void executeDownloadException( @Mocked final MediaHttpDownloader downloader,
-                                          @Mocked final DownloadExecutorAdaptee adaptee )
+                                          @Mocked final DownloadExecutorAdaptee adaptee,
+                                          @Mocked final DownloadResponseInterceptor interceptor )
             throws IOException
     {
         final URL url = new URL( "https://www.ctoolkit.org/download" );
@@ -391,12 +396,14 @@ public class RestFacadeAdapterTest
         ByteArrayOutputStream content = new ByteArrayOutputStream();
         final Identifier id = new Identifier( 1L );
 
-        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, null, null, null );
+        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, interceptor, null,
+                null, null );
     }
 
     @Test
     public void executeDownload( @Mocked final MediaHttpDownloader downloader,
-                                 @Mocked final DownloadExecutorAdaptee adaptee )
+                                 @Mocked final DownloadExecutorAdaptee adaptee,
+                                 @Mocked final DownloadResponseInterceptor interceptor )
             throws IOException
     {
         final Identifier id = new Identifier( 1L );
@@ -424,7 +431,8 @@ public class RestFacadeAdapterTest
         };
 
         final ByteArrayOutputStream content = new ByteArrayOutputStream();
-        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, type, params, locale );
+        Class<ResourceNoMapping> resource = ResourceNoMapping.class;
+        tested.executeDownload( downloader, adaptee, resource, id, content, interceptor, type, params, locale );
 
         String languageTag = ( String ) headers.get( com.google.common.net.HttpHeaders.ACCEPT_LANGUAGE );
         assertEquals( languageTag, "de-DE", "Accept Language" );
@@ -445,7 +453,7 @@ public class RestFacadeAdapterTest
     }
 
     @Test
-    public void prepareDownloadRequestRootIdentifier( @Mocked final DownloadRequest request,
+    public void prepareDownloadRequestRootIdentifier( @Mocked final DownloadRequestImpl request,
                                                       @Mocked final OutputStream output,
                                                       @Mocked final MediaHttpDownloader downloader,
                                                       @Mocked final DownloadExecutorAdaptee adaptee )
@@ -456,9 +464,10 @@ public class RestFacadeAdapterTest
         new Verifications()
         {
             {
-                new DownloadRequest( ( RestFacadeAdapter ) any, ( DownloadExecutorAdaptee ) any,
+                new DownloadRequestImpl( ( RestFacadeAdapter ) any, ( DownloadExecutorAdaptee ) any,
                         ( MediaHttpDownloader ) any, ResourceNoMapping.class,
-                        withSameInstance( identifier.root() ), ( OutputStream ) any, null );
+                        withSameInstance( identifier.root() ), ( OutputStream ) any,
+                        ( DownloadResponseInterceptor ) any, null );
             }
         };
     }
@@ -466,7 +475,8 @@ public class RestFacadeAdapterTest
     @Test
     public void executeDownloadRootIdentifier( @Mocked final MediaHttpDownloader downloader,
                                                @Mocked final DownloadExecutorAdaptee adaptee,
-                                               @Mocked final OutputStream output )
+                                               @Mocked final OutputStream output,
+                                               @Mocked final DownloadResponseInterceptor interceptor )
             throws MalformedURLException
     {
         final Identifier identifier = new Identifier( 1L, 99L ).leaf();
@@ -479,7 +489,7 @@ public class RestFacadeAdapterTest
         };
 
         tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, identifier, output,
-                null, null, null );
+                interceptor, null, null, null );
 
         new Verifications()
         {

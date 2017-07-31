@@ -19,10 +19,10 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
+import org.ctoolkit.restapi.client.DownloadRequest;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
-import org.ctoolkit.restapi.client.SimpleRequest;
 import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 
 import javax.annotation.Nonnull;
@@ -40,8 +40,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-class DownloadRequest
-        implements SimpleRequest<Void>
+class DownloadRequestImpl
+        implements DownloadRequest
 {
     private final RestFacadeAdapter adapter;
 
@@ -55,6 +55,8 @@ class DownloadRequest
 
     private final OutputStream output;
 
+    private final DownloadResponseInterceptor interceptor;
+
     private final String type;
 
     private Map<String, Object> params;
@@ -64,21 +66,23 @@ class DownloadRequest
     /**
      * Constructor.
      *
-     * @param adapter    the resource facade adapter instance
-     * @param adaptee    the download adaptee configured for given resource
-     * @param downloader the http downloader to interact with
-     * @param resource   the type of resource to download as a media
-     * @param identifier the unique identifier of content to download
-     * @param output     the output stream where desired content will be downloaded to.
-     * @param type       the content type or {@code null} to expect default
+     * @param adapter     the resource facade adapter instance
+     * @param adaptee     the download adaptee configured for given resource
+     * @param downloader  the http downloader to interact with
+     * @param resource    the type of resource to download as a media
+     * @param identifier  the unique identifier of content to download
+     * @param output      the output stream where desired content will be downloaded to
+     * @param interceptor the response interceptor
+     * @param type        the content type or {@code null} to expect default
      */
-    DownloadRequest( @Nonnull RestFacadeAdapter adapter,
-                     @Nonnull DownloadExecutorAdaptee adaptee,
-                     @Nonnull MediaHttpDownloader downloader,
-                     @Nonnull Class resource,
-                     @Nonnull Identifier identifier,
-                     @Nonnull OutputStream output,
-                     @Nullable String type )
+    DownloadRequestImpl( @Nonnull RestFacadeAdapter adapter,
+                         @Nonnull DownloadExecutorAdaptee adaptee,
+                         @Nonnull MediaHttpDownloader downloader,
+                         @Nonnull Class resource,
+                         @Nonnull Identifier identifier,
+                         @Nonnull OutputStream output,
+                         @Nonnull DownloadResponseInterceptor interceptor,
+                         @Nullable String type )
     {
         this.adapter = checkNotNull( adapter );
         this.adaptee = checkNotNull( adaptee );
@@ -86,18 +90,19 @@ class DownloadRequest
         this.resource = checkNotNull( resource );
         this.identifier = checkNotNull( identifier );
         this.output = checkNotNull( output );
+        this.interceptor = checkNotNull( interceptor );
         this.type = type;
         this.params = new HashMap<>();
     }
 
     @Override
-    public Void finish()
+    public Map<String, Object> finish()
     {
         return finish( null, withLocale );
     }
 
     @Override
-    public Void finish( @Nonnull RequestCredential credential )
+    public Map<String, Object> finish( @Nonnull RequestCredential credential )
     {
         checkNotNull( credential );
         credential.populate( this.params );
@@ -105,30 +110,30 @@ class DownloadRequest
     }
 
     @Override
-    public Void finish( @Nullable Map<String, Object> parameters )
+    public Map<String, Object> finish( @Nullable Map<String, Object> parameters )
     {
         return finish( parameters, withLocale );
     }
 
     @Override
-    public Void finish( @Nullable Locale locale )
+    public Map<String, Object> finish( @Nullable Locale locale )
     {
         return finish( null, locale );
     }
 
     @Override
-    public Void finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public Map<String, Object> finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
     {
         if ( parameters != null )
         {
             params.putAll( parameters );
         }
 
-        return adapter.executeDownload( downloader, adaptee, resource, identifier, output, type, params, locale );
+        return adapter.executeDownload( downloader, adaptee, resource, identifier, output, interceptor, type, params, locale );
     }
 
     @Override
-    public Request<Void> configWith( @Nonnull Properties properties )
+    public Request<Map<String, Object>> configWith( @Nonnull Properties properties )
     {
         checkNotNull( properties );
         RequestCredential.populate( properties, this.params );
@@ -136,14 +141,14 @@ class DownloadRequest
     }
 
     @Override
-    public Request<Void> forLang( @Nonnull Locale locale )
+    public Request<Map<String, Object>> forLang( @Nonnull Locale locale )
     {
         this.withLocale = checkNotNull( locale );
         return this;
     }
 
     @Override
-    public Request<Void> add( @Nonnull String name, @Nonnull Object value )
+    public Request<Map<String, Object>> add( @Nonnull String name, @Nonnull Object value )
     {
         checkNotNull( name );
         checkNotNull( value );
@@ -153,7 +158,7 @@ class DownloadRequest
     }
 
     @Override
-    public Request<Void> add( @Nonnull String name, @Nonnull String value )
+    public Request<Map<String, Object>> add( @Nonnull String name, @Nonnull String value )
     {
         checkNotNull( name );
         checkNotNull( value );
