@@ -24,7 +24,7 @@ package org.ctoolkit.restapi.client.agent.model;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class MigrationBatch
-        extends Batch<MigrationBatch.MigrationItem, ExportJobInfo>
+        extends Batch<MigrationBatch.MigrationItem, MigrationJobInfo>
 {
     private String source;
 
