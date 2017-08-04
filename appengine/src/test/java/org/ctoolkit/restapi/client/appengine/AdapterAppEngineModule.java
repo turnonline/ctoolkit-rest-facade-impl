@@ -132,6 +132,6 @@ public class AdapterAppEngineModule
     @Provides
     HttpServletRequest provideHttpServletRequest()
     {
-        throw new UnsupportedOperationException( "Not implemnted as not needed yet" );
+        throw new UnsupportedOperationException( "Not implemented as not needed yet" );
     }
 }

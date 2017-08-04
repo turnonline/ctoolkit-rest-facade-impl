@@ -20,6 +20,7 @@ package org.ctoolkit.restapi.client.googleapis;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpExecuteInterceptor;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponseInterceptor;
@@ -412,12 +413,11 @@ public abstract class GoogleApiProxyFactory
             // json file load right before usage
             InputStream json = getServiceAccountJsonStream( prefix );
 
-            googleCredential = new ConfiguredByJsonGoogleCredential( json )
+            googleCredential = new ConfiguredByJsonGoogleCredential( json, prefix )
                     .setTransport( getHttpTransport() )
                     .setJsonFactory( getJsonFactory() )
                     .setServiceAccountScopes( scopes )
                     .setServiceAccountUser( userAccount )
-                    .setRequestInitializer( newRequestConfig( prefix, null ) )
                     .build();
         }
         else
@@ -431,14 +431,13 @@ public abstract class GoogleApiProxyFactory
             // p12 file load right before usage
             URL resource = getServiceAccountPrivateKeyP12Resource( prefix );
 
-            googleCredential = new ConfiguredGoogleCredential()
+            googleCredential = new ConfiguredGoogleCredential( prefix )
                     .setTransport( getHttpTransport() )
                     .setJsonFactory( getJsonFactory() )
                     .setServiceAccountId( serviceAccountEmail )
                     .setServiceAccountScopes( scopes )
                     .setServiceAccountPrivateKeyFromP12File( new File( resource.getPath() ) )
                     .setServiceAccountUser( userAccount )
-                    .setRequestInitializer( newRequestConfig( prefix, null ) )
                     .build();
         }
 
@@ -526,6 +525,19 @@ public abstract class GoogleApiProxyFactory
         }
     }
 
+    /**
+     * Configure HTTP request right before execution.
+     *
+     * @param request         the HTTP request
+     * @param numberOfRetries the number of configured retries
+     * @param readTimeout     the request read timeout in milliseconds
+     */
+    protected final void configureHttpRequest( @Nonnull HttpRequest request, int numberOfRetries, int readTimeout )
+    {
+        request.setNumberOfRetries( numberOfRetries );
+        request.setReadTimeout( readTimeout );
+    }
+
     private class RequestConfig
             implements HttpRequestInitializer
     {
@@ -533,22 +545,32 @@ public abstract class GoogleApiProxyFactory
 
         private final int readTimeout;
 
-        private final HttpResponseInterceptor interceptor;
+        private final HttpResponseInterceptor responseInterceptor;
 
-        private RequestConfig( String prefix, HttpResponseInterceptor interceptor )
+        HttpExecuteInterceptor interceptor = new HttpExecuteInterceptor()
+        {
+            @Override
+            public void intercept( HttpRequest request ) throws IOException
+            {
+                eventBus.post( new BeforeRequestEvent( request ) );
+            }
+        };
+
+        private RequestConfig( String prefix, HttpResponseInterceptor responseInterceptor )
         {
             this.numberOfRetries = getNumberOfRetries( prefix );
             this.readTimeout = getReadTimeout( prefix );
-            this.interceptor = interceptor;
+            this.responseInterceptor = responseInterceptor;
         }
 
         public void initialize( HttpRequest request )
         {
-            request.setNumberOfRetries( numberOfRetries );
-            request.setReadTimeout( readTimeout );
-            if ( interceptor != null )
+            configureHttpRequest( request, numberOfRetries, readTimeout );
+            request.setInterceptor( interceptor );
+
+            if ( responseInterceptor != null )
             {
-                request.setResponseInterceptor( interceptor );
+                request.setResponseInterceptor( responseInterceptor );
             }
         }
     }
@@ -559,6 +581,16 @@ public abstract class GoogleApiProxyFactory
     private class ConfiguredGoogleCredential
             extends GoogleCredential.Builder
     {
+        private final int numberOfRetries;
+
+        private final int readTimeout;
+
+        private ConfiguredGoogleCredential( String prefix )
+        {
+            this.numberOfRetries = getNumberOfRetries( prefix );
+            this.readTimeout = getReadTimeout( prefix );
+        }
+
         @Override
         public GoogleCredential build()
         {
@@ -570,6 +602,13 @@ public abstract class GoogleApiProxyFactory
                     super.intercept( request );
                     eventBus.post( new BeforeRequestEvent( request ) );
                 }
+
+                @Override
+                public void initialize( HttpRequest request ) throws IOException
+                {
+                    super.initialize( request );
+                    configureHttpRequest( request, numberOfRetries, readTimeout );
+                }
             };
         }
     }
@@ -577,8 +616,9 @@ public abstract class GoogleApiProxyFactory
     private class ConfiguredByJsonGoogleCredential
             extends ConfiguredGoogleCredential
     {
-        public ConfiguredByJsonGoogleCredential( InputStream jsonStream ) throws IOException
+        public ConfiguredByJsonGoogleCredential( InputStream jsonStream, String prefix ) throws IOException
         {
+            super( prefix );
             JsonObjectParser parser = new JsonObjectParser( GoogleApiProxyFactory.this.getJsonFactory() );
             GenericJson fileContents = parser.parseAndClose( jsonStream, Charsets.UTF_8, GenericJson.class );
 

@@ -61,28 +61,11 @@ class GoogleApiProxyFactoryAppEngine
     {
         if ( super.isCredentialOn( prefix ) )
         {
-            // for local development (outside of the AppEngine) call standard authorization
             return super.authorize( scopes, userAccount, prefix );
         }
         else
         {
-            AppIdentityCredential credential = new AppIdentityCredential( scopes )
-            {
-                @Override
-                public void intercept( HttpRequest request ) throws IOException
-                {
-                    super.intercept( request );
-                    eventBus.post( new BeforeRequestEvent( request ) );
-                }
-
-                @Override
-                public void initialize( HttpRequest request ) throws IOException
-                {
-                    super.initialize( request );
-                    request.setNumberOfRetries( getNumberOfRetries( prefix ) );
-                }
-            };
-            return new AppIdentityCredentialApiToken( credential );
+            return new AppIdentityCredentialApiToken( new ConfiguredAppIdentityCredential( scopes, prefix ) );
         }
     }
 
@@ -90,5 +73,34 @@ class GoogleApiProxyFactoryAppEngine
     {
         @com.google.inject.Inject( optional = true )
         AuthKeyProvider keyProvider = null;
+    }
+
+    private class ConfiguredAppIdentityCredential
+            extends AppIdentityCredential
+    {
+        private final int numberOfRetries;
+
+        private final int readTimeout;
+
+        ConfiguredAppIdentityCredential( Collection<String> scopes, String prefix )
+        {
+            super( scopes );
+            this.numberOfRetries = getNumberOfRetries( prefix );
+            this.readTimeout = getReadTimeout( prefix );
+        }
+
+        @Override
+        public void intercept( HttpRequest request ) throws IOException
+        {
+            super.intercept( request );
+            eventBus.post( new BeforeRequestEvent( request ) );
+        }
+
+        @Override
+        public void initialize( HttpRequest request ) throws IOException
+        {
+            super.initialize( request );
+            configureHttpRequest( request, numberOfRetries, readTimeout );
+        }
     }
 }

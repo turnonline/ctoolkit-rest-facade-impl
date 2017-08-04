@@ -20,6 +20,7 @@ package org.ctoolkit.restapi.client.appengine.adapter;
 
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
+import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
 
@@ -37,7 +38,7 @@ import java.util.Map;
  */
 public class FooGetAdaptee
         extends AbstractGoogleClientAdaptee<FakeClient>
-        implements DownloadExecutorAdaptee<RemoteFoo>
+        implements GetExecutorAdaptee<RemoteFoo>, DownloadExecutorAdaptee<RemoteFoo>
 {
     @Inject
     public FooGetAdaptee( FakeClient client )
