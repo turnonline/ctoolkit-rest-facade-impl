@@ -19,6 +19,7 @@
 package org.ctoolkit.restapi.client.identity;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
+import com.google.common.net.HttpHeaders;
 import org.ctoolkit.restapi.client.TokenVerifier;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 
@@ -117,7 +118,7 @@ public class IdentityTokenResolver
 
         if ( cookies == null )
         {
-            return null;
+            return httpRequest.getHeader( HttpHeaders.AUTHORIZATION );
         }
 
         String token = null;
@@ -129,6 +130,11 @@ public class IdentityTokenResolver
                 token = cookie.getValue();
                 break;
             }
+        }
+
+        if ( token == null )
+        {
+            return httpRequest.getHeader( HttpHeaders.AUTHORIZATION );
         }
 
         return token;
