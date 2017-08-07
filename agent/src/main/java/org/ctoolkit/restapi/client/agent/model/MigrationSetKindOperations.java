@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -76,6 +77,73 @@ public class MigrationSetKindOperations
         all.addAll( getRemove() );
 
         return all;
+    }
+
+    public void addOperationAdd( String kind, String property )
+    {
+        MigrationSetKindOperationAdd op = new MigrationSetKindOperationAdd();
+        op.setKind( kind );
+        op.setProperty( property );
+        getAdd().add( op );
+    }
+
+    public void addOperationChange( String kind, String property )
+    {
+        removeOperationChange( kind, property );
+
+        MigrationSetKindOperationChange op = new MigrationSetKindOperationChange();
+        op.setKind( kind );
+        op.setProperty( property );
+        getChange().add( op );
+    }
+
+    public void addOperationRemove( String kind, String property )
+    {
+        removeOperationRemove( kind, property );
+
+        MigrationSetKindOperationRemove op = new MigrationSetKindOperationRemove();
+        op.setKind( kind );
+        op.setProperty( property );
+        getRemove().add( op );
+    }
+
+    public void removeOperationAdd( String kind, String property )
+    {
+        Iterator<MigrationSetKindOperationAdd> it = getAdd().iterator();
+        while ( it.hasNext() )
+        {
+            MigrationSetKindOperationAdd op = it.next();
+            if ( kind.equals( op.getKind() ) && property.equals( op.getProperty() ) )
+            {
+                it.remove();
+            }
+        }
+    }
+
+    public void removeOperationChange( String kind, String property )
+    {
+        Iterator<MigrationSetKindOperationChange> it = getChange().iterator();
+        while ( it.hasNext() )
+        {
+            MigrationSetKindOperationChange op = it.next();
+            if ( kind.equals( op.getKind() ) && property.equals( op.getProperty() ) )
+            {
+                it.remove();
+            }
+        }
+    }
+
+    public void removeOperationRemove( String kind, String property )
+    {
+        Iterator<MigrationSetKindOperationRemove> it = getRemove().iterator();
+        while ( it.hasNext() )
+        {
+            MigrationSetKindOperationRemove op = it.next();
+            if ( kind.equals( op.getKind() ) && property.equals( op.getProperty() ) )
+            {
+                it.remove();
+            }
+        }
     }
 
     @Override
