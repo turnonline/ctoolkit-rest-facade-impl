@@ -3,6 +3,7 @@ package org.ctoolkit.restapi.client.agent.model;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -68,6 +69,7 @@ public class MigrationSetKindOperations
         this.remove = remove;
     }
 
+    @XmlTransient
     public List<MigrationSetKindOperation> getAll()
     {
         List<MigrationSetKindOperation> all = new ArrayList<MigrationSetKindOperation>();
@@ -79,21 +81,23 @@ public class MigrationSetKindOperations
         return all;
     }
 
-    public void addOperationAdd( String kind, String property )
+    public void addOperationAdd( String kind )
     {
         MigrationSetKindOperationAdd op = new MigrationSetKindOperationAdd();
         op.setKind( kind );
-        op.setProperty( property );
+        op.setNewType( ChangeSetEntityProperty.PROPERTY_TYPE_STRING );
         getAdd().add( op );
     }
 
-    public void addOperationChange( String kind, String property )
+    public void addOperationChange( String kind, String type, String property )
     {
         removeOperationChange( kind, property );
 
         MigrationSetKindOperationChange op = new MigrationSetKindOperationChange();
         op.setKind( kind );
         op.setProperty( property );
+        op.setNewType( type );
+        op.setNewName( property );
         getChange().add( op );
     }
 
@@ -105,19 +109,6 @@ public class MigrationSetKindOperations
         op.setKind( kind );
         op.setProperty( property );
         getRemove().add( op );
-    }
-
-    public void removeOperationAdd( String kind, String property )
-    {
-        Iterator<MigrationSetKindOperationAdd> it = getAdd().iterator();
-        while ( it.hasNext() )
-        {
-            MigrationSetKindOperationAdd op = it.next();
-            if ( kind.equals( op.getKind() ) && property.equals( op.getProperty() ) )
-            {
-                it.remove();
-            }
-        }
     }
 
     public void removeOperationChange( String kind, String property )
