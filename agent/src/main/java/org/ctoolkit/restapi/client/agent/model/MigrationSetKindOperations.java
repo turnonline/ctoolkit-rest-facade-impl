@@ -3,7 +3,6 @@ package org.ctoolkit.restapi.client.agent.model;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -69,38 +68,6 @@ public class MigrationSetKindOperations
         this.remove = remove;
     }
 
-    @XmlTransient
-    public List<MigrationSetKindOperation> getAll()
-    {
-        List<MigrationSetKindOperation> all = new ArrayList<MigrationSetKindOperation>();
-
-        all.addAll( getAdd() );
-        all.addAll( getChange() );
-        all.addAll( getRemove() );
-
-        return all;
-    }
-
-    public void addOperationAdd( String kind )
-    {
-        MigrationSetKindOperationAdd op = new MigrationSetKindOperationAdd();
-        op.setKind( kind );
-        op.setNewType( ChangeSetEntityProperty.PROPERTY_TYPE_STRING );
-        getAdd().add( op );
-    }
-
-    public void addOperationChange( String kind, String type, String property )
-    {
-        removeOperationChange( kind, property );
-
-        MigrationSetKindOperationChange op = new MigrationSetKindOperationChange();
-        op.setKind( kind );
-        op.setProperty( property );
-        op.setNewType( type );
-        op.setNewName( property );
-        getChange().add( op );
-    }
-
     public void addOperationRemove( String kind, String property )
     {
         removeOperationRemove( kind, property );
@@ -109,19 +76,6 @@ public class MigrationSetKindOperations
         op.setKind( kind );
         op.setProperty( property );
         getRemove().add( op );
-    }
-
-    public void removeOperationChange( String kind, String property )
-    {
-        Iterator<MigrationSetKindOperationChange> it = getChange().iterator();
-        while ( it.hasNext() )
-        {
-            MigrationSetKindOperationChange op = it.next();
-            if ( kind.equals( op.getKind() ) && property.equals( op.getProperty() ) )
-            {
-                it.remove();
-            }
-        }
     }
 
     public void removeOperationRemove( String kind, String property )
