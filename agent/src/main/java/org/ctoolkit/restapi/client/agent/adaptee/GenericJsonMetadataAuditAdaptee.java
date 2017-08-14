@@ -72,7 +72,7 @@ public class GenericJsonMetadataAuditAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( CustomizedCtoolkitAgent.Audit.List ) request ).execute( credential ).getItems();
     }
 }

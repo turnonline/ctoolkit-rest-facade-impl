@@ -70,7 +70,7 @@ public class GenericJsonPropertyMetaDataAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( CustomizedCtoolkitAgent.Metadata.Kind.Property.List ) request ).execute( credential ).getItems();
     }
 }

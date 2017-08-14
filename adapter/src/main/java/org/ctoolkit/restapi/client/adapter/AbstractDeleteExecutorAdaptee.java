@@ -31,6 +31,6 @@ public abstract class AbstractDeleteExecutorAdaptee<C, M>
                                @Nullable Locale locale )
             throws IOException
     {
-        execute( request, parameters, locale );
+        execute( request, parameters );
     }
 }

@@ -79,7 +79,7 @@ public class GenericJsonMigrationItemAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( CustomizedCtoolkitAgent.MigrationBatch.Item.Get ) request ).execute( credential );
     }
 
@@ -106,7 +106,7 @@ public class GenericJsonMigrationItemAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( CustomizedCtoolkitAgent.MigrationBatch.Item.Insert ) request ).execute( credential );
     }
 
@@ -136,7 +136,7 @@ public class GenericJsonMigrationItemAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( CustomizedCtoolkitAgent.MigrationBatch.Item.Update ) request ).execute( credential );
     }
 

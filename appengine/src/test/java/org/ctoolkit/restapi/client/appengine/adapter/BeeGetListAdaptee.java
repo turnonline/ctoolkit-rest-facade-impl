@@ -23,6 +23,7 @@ import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteBee;
+import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteRequest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -50,7 +51,7 @@ public class BeeGetListAdaptee
     public Object prepareGet( @Nonnull Identifier identifier )
             throws IOException
     {
-        return new FakeClient();
+        return new RemoteRequest();
     }
 
     @Override
@@ -66,7 +67,7 @@ public class BeeGetListAdaptee
     public Object prepareList( @Nullable Identifier parentKey )
             throws IOException
     {
-        return new FakeClient();
+        return new RemoteRequest();
     }
 
     @Override

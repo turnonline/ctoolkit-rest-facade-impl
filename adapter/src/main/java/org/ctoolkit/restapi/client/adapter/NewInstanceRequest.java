@@ -53,6 +53,8 @@ class NewInstanceRequest<T>
 
     private Locale withLocale;
 
+    private GoogleRequestHeadersFiller filler;
+
     NewInstanceRequest( @Nonnull Class<T> resource,
                         @Nonnull RestFacadeAdapter adapter,
                         @Nonnull NewExecutorAdaptee adaptee,
@@ -63,6 +65,7 @@ class NewInstanceRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = remoteRequest;
         this.params = new HashMap<>();
+        this.filler = new GoogleRequestHeadersFiller( remoteRequest );
     }
 
     @Override
@@ -117,6 +120,7 @@ class NewInstanceRequest<T>
             params.putAll( parameters );
         }
 
+        filler.acceptLanguage( locale );
         return adapter.callbackNewInstance( adaptee, remoteRequest, resource, params, locale );
     }
 
@@ -152,6 +156,25 @@ class NewInstanceRequest<T>
         checkNotNull( value );
 
         params.put( name, value );
+        return this;
+    }
+
+    @Override
+    public Request<T> addHeader( @Nonnull String header, @Nonnull String value )
+    {
+        checkNotNull( header );
+        checkNotNull( value );
+
+        filler.addHeader( header, value );
+        return this;
+    }
+
+    @Override
+    public Request<T> authBy( @Nonnull String authorization )
+    {
+        checkNotNull( authorization );
+
+        filler.authorization( authorization );
         return this;
     }
 

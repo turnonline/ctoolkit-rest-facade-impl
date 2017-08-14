@@ -19,6 +19,7 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
+import com.google.api.client.http.HttpHeaders;
 import org.ctoolkit.restapi.client.DownloadRequest;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.Request;
@@ -57,11 +58,11 @@ class DownloadRequestImpl
 
     private final DownloadResponseInterceptor interceptor;
 
-    private final String type;
-
     private Map<String, Object> params;
 
     private Locale withLocale;
+
+    private GoogleRequestHeadersFiller filler;
 
     /**
      * Constructor.
@@ -91,8 +92,9 @@ class DownloadRequestImpl
         this.identifier = checkNotNull( identifier );
         this.output = checkNotNull( output );
         this.interceptor = checkNotNull( interceptor );
-        this.type = type;
         this.params = new HashMap<>();
+        this.filler = new GoogleRequestHeadersFiller( new HttpHeaders() );
+        this.filler.contentType( type );
     }
 
     @Override
@@ -129,7 +131,12 @@ class DownloadRequestImpl
             params.putAll( parameters );
         }
 
-        return adapter.executeDownload( downloader, adaptee, resource, identifier, output, interceptor, type, params, locale );
+        filler.acceptLanguage( locale );
+        filler.fillInCredential( params );
+        HttpHeaders headers = filler.getHeaders();
+
+        return adapter.executeDownload( downloader, adaptee, resource, identifier, output, interceptor,
+                headers, params, locale );
     }
 
     @Override
@@ -164,6 +171,25 @@ class DownloadRequestImpl
         checkNotNull( value );
 
         params.put( name, value );
+        return this;
+    }
+
+    @Override
+    public Request<Map<String, Object>> addHeader( @Nonnull String header, @Nonnull String value )
+    {
+        checkNotNull( header );
+        checkNotNull( value );
+
+        filler.addHeader( header, value );
+        return this;
+    }
+
+    @Override
+    public Request<Map<String, Object>> authBy( @Nonnull String authorization )
+    {
+        checkNotNull( authorization );
+
+        filler.authorization( authorization );
         return this;
     }
 }

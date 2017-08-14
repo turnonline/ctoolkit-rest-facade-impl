@@ -64,7 +64,7 @@ public class ModifyAckDeadlineAdaptee
                                  @Nullable Locale locale )
             throws IOException
     {
-        execute( request, parameters, locale );
+        execute( request, parameters );
         // means if successful, the response body will be empty
         return null;
     }

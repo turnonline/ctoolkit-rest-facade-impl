@@ -67,7 +67,7 @@ public class SubscriptionAdaptee
                                     @Nullable Locale locale )
             throws IOException
     {
-        return Subscription.class.cast( execute( request, parameters, locale ) );
+        return Subscription.class.cast( execute( request, parameters ) );
     }
 
     @Override
@@ -100,7 +100,7 @@ public class SubscriptionAdaptee
             list.setPageSize( length );
         }
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return list.execute().getSubscriptions();
     }
 
@@ -128,7 +128,7 @@ public class SubscriptionAdaptee
                                  @Nullable Locale locale )
             throws IOException
     {
-        return execute( request, parameters, locale );
+        return execute( request, parameters );
     }
 
     @Override
@@ -144,6 +144,6 @@ public class SubscriptionAdaptee
                                @Nullable Locale locale )
             throws IOException
     {
-        execute( request, parameters, locale );
+        execute( request, parameters );
     }
 }

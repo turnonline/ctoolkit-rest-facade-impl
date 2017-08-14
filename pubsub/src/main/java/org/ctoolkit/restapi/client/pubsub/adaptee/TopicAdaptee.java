@@ -68,7 +68,7 @@ public class TopicAdaptee
                              @Nullable Locale locale )
             throws IOException
     {
-        return Topic.class.cast( execute( request, parameters, locale ) );
+        return Topic.class.cast( execute( request, parameters ) );
     }
 
     @Override
@@ -102,7 +102,7 @@ public class TopicAdaptee
             list.setPageSize( length );
         }
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return list.execute().getTopics();
     }
 
@@ -129,7 +129,7 @@ public class TopicAdaptee
                                  @Nullable Locale locale )
             throws IOException
     {
-        return execute( request, parameters, locale );
+        return execute( request, parameters );
     }
 
     @Override
@@ -144,6 +144,6 @@ public class TopicAdaptee
                                @Nullable Locale locale )
             throws IOException
     {
-        execute( request, parameters, locale );
+        execute( request, parameters );
     }
 }

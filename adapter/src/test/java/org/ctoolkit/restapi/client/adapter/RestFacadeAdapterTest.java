@@ -32,7 +32,6 @@ import mockit.Tested;
 import mockit.Verifications;
 import org.ctoolkit.restapi.client.DownloadRequest;
 import org.ctoolkit.restapi.client.Identifier;
-import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
@@ -414,34 +413,19 @@ public class RestFacadeAdapterTest
         final HttpHeaders headers = new HttpHeaders();
         final Map<String, Object> params = new HashMap<>();
 
-        //noinspection MismatchedQueryAndUpdateOfCollection
-        RequestCredential credential = new RequestCredential();
-        credential.setApiKey( "SecretABC" );
-        credential.populate( params );
+        headers.setContentType( type );
 
         new Expectations( tested )
         {
             {
                 adaptee.prepareDownloadUrl( id, type, params, locale );
                 result = url;
-
-                tested.createHttpHeaders();
-                result = headers;
             }
         };
 
         final ByteArrayOutputStream content = new ByteArrayOutputStream();
         Class<ResourceNoMapping> resource = ResourceNoMapping.class;
-        tested.executeDownload( downloader, adaptee, resource, id, content, interceptor, type, params, locale );
-
-        String languageTag = ( String ) headers.get( com.google.common.net.HttpHeaders.ACCEPT_LANGUAGE );
-        assertEquals( languageTag, "de-DE", "Accept Language" );
-
-        String contentType = headers.getContentType();
-        assertEquals( contentType, type, "Content Type" );
-
-        String authorization = headers.getAuthorization();
-        assertEquals( authorization, "SecretABC", "Authorization" );
+        tested.executeDownload( downloader, adaptee, resource, id, content, interceptor, headers, params, locale );
 
         new Verifications()
         {
@@ -454,9 +438,7 @@ public class RestFacadeAdapterTest
 
     @Test
     public void prepareDownloadRequestRootIdentifier( @Mocked final DownloadRequestImpl request,
-                                                      @Mocked final OutputStream output,
-                                                      @Mocked final MediaHttpDownloader downloader,
-                                                      @Mocked final DownloadExecutorAdaptee adaptee )
+                                                      @Mocked final OutputStream output )
     {
         final Identifier identifier = new Identifier( 1L, 99L ).leaf();
         tested.prepareDownloadRequest( ResourceNoMapping.class, identifier, output, null );
@@ -548,7 +530,8 @@ public class RestFacadeAdapterTest
     }
 
     @Test
-    public void listRequestRootIdentifier( @Mocked final ListExecutorAdaptee adaptee )
+    public void listRequestRootIdentifier( @Mocked final ListExecutorAdaptee adaptee,
+                                           @Mocked final RemoteRequest remoteRequest )
             throws IOException
     {
         final Identifier identifier = new Identifier( 1L, 99L ).leaf();
@@ -556,7 +539,7 @@ public class RestFacadeAdapterTest
         {
             {
                 adaptee.prepareList( ( Identifier ) any );
-                result = new Object();
+                result = remoteRequest;
             }
         };
 
@@ -574,7 +557,8 @@ public class RestFacadeAdapterTest
 
     @Test
     public void internalInsertRequestRootIdentifier( @Mocked final ResourceNoMapping resource,
-                                                     @Mocked final InsertExecutorAdaptee adaptee )
+                                                     @Mocked final InsertExecutorAdaptee adaptee,
+                                                     @Mocked final RemoteRequest remoteRequest )
             throws IOException
     {
         final Identifier identifier = new Identifier( 1L, 99L ).leaf();
@@ -582,7 +566,7 @@ public class RestFacadeAdapterTest
         {
             {
                 adaptee.prepareInsert( any, null, null );
-                result = new Object();
+                result = remoteRequest;
             }
         };
 
@@ -600,7 +584,8 @@ public class RestFacadeAdapterTest
 
     @Test
     public void internalUpdateRequestRootIdentifier( @Mocked final ResourceNoMapping resource,
-                                                     @Mocked final UpdateExecutorAdaptee adaptee )
+                                                     @Mocked final UpdateExecutorAdaptee adaptee,
+                                                     @Mocked final RemoteRequest remoteRequest )
             throws IOException
     {
         final Identifier identifier = new Identifier( 1L, 99L ).leaf();
@@ -608,7 +593,7 @@ public class RestFacadeAdapterTest
         {
             {
                 adaptee.prepareUpdate( any, ( Identifier ) any, null );
-                result = new Object();
+                result = remoteRequest;
             }
         };
 
@@ -625,7 +610,8 @@ public class RestFacadeAdapterTest
     }
 
     @Test
-    public void internalDeleteRequestRootIdentifier( @Mocked final DeleteExecutorAdaptee adaptee )
+    public void internalDeleteRequestRootIdentifier( @Mocked final DeleteExecutorAdaptee adaptee,
+                                                     @Mocked final RemoteRequest remoteRequest )
             throws IOException
     {
         final Identifier identifier = new Identifier( 1L, 99L ).leaf();
@@ -633,7 +619,7 @@ public class RestFacadeAdapterTest
         {
             {
                 adaptee.prepareDelete( ( Identifier ) any );
-                result = new Object();
+                result = remoteRequest;
             }
         };
 

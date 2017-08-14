@@ -73,6 +73,6 @@ public class TopicMessageAdaptee
                                  @Nullable Locale locale )
             throws IOException
     {
-        return PublishResponse.class.cast( execute( request, parameters, locale ) );
+        return PublishResponse.class.cast( execute( request, parameters ) );
     }
 }

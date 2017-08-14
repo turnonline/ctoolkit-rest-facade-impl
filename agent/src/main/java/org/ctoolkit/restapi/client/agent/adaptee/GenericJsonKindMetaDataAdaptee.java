@@ -69,7 +69,7 @@ public class GenericJsonKindMetaDataAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( CustomizedCtoolkitAgent.Metadata.Kind.List ) request ).execute( credential ).getItems();
     }
 }

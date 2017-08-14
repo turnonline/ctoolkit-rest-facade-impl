@@ -20,13 +20,11 @@ package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest;
 import com.google.api.client.http.AbstractInputStreamContent;
-import com.google.api.client.http.HttpHeaders;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.Locale;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -52,48 +50,21 @@ public class AbstractGoogleClientAdaptee<C>
     }
 
     /**
-     * Accept optional language.
+     * Fill request with optional resource parameters added as URL query parameters.
      *
-     * @param request the Google API client request
-     * @param locale  the optional locale to be set
+     * @param remoteRequest the Google API client request
+     * @param parameters    the optional resource parameters
      */
-    protected final void acceptLanguage( @Nonnull Object request, @Nullable Locale locale )
+    protected void fill( @Nonnull Object remoteRequest,
+                         @Nullable Map<String, Object> parameters )
     {
-        checkNotNull( request );
-        acceptLanguage( ( ( AbstractGoogleJsonClientRequest ) request ).getRequestHeaders(), locale );
-    }
+        checkNotNull( remoteRequest );
 
-    /**
-     * Accept optional language.
-     *
-     * @param headers the Google API client HTTP headers
-     * @param locale  the optional locale to be set
-     */
-    private void acceptLanguage( @Nonnull HttpHeaders headers, @Nullable Locale locale )
-    {
-        checkNotNull( headers );
+        AbstractGoogleJsonClientRequest request = ( AbstractGoogleJsonClientRequest ) remoteRequest;
 
-        if ( locale != null )
+        if ( parameters != null )
         {
-            String languageTag = new java.util.Locale( locale.getLanguage(), locale.getCountry() ).toLanguageTag();
-            headers.put( com.google.common.net.HttpHeaders.ACCEPT_LANGUAGE, languageTag );
-        }
-    }
-
-    /**
-     * Fill optional resource parameters or criteria.
-     *
-     * @param request  the Google API client request
-     * @param criteria the optional resource parameters
-     */
-    private void fillCriteria( @Nonnull AbstractGoogleJsonClientRequest request,
-                               @Nullable Map<String, Object> criteria )
-    {
-        checkNotNull( request );
-
-        if ( criteria != null )
-        {
-            for ( Map.Entry<String, Object> entrySet : criteria.entrySet() )
+            for ( Map.Entry<String, Object> entrySet : parameters.entrySet() )
             {
                 Object value = entrySet.getValue();
                 if ( value instanceof Enum )
@@ -103,23 +74,6 @@ public class AbstractGoogleClientAdaptee<C>
                 request.set( entrySet.getKey(), value );
             }
         }
-    }
-
-    /**
-     * Fill {@link #fillCriteria(AbstractGoogleJsonClientRequest, Map)} and {@link #acceptLanguage(HttpHeaders, Locale)}
-     *
-     * @param request    the Google API client request
-     * @param parameters the optional resource parameters
-     * @param locale     the optional locale to be set
-     */
-    protected void fill( @Nonnull Object request,
-                         @Nullable Map<String, Object> parameters,
-                         @Nullable Locale locale )
-    {
-        checkNotNull( request );
-
-        fillCriteria( ( AbstractGoogleJsonClientRequest ) request, parameters );
-        acceptLanguage( request, locale );
     }
 
     protected final AbstractInputStreamContent media( @Nullable MediaProvider provider )
@@ -133,22 +87,20 @@ public class AbstractGoogleClientAdaptee<C>
     }
 
     /**
-     * Fills request parameters and locale and then executes a remote call.
+     * Fill request with optional resource parameters and execute a remote call.
      *
      * @param request    the Google API client request
-     * @param parameters the optional resource parameters
-     * @param locale     the optional locale to be set
+     * @param parameters the optional resource (query) parameters
      * @return the response of the remote call
      * @throws IOException might be thrown during remote call execution
      */
     public Object execute( @Nonnull Object request,
-                           @Nullable Map<String, Object> parameters,
-                           @Nullable Locale locale )
+                           @Nullable Map<String, Object> parameters )
             throws IOException
     {
         checkNotNull( request );
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( AbstractGoogleJsonClientRequest ) request ).execute();
     }
 }

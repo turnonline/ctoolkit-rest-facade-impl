@@ -32,6 +32,6 @@ public abstract class AbstractGetExecutorAdaptee<C, M>
                          @Nullable Locale locale )
             throws IOException
     {
-        return ( M ) execute( request, parameters, locale );
+        return ( M ) execute( request, parameters );
     }
 }

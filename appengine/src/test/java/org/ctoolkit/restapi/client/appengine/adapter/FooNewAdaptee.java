@@ -21,6 +21,7 @@ package org.ctoolkit.restapi.client.appengine.adapter;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
+import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteRequest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -46,7 +47,7 @@ public class FooNewAdaptee
     public Object prepareNew( @Nullable String type )
             throws IOException
     {
-        return new FakeClient();
+        return new RemoteRequest();
     }
 
     @Override

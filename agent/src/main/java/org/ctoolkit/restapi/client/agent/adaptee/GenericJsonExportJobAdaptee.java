@@ -75,7 +75,7 @@ public class GenericJsonExportJobAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( CustomizedCtoolkitAgent.ExportBatch.Job.Progress ) request ).execute( credential );
     }
 
@@ -102,7 +102,7 @@ public class GenericJsonExportJobAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( CustomizedCtoolkitAgent.ExportBatch.Job.Start ) request ).execute( credential );
     }
 

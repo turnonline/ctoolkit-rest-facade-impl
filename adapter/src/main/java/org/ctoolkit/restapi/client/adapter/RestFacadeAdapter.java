@@ -24,8 +24,6 @@ import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpStatusCodes;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -134,7 +132,7 @@ public class RestFacadeAdapter
      * @param identifier  the unique identifier of content to download
      * @param output      the output stream where desired content will be downloaded to.
      * @param interceptor the response interceptor
-     * @param type        the content type or {@code null} to expect default
+     * @param headers     the HTTP request headers
      * @param params      the optional resource params
      * @param locale      the language the client has configured to prefer in results if applicable
      * @return Void
@@ -145,7 +143,7 @@ public class RestFacadeAdapter
                                          @Nonnull Identifier identifier,
                                          @Nonnull OutputStream output,
                                          @Nonnull DownloadResponseInterceptor interceptor,
-                                         @Nullable String type,
+                                         @Nullable HttpHeaders headers,
                                          @Nullable Map<String, Object> params,
                                          @Nullable Locale locale )
     {
@@ -159,39 +157,13 @@ public class RestFacadeAdapter
         //noinspection MismatchedQueryAndUpdateOfCollection
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( params, false );
+        String type = headers == null ? null : headers.getContentType();
 
         URL path = adaptee.prepareDownloadUrl( identifier.root(), type, params, locale );
         if ( path == null )
         {
             String msg = "URL to download a resource content cannot be null. Identifier: ";
             throw new IllegalArgumentException( msg + identifier + " Resource: " + resource.getName() );
-        }
-
-        HttpHeaders headers = null;
-        if ( locale != null )
-        {
-            headers = createHttpHeaders();
-            String languageTag = new java.util.Locale( locale.getLanguage(), locale.getCountry() ).toLanguageTag();
-            headers.put( com.google.common.net.HttpHeaders.ACCEPT_LANGUAGE, languageTag );
-        }
-
-        if ( !Strings.isNullOrEmpty( type ) )
-        {
-            if ( headers == null )
-            {
-                headers = createHttpHeaders();
-            }
-            headers.setContentType( type );
-        }
-
-        String apiKey = credential.getApiKey();
-        if ( !Strings.isNullOrEmpty( apiKey ) )
-        {
-            if ( headers == null )
-            {
-                headers = createHttpHeaders();
-            }
-            headers.setAuthorization( apiKey );
         }
 
         try
@@ -204,12 +176,6 @@ public class RestFacadeAdapter
             throw prepareUpdateException( e, resource, identifier );
         }
         return interceptor.getHeaders();
-    }
-
-    @VisibleForTesting
-    HttpHeaders createHttpHeaders()
-    {
-        return new HttpHeaders();
     }
 
     /**

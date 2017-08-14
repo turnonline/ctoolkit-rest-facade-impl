@@ -54,6 +54,8 @@ class UpdateRequest<T>
 
     private Locale withLocale;
 
+    private GoogleRequestHeadersFiller filler;
+
     UpdateRequest( @Nonnull Class<T> resource,
                    @Nonnull Object identifier,
                    @Nonnull RestFacadeAdapter adapter,
@@ -66,6 +68,7 @@ class UpdateRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
         this.params = new HashMap<>();
+        this.filler = new GoogleRequestHeadersFiller( remoteRequest );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -109,6 +112,7 @@ class UpdateRequest<T>
             params.putAll( parameters );
         }
 
+        filler.acceptLanguage( locale );
         return adapter.callbackExecuteUpdate( adaptee, remoteRequest, resource, identifier, params, locale );
     }
 
@@ -144,6 +148,25 @@ class UpdateRequest<T>
         checkNotNull( value );
 
         params.put( name, value );
+        return this;
+    }
+
+    @Override
+    public Request<T> addHeader( @Nonnull String header, @Nonnull String value )
+    {
+        checkNotNull( header );
+        checkNotNull( value );
+
+        filler.addHeader( header, value );
+        return this;
+    }
+
+    @Override
+    public Request<T> authBy( @Nonnull String authorization )
+    {
+        checkNotNull( authorization );
+
+        filler.authorization( authorization );
         return this;
     }
 

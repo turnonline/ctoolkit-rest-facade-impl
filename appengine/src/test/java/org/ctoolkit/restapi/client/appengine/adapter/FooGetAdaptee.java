@@ -23,6 +23,7 @@ import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
+import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteRequest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -50,7 +51,7 @@ public class FooGetAdaptee
     public Object prepareGet( @Nonnull Identifier identifier )
             throws IOException
     {
-        return new FakeClient();
+        return new RemoteRequest();
     }
 
     @Override

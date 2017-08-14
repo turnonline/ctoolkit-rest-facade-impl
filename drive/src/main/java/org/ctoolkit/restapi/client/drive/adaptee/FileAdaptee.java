@@ -78,7 +78,7 @@ public class FileAdaptee
                                  @Nullable Locale locale )
             throws IOException
     {
-        return execute( request, parameters, locale );
+        return execute( request, parameters );
     }
 
     @Override
@@ -95,7 +95,7 @@ public class FileAdaptee
                                @Nullable Locale locale )
             throws IOException
     {
-        execute( request, parameters, locale );
+        execute( request, parameters );
     }
 
     @Override

@@ -64,7 +64,7 @@ public class PolicyAdaptee
                               @Nullable Locale locale )
             throws IOException
     {
-        return Policy.class.cast( execute( request, parameters, locale ) );
+        return Policy.class.cast( execute( request, parameters ) );
     }
 
     @Override
@@ -93,6 +93,6 @@ public class PolicyAdaptee
                                  @Nullable Locale locale )
             throws IOException
     {
-        return execute( request, parameters, locale );
+        return execute( request, parameters );
     }
 }

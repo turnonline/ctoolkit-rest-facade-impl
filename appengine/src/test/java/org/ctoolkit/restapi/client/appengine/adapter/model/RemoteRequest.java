@@ -16,11 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.restapi.client.adapter;
+package org.ctoolkit.restapi.client.appengine.adapter.model;
 
-import com.google.api.client.googleapis.services.AbstractGoogleClient;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
-import com.google.api.client.http.HttpContent;
+import com.google.api.client.googleapis.testing.services.MockGoogleClient;
+import com.google.api.client.http.BasicAuthentication;
+import com.google.api.client.http.UrlEncodedParser;
+import com.google.api.client.testing.http.MockHttpTransport;
 
 /**
  * The fake request for testing purpose.
@@ -30,12 +32,10 @@ import com.google.api.client.http.HttpContent;
 public class RemoteRequest
         extends AbstractGoogleClientRequest
 {
-    protected RemoteRequest( AbstractGoogleClient abstractGoogleClient,
-                             String requestMethod,
-                             String uriTemplate,
-                             HttpContent httpContent,
-                             Class responseClass )
+    public RemoteRequest()
     {
-        super( abstractGoogleClient, requestMethod, uriTemplate, httpContent, responseClass );
+        super( new MockGoogleClient.Builder( new MockHttpTransport(), "", "", new UrlEncodedParser(),
+                        new BasicAuthentication( "", "" ) ).build(), "", "",
+                null, RemoteRequest.class );
     }
 }

@@ -79,7 +79,7 @@ public class GenericJsonImportBatchAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( CustomizedCtoolkitAgent.ImportBatch.Get ) request ).execute( credential );
     }
 
@@ -104,7 +104,7 @@ public class GenericJsonImportBatchAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( CustomizedCtoolkitAgent.ImportBatch.Insert ) request ).execute( credential );
     }
 
@@ -131,7 +131,7 @@ public class GenericJsonImportBatchAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( CustomizedCtoolkitAgent.ImportBatch.Update ) request ).execute( credential );
     }
 
@@ -179,7 +179,7 @@ public class GenericJsonImportBatchAdaptee
         credential.fillInFrom( parameters, true );
 
 
-        fill( request, parameters, locale );
+        fill( request, parameters );
         return ( ( CustomizedCtoolkitAgent.ImportBatch.List ) request ).execute( credential ).getItems();
     }
 }
