@@ -41,7 +41,14 @@ public class GoogleRequestHeadersFiller
 
     public GoogleRequestHeadersFiller( Object remoteRequest )
     {
-        this.headers = ( ( AbstractGoogleClientRequest ) remoteRequest ).getRequestHeaders();
+        if ( remoteRequest instanceof AbstractGoogleClientRequest )
+        {
+            this.headers = ( ( AbstractGoogleClientRequest ) remoteRequest ).getRequestHeaders();
+        }
+        else
+        {
+            this.headers = new HttpHeaders();
+        }
     }
 
     public GoogleRequestHeadersFiller( HttpHeaders headers )
