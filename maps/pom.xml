@@ -51,7 +51,6 @@
         <dependency>
             <groupId>org.ctoolkit.restapi</groupId>
             <artifactId>ctoolkit-rest-facade-adapter</artifactId>
-            <version>0.24-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
