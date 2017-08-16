@@ -182,11 +182,11 @@
     <properties>
         <ctoolkit-library-bom.version>5</ctoolkit-library-bom.version>
         <appengine.version>1.9.54</appengine.version>
-        <ctoolkit-rest-facade-api.version>0.19-20170814.142432-2</ctoolkit-rest-facade-api.version>
+        <ctoolkit-rest-facade-api.version>0.19</ctoolkit-rest-facade-api.version>
         <google-api-services-analytics.version>v3-rev134-1.22.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev58-1.22.0</google-api-services-drive.version>
         <google-api-services-identitytoolkit.version>v3-rev232-1.22.0</google-api-services-identitytoolkit.version>
-        <google-maps-services.version>0.1.20</google-maps-services.version>
+        <google-maps-services.version>0.1.22</google-maps-services.version>
         <google-api-services-pubsub.version>v1-rev356-1.22.0</google-api-services-pubsub.version>
         <gitkitclient.version>1.2.7</gitkitclient.version>
         <jmockit.version>1.32</jmockit.version>

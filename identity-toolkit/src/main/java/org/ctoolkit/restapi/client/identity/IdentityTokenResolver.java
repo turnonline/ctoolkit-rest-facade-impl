@@ -61,7 +61,7 @@ public class IdentityTokenResolver
         String token = getToken( httpRequest );
         if ( Strings.isNullOrEmpty( token ) )
         {
-            throw new UnauthorizedException( "No " + Identity.GTOKEN + " cookie has found in the given request!" );
+            throw new UnauthorizedException( "No authorization token has found in the request!" );
         }
 
         return internalVerifyAndGet( token, true );
