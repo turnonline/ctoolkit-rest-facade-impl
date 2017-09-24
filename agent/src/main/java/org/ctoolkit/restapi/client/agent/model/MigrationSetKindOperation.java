@@ -33,6 +33,9 @@ public abstract class MigrationSetKindOperation
     @XmlAttribute( name = "newValue" )
     private String newValue;
 
+    @XmlAttribute( name = "multiplicity" )
+    private String multiplicity;
+
     @XmlElement( name = "ruleset" )
     private MigrationSetKindOpRuleSet ruleSet;
 
@@ -96,6 +99,16 @@ public abstract class MigrationSetKindOperation
         this.newValue = newValue;
     }
 
+    public String getMultiplicity()
+    {
+        return multiplicity;
+    }
+
+    public void setMultiplicity( String multiplicity )
+    {
+        this.multiplicity = multiplicity;
+    }
+
     public MigrationSetKindOpRuleSet getRuleSet()
     {
         return ruleSet;
@@ -109,13 +122,14 @@ public abstract class MigrationSetKindOperation
     @Override
     public String toString()
     {
-        return getClass().getSimpleName() + "{" +
+        return "MigrationSetKindOperation{" +
                 "kind='" + kind + '\'' +
                 ", property='" + property + '\'' +
                 ", newKind='" + newKind + '\'' +
                 ", newType='" + newType + '\'' +
                 ", newName='" + newName + '\'' +
                 ", newValue='" + newValue + '\'' +
+                ", multiplicity='" + multiplicity + '\'' +
                 ", ruleSet=" + ruleSet +
                 '}';
     }

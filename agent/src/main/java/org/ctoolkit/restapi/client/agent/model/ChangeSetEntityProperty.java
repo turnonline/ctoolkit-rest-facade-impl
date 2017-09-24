@@ -43,11 +43,7 @@ public class ChangeSetEntityProperty
      */
     public static final String PROPERTY_TYPE_STRING = "string";
 
-    public static final String PROPERTY_TYPE_FLOAT = "float";
-
     public static final String PROPERTY_TYPE_DOUBLE = "double";
-
-    public static final String PROPERTY_TYPE_INTEGER = "int";
 
     public static final String PROPERTY_TYPE_LONG = "long";
 
@@ -55,31 +51,27 @@ public class ChangeSetEntityProperty
 
     public static final String PROPERTY_TYPE_BOOLEAN = "boolean";
 
-    public static final String PROPERTY_TYPE_SHORTBLOB = "shortblob";
-
     public static final String PROPERTY_TYPE_BLOB = "blob";
 
     public static final String PROPERTY_TYPE_NULL = "null";
 
-    public static final String PROPERTY_TYPE_KEY = "key";
+    public static final String PROPERTY_TYPE_REFERENCE = "reference";
 
-    public static final String PROPERTY_TYPE_KEY_NAME = "key-name";
+    /**
+     * Supported change set entity multiplicity types
+     */
+    public static final String PROPERTY_MULTIPLICITY_SINGLE = "single";
 
-    public static final String PROPERTY_TYPE_TEXT = "text";
-
-    public static final String PROPERTY_TYPE_LIST_KEY = "list-key";
-
-    public static final String PROPERTY_TYPE_LIST_LONG = "list-long";
-
-    public static final String PROPERTY_TYPE_LIST_ENUM = "list-enum";
-
-    public static final String PROPERTY_TYPE_LIST_STRING = "list-string";
+    public static final String PROPERTY_MULTIPLICITY_LIST = "list";
 
     @XmlAttribute( name = "name" )
     private String name;
 
     @XmlAttribute( name = "type" )
     private String type;
+
+    @XmlAttribute( name = "multiplicity" )
+    private String multiplicity;
 
     @XmlAttribute( name = "value" )
     private String value;
@@ -112,6 +104,22 @@ public class ChangeSetEntityProperty
         this.value = value;
     }
 
+    /**
+     * Constructor
+     *
+     * @param name         the property name to be set
+     * @param type         the property type to be set
+     * @param multiplicity the property multiplicity to be set
+     * @param value        the property value to be set
+     */
+    public ChangeSetEntityProperty( String name, String type, String multiplicity, String value )
+    {
+        this.name = name;
+        this.type = type;
+        this.multiplicity = multiplicity;
+        this.value = value;
+    }
+
     public String getName()
     {
         return name;
@@ -132,6 +140,16 @@ public class ChangeSetEntityProperty
         this.type = type;
     }
 
+    public String getMultiplicity()
+    {
+        return multiplicity;
+    }
+
+    public void setMultiplicity( String multiplicity )
+    {
+        this.multiplicity = multiplicity;
+    }
+
     public String getValue()
     {
         return value;
@@ -148,6 +166,7 @@ public class ChangeSetEntityProperty
         return "ChangeSetEntityProperty{" +
                 "name='" + name + '\'' +
                 ", type='" + type + '\'' +
+                ", multiplicity='" + multiplicity + '\'' +
                 ", value='" + value + '\'' +
                 '}';
     }
