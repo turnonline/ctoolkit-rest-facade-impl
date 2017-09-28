@@ -45,7 +45,7 @@ public class ResourcesMapper
         factory.classMap( ExportJobInfo.class, org.ctoolkit.api.agent.model.ExportJob.class ).byDefault().register();
         factory.classMap( MigrationJobInfo.class, org.ctoolkit.api.agent.model.MigrationJob.class ).byDefault().register();
 
-        factory.classMap( MetadataAudit.class, org.ctoolkit.api.agent.model.MetadataAudit.class ).byDefault().register();
+        factory.classMap( Audit.class, org.ctoolkit.api.agent.model.MetadataAudit.class ).byDefault().register();
         factory.classMap( KindMetaData.class, org.ctoolkit.api.agent.model.KindMetaData.class ).byDefault().register();
         factory.classMap( PropertyMetaData.class, org.ctoolkit.api.agent.model.PropertyMetaData.class ).byDefault().register();
     }

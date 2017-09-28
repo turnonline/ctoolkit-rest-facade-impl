@@ -24,18 +24,12 @@ import java.util.Date;
 /**
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
-public class MetadataAudit
+public class Audit
         implements Serializable
 {
-    private String key;
-
     private Date createDate;
 
-    private Date updateDate;
-
     private String createdBy;
-
-    private String updatedBy;
 
     private Action action;
 
@@ -47,16 +41,6 @@ public class MetadataAudit
 
     private String userDisplayName;
 
-    public String getKey()
-    {
-        return key;
-    }
-
-    public void setKey( String key )
-    {
-        this.key = key;
-    }
-
     public Date getCreateDate()
     {
         return createDate;
@@ -67,16 +51,6 @@ public class MetadataAudit
         this.createDate = createDate;
     }
 
-    public Date getUpdateDate()
-    {
-        return updateDate;
-    }
-
-    public void setUpdateDate( Date updateDate )
-    {
-        this.updateDate = updateDate;
-    }
-
     public String getCreatedBy()
     {
         return createdBy;
@@ -85,16 +59,6 @@ public class MetadataAudit
     public void setCreatedBy( String createdBy )
     {
         this.createdBy = createdBy;
-    }
-
-    public String getUpdatedBy()
-    {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy( String updatedBy )
-    {
-        this.updatedBy = updatedBy;
     }
 
     public Action getAction()
@@ -150,12 +114,9 @@ public class MetadataAudit
     @Override
     public String toString()
     {
-        return "MetadataAudit{" +
-                "key='" + key + '\'' +
-                ", createDate=" + createDate +
-                ", updateDate=" + updateDate +
+        return "Audit{" +
+                "createDate=" + createDate +
                 ", createdBy='" + createdBy + '\'' +
-                ", updatedBy='" + updatedBy + '\'' +
                 ", action=" + action +
                 ", operation=" + operation +
                 ", ownerId='" + ownerId + '\'' +
@@ -171,19 +132,18 @@ public class MetadataAudit
         DELETE,
 
         START_JOB,
-        CANCEL_JOB,
-        DELETE_JOB,
-
-        MIGRATION
+        CANCEL_JOB
     }
 
     public enum Operation
     {
         IMPORT,
         IMPORT_ITEM,
+
         EXPORT,
         EXPORT_ITEM,
-        CHANGE,
-        CHANGE_ITEM
+
+        MIGRATION,
+        MIGRATION_ITEM
     }
 }
