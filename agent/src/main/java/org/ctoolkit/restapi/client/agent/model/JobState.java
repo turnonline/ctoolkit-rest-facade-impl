@@ -25,24 +25,46 @@ package org.ctoolkit.restapi.client.agent.model;
  */
 public enum JobState
 {
-    /** The job state could not be obtained or was not specified. */
+    /**
+     * The job state could not be obtained or was not specified.
+     */
     UNKNOWN,
 
-    /** The job has been paused, or has not yet started. */
+    /**
+     * The job has been paused, or has not yet started.
+     */
     STOPPED,
 
-    /** The job is currently running. */
+    /**
+     * The job is currently running.
+     */
     RUNNING,
 
-    /** The job has successfully completed. */
+    /**
+     * The job has successfully completed.
+     */
     DONE,
 
-    /** The job has failed. */
+    /**
+     * The job has failed.
+     */
     FAILED,
 
-    /** The job has been explicitly cancelled. */
+    /**
+     * The job has been explicitly cancelled.
+     */
     CANCELLED,
 
-    /** The job has been updated. */
-    UPDATED;
+    /**
+     * Job is being cancelled
+     */
+    CANCELLING,
+
+    /**
+     * The job has been updated.
+     */
+    UPDATED,
+
+    /* The is pending*/
+    PENDING;
 }

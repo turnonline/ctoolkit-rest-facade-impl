@@ -34,11 +34,7 @@ public abstract class JobInfo
 
     private String jobUrl;
 
-    private int totalItems;
-
     private int processedItems;
-
-    private int processedErrorItems;
 
     private JobState state;
 
@@ -74,16 +70,6 @@ public abstract class JobInfo
         this.jobUrl = jobUrl;
     }
 
-    public int getTotalItems()
-    {
-        return totalItems;
-    }
-
-    public void setTotalItems( int totalItems )
-    {
-        this.totalItems = totalItems;
-    }
-
     public int getProcessedItems()
     {
         return processedItems;
@@ -92,16 +78,6 @@ public abstract class JobInfo
     public void setProcessedItems( int processedItems )
     {
         this.processedItems = processedItems;
-    }
-
-    public int getProcessedErrorItems()
-    {
-        return processedErrorItems;
-    }
-
-    public void setProcessedErrorItems( int processedErrorItems )
-    {
-        this.processedErrorItems = processedErrorItems;
     }
 
     public JobState getState()
@@ -131,9 +107,7 @@ public abstract class JobInfo
                 "id=" + id +
                 ", jobId='" + jobId + '\'' +
                 ", jobUrl='" + jobUrl + '\'' +
-                ", totalItems=" + totalItems +
                 ", processedItems=" + processedItems +
-                ", processedErrorItems=" + processedErrorItems +
                 ", state=" + state +
                 ", stackTrace='" + stackTrace + '\'' +
                 '}';
