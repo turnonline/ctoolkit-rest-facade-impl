@@ -40,11 +40,6 @@
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-identitytoolkit</artifactId>
         </dependency>
-        <!--identity toolkit client that provides functionality to validate token-->
-        <dependency>
-            <groupId>com.google.identitytoolkit</groupId>
-            <artifactId>gitkitclient</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>

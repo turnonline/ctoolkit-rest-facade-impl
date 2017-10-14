@@ -125,11 +125,6 @@
                 <version>${google-api-services-identitytoolkit.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.google.identitytoolkit</groupId>
-                <artifactId>gitkitclient</artifactId>
-                <version>${gitkitclient.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.google.maps</groupId>
                 <artifactId>google-maps-services</artifactId>
                 <version>${google-maps-services.version}</version>
@@ -184,10 +179,9 @@
         <ctoolkit-rest-facade-api.version>0.19</ctoolkit-rest-facade-api.version>
         <google-api-services-analytics.version>v3-rev134-1.22.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev58-1.22.0</google-api-services-drive.version>
-        <google-api-services-identitytoolkit.version>v3-rev232-1.22.0</google-api-services-identitytoolkit.version>
+        <google-api-services-identitytoolkit.version>v3-rev243-1.22.0</google-api-services-identitytoolkit.version>
         <google-maps-services.version>0.1.22</google-maps-services.version>
         <google-api-services-pubsub.version>v1-rev356-1.22.0</google-api-services-pubsub.version>
-        <gitkitclient.version>1.2.7</gitkitclient.version>
         <jmockit.version>1.32</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
         <jmockit.setting>

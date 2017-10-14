@@ -29,7 +29,6 @@ import org.ctoolkit.restapi.client.ApiToken;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
-import org.ctoolkit.restapi.client.identity.verifier.IdentityVerifierModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +59,6 @@ public class GoogleApiIdentityToolkitModule
     @Override
     protected void configure()
     {
-        install( new IdentityVerifierModule() );
     }
 
     @Provides
