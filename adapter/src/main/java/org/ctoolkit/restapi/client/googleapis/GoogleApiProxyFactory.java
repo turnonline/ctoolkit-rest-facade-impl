@@ -486,6 +486,11 @@ public abstract class GoogleApiProxyFactory
         {
             String fileName = getFileNameJsonStream( prefix );
             stream = GoogleApiProxyFactory.class.getResourceAsStream( fileName );
+
+            if ( stream == null )
+            {
+                throw new IllegalArgumentException( "No file has been found with name '" + fileName + "'" );
+            }
         }
         return stream;
     }
