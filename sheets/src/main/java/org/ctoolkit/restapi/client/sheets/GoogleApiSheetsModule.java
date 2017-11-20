@@ -39,6 +39,7 @@ import java.util.Set;
 
 /**
  * The Google Sheets guice module as a default configuration.
+ * Install this module if {@link Sheets} needs to be injected.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
@@ -58,7 +59,7 @@ public class GoogleApiSheetsModule
 
     @Provides
     @Singleton
-    Sheets providePubsub( GoogleApiProxyFactory factory )
+    Sheets provideSheets( GoogleApiProxyFactory factory )
     {
         Set<String> scopes = SheetsScopes.all();
         Sheets.Builder builder;
@@ -91,7 +92,7 @@ public class GoogleApiSheetsModule
 
     @Provides
     @AccessToken( apiName = API_PREFIX )
-    ApiToken.Data providePubsubTokenData( Sheets client )
+    ApiToken.Data provideSheetsTokenData( Sheets client )
     {
         initialized.setServiceUrl( client.getBaseUrl() );
         return initialized.getTokenData();

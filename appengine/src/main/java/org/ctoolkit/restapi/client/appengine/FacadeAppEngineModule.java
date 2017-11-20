@@ -41,6 +41,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The client facade API AppEngine guice module.
+ * The module is being required once REST {@link RestFacade} is being used (injected)
+ * at the client that is running on App Engine standard environment.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
