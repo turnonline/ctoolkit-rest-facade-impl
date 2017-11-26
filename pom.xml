@@ -131,7 +131,7 @@
                 <version>${google-maps-services.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>com.squareup.okhttp</groupId>
+                        <groupId>com.squareup.okhttp3</groupId>
                         <artifactId>okhttp</artifactId>
                     </exclusion>
                 </exclusions>
@@ -187,7 +187,7 @@
         <google-api-services-drive.version>v3-rev58-1.22.0</google-api-services-drive.version>
         <google-api-services-identitytoolkit.version>v3-rev243-1.22.0</google-api-services-identitytoolkit.version>
         <google-api-services-sheets.version>v4-rev489-1.22.0</google-api-services-sheets.version>
-        <google-maps-services.version>0.1.22</google-maps-services.version>
+        <google-maps-services.version>0.2.5</google-maps-services.version>
         <google-api-services-pubsub.version>v1-rev356-1.22.0</google-api-services-pubsub.version>
         <jmockit.version>1.32</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->

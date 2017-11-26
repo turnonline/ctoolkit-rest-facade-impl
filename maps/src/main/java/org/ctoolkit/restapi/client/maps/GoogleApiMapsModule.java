@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The Google Drive guice module as a default configuration.
+ * The Google Maps API guice module as a default configuration.
  * Provides Geo API context to make a request to following maps APIs:
  * <ul>
  * <li>Directions API, ask to inject {@link DirectionsApiRequest}</li>
@@ -45,8 +45,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <li>Roads API</li>
  * <li>Time Zone API</li>
  * </ul>
+ * If property <b>{@code credential.maps.numberOfRetries}</b> value is less or equal to 0 (default value is 1)
+ * retries will be disabled <b>{@code .disableRetries()}</b>.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ * @see GeoApiContext.Builder
  */
 public class GoogleApiMapsModule
         extends AbstractModule
@@ -64,11 +67,22 @@ public class GoogleApiMapsModule
 
     private GeoApiContext provideGeoApiContext( GoogleApiProxyFactory factory )
     {
-        String apiKey = checkNotNull( factory.getApiKey( API_PREFIX ) );
+        String apiKey = checkNotNull( factory.getApiKey( API_PREFIX ), "The API key is missing!" );
 
-        GeoApiContext context = new GeoApiContext( new GaeRequestHandler() );
-        context.setApiKey( apiKey );
+        int numberOfRetries = factory.getNumberOfRetries( API_PREFIX );
+        boolean disableRetries = numberOfRetries <= 0;
 
+        GeoApiContext.Builder builder = new GeoApiContext.Builder( new GaeRequestHandler.Builder() ).apiKey( apiKey );
+
+        if ( disableRetries )
+        {
+            builder.disableRetries();
+        }
+        else
+        {
+            builder.maxRetries( numberOfRetries );
+        }
+        GeoApiContext context = builder.build();
         logger.info( "GeoApiContext has been initialized." );
 
         return context;
