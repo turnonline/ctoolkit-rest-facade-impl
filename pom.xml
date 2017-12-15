@@ -182,7 +182,7 @@
     <properties>
         <ctoolkit-library-bom.version>5</ctoolkit-library-bom.version>
         <appengine.version>1.9.54</appengine.version>
-        <ctoolkit-rest-facade-api.version>0.19</ctoolkit-rest-facade-api.version>
+        <ctoolkit-rest-facade-api.version>0.20</ctoolkit-rest-facade-api.version>
         <google-api-services-analytics.version>v3-rev134-1.22.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev58-1.22.0</google-api-services-drive.version>
         <google-api-services-identitytoolkit.version>v3-rev243-1.22.0</google-api-services-identitytoolkit.version>
