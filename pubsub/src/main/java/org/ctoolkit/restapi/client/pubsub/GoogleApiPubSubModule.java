@@ -29,6 +29,7 @@ import org.ctoolkit.restapi.client.ApiToken;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
+import org.ctoolkit.restapi.client.pubsub.adaptee.PubSubAdapteesModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +42,7 @@ import java.util.Set;
  * The Google Pub/Sub guice module as a default configuration.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ * @see PubSubAdapteesModule
  */
 public class GoogleApiPubSubModule
         extends AbstractModule
