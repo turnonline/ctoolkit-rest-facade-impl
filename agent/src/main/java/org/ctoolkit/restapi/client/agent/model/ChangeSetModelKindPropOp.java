@@ -25,24 +25,14 @@ import java.io.Serializable;
 
 /**
  * The bean holding entity kind property model update description
- * Example:
- * <table border="1">
- * <tr>
- * <th>Operation</th>
- * <th>Example</th>
- * </tr>
- * <tr>
- * <td>add</td>
- * <td>{@code <kindprop op="add" kind="User" newName="age" property="string" newValue="{optional-default-value}"/>}</td>
- * </tr>
- * <tr>
- * <td>remove</td>
- * <td>{@code <kindprop op="remove" kind="User" property="age"/>}</td>
- * </tr>
- * <tr>
- * <td>change</td>
- * <td>{@code <kindprop op="change" kind="User" property="age" newName="business-age" newType="text" newValue="{optional-default-value}"/>}</td>
- * </table>
+ * Example: <b>Operation: Example</b>
+ * <ul>
+ * <li><b>add</b>: {@code <kindprop op="add" kind="User" newName="age" property="string"
+ * newValue="{optional-default-value}"/>}</li>
+ * <li><b>remove</b>: {@code <kindprop op="remove" kind="User" property="age"/>}</li>
+ * <li><b>change</b>: {@code <kindprop op="change" kind="User" property="age" newName="business-age"
+ * newType="text" newValue="{optional-default-value}"/>}</li>
+ * </ul>
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */

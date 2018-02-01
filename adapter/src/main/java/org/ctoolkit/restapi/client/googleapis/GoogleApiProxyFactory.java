@@ -79,7 +79,7 @@ import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_SERVICE_ACCOUNT
 /**
  * The factory to build proxy instance to allow authenticated calls to Google APIs on behalf of the application
  * instead of an end-user by OAuth 2.0.
- * <p/>
+ * <p>
  * OAuth 2.0 allows users to share specific data with application (for example, contact lists)
  * while keeping their usernames, passwords, and other information private.
  *
@@ -114,6 +114,8 @@ public abstract class GoogleApiProxyFactory
 
     /**
      * Returns singleton instance of the HTTP transport.
+     *
+     * @return the reusable {@link HttpTransport} instance
      */
     public final HttpTransport getHttpTransport() throws GeneralSecurityException, IOException
     {
@@ -126,6 +128,8 @@ public abstract class GoogleApiProxyFactory
 
     /**
      * Returns singleton instance of the JSON factory.
+     *
+     * @return the reusable {@link JsonFactory} instance
      */
     public final JsonFactory getJsonFactory()
     {
@@ -401,7 +405,6 @@ public abstract class GoogleApiProxyFactory
      * @param userAccount the email address. If you want to impersonate a user account, specify the email address.
      *                    Useful for domain-wide delegation.
      * @return the thread-safe credential instance
-     * @throws GeneralSecurityException, IOException
      */
     public ApiToken<? extends HttpRequestInitializer> authorize( Collection<String> scopes, String userAccount, String prefix )
             throws GeneralSecurityException, IOException

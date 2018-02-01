@@ -53,6 +53,7 @@ public interface ResourceProviderInjector
      *
      * @param adapteeType the adaptee type to get
      * @param resource    the generic type of adaptee to get
+     * @param <A>         the type of the adaptee
      * @return the adaptee implementation for given arguments if any
      */
     <A> A getExecutorAdaptee( @Nonnull Class<A> adapteeType, @Nonnull Class<?> resource );

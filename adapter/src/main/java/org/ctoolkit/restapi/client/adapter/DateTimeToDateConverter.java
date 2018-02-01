@@ -11,19 +11,17 @@ import java.util.Date;
  * The bidirectional Google API client {@link DateTime} vs. standard java {@link Date} converter.
  * If needed configure your orika mapper:
  * <pre>
- * {@code
  *
  * import ma.glasnost.orika.converter.ConverterFactory;
  * import ma.glasnost.orika.MapperFactory;
  * ..
  *
- *   @literal @Inject
+ *    &#64;Inject
  *    MapperFactory factory;
  *
  *    ..
  *    ConverterFactory converterFactory = factory.getConverterFactory();
  *    converterFactory.registerConverter( new DateTimeToDateConverter() );
- * }
  * </pre>
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>

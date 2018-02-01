@@ -39,6 +39,8 @@ public @interface AccessToken
 {
     /**
      * The API short name.
+     *
+     * @return the API name
      */
     String apiName();
 }
