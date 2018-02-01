@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ctoolkit.restapi</groupId>
     <artifactId>ctoolkit-rest-facade-impl</artifactId>
-    <version>0.25-SNAPSHOT</version>
+    <version>0.25</version>
     <packaging>pom</packaging>
     <name>CtoolkiT REST Client Parent Project</name>
     <description>
@@ -41,7 +41,7 @@
         <developerConnection>scm:git:[push=]git@github.com:turnonline/ctoolkit-rest-facade-impl.git
         </developerConnection>
         <url>https://github.com/turnonline/ctoolkit-rest-facade-impl</url>
-        <tag>HEAD</tag>
+        <tag>ctoolkit-rest-facade-impl-0.25</tag>
     </scm>
 
     <issueManagement>
