@@ -19,8 +19,9 @@
 package org.ctoolkit.restapi.client.agent.model;
 
 import ma.glasnost.orika.MapperFactory;
+import org.ctoolkit.restapi.client.adapter.BeanMapperConfig;
 
-import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Resource mapper maps model object from rest api to rest client. Frontend requires from model object to be serializable,
@@ -28,10 +29,12 @@ import javax.inject.Inject;
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
+@Singleton
 public class ResourcesMapper
+        implements BeanMapperConfig
 {
-    @Inject
-    public ResourcesMapper( MapperFactory factory )
+    @Override
+    public void config( MapperFactory factory )
     {
         factory.classMap( ImportBatch.class, org.ctoolkit.api.agent.model.ImportBatch.class ).byDefault().register();
         factory.classMap( ExportBatch.class, org.ctoolkit.api.agent.model.ExportBatch.class ).byDefault().register();

@@ -24,6 +24,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.Multibinder;
 import org.ctoolkit.api.agent.Agent;
 import org.ctoolkit.api.agent.AgentScopes;
 import org.ctoolkit.api.agent.model.ExportBatch;
@@ -47,6 +48,7 @@ import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
+import org.ctoolkit.restapi.client.adapter.BeanMapperConfig;
 import org.ctoolkit.restapi.client.agent.adaptee.CustomizedCtoolkitAgent;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportBatchAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportItemAdaptee;
@@ -88,7 +90,8 @@ public class CtoolkitApiAgentModule
     protected void configure()
     {
         // bind resource mapper which maps generated rest client model objects into rest model objects
-        bind( ResourcesMapper.class ).asEagerSingleton();
+        Multibinder<BeanMapperConfig> multibinder = Multibinder.newSetBinder( binder(), BeanMapperConfig.class );
+        multibinder.addBinding().to( ResourcesMapper.class ).in( Singleton.class );
 
         // ImportBatch
         bind( new TypeLiteral<GetExecutorAdaptee<ImportBatch>>()
