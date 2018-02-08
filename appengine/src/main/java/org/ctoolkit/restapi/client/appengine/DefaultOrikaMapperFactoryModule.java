@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2018 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,16 +20,30 @@ package org.ctoolkit.restapi.client.appengine;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.multibindings.Multibinder;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
+import org.ctoolkit.restapi.client.adapter.BeanMapperConfig;
+import org.ctoolkit.restapi.client.adapter.DateTimeToDateConverter;
 
 import javax.inject.Singleton;
+import java.util.Set;
 
 /**
- * The default Orika{@link MapperFacade} configuration. Provide your own in order to configure orika mapper.
+ * The default Orika{@link MapperFacade} configuration.
+ * <p>
+ * If contribution to the orika bean mapper {@link MapperFactory} configuration is being required,
+ * implement your own {@link BeanMapperConfig} and register it via guice multi binder as the example below.
+ * This module will configure the shared mapper factory during instantiation.
+ * <pre>
+ * Multibinder<BeanMapperConfig> multibinder = Multibinder.newSetBinder( binder(), BeanMapperConfig.class );
+ * multibinder.addBinding().to( MyBeanMapperConfigImpl.class );
+ * </pre>
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ * @see BeanMapperConfig
  */
 public class DefaultOrikaMapperFactoryModule
         extends AbstractModule
@@ -47,14 +61,22 @@ public class DefaultOrikaMapperFactoryModule
 
     @Provides
     @Singleton
-    MapperFacade provideMapperFacade( MapperFactory factory )
+    MapperFacade provideMapperFacade( MapperFactory factory, Set<BeanMapperConfig> configs )
     {
+        ConverterFactory converterFactory = factory.getConverterFactory();
+        converterFactory.registerConverter( new DateTimeToDateConverter() );
+
+        for ( BeanMapperConfig next : configs )
+        {
+            next.config( factory );
+        }
+
         return factory.getMapperFacade();
     }
 
     @Override
     protected void configure()
     {
-
+        Multibinder.newSetBinder( binder(), BeanMapperConfig.class );
     }
 }

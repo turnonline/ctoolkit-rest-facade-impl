@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+  ~ Copyright (c) 2018 Comvai, s.r.o. All Rights Reserved.
   ~
   ~ This library is free software; you can redistribute it and/or
   ~ modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,7 @@
 
 <project name="REST Client Facade API implementation">
     <bannerLeft>
-        <name>Uniform client facade API implementation to perform common operations on top of REST.</name>
+        <name>Fluent facade API implementation to allow perform REST operations of various APIs through a single interface.</name>
         <src>http://maven.apache.org/images/apache-maven-project-2.png</src>
         <href>https://github.com/turnonline/ctoolkit-rest-facade-impl</href>
     </bannerLeft>

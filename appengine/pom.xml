@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+  ~ Copyright (c) 2018 Comvai, s.r.o. All Rights Reserved.
   ~
   ~ This library is free software; you can redistribute it and/or
   ~ modify it under the terms of the GNU Lesser General Public
@@ -30,9 +30,9 @@
     <artifactId>ctoolkit-rest-facade-appengine</artifactId>
     <version>0.26-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>CtoolkiT REST Client Facade API for AppEngine</name>
+    <name>CtoolkiT REST Facade API for AppEngine</name>
     <description>
-        Uniform client facade API implementation to perform common operations on top of REST.
+        Fluent facade API implementation to allow perform REST operations of various APIs through a single interface.
         Implemented for Google AppEngine runtime with Guice.
     </description>
 
@@ -56,6 +56,10 @@
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-servlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-multibindings</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
