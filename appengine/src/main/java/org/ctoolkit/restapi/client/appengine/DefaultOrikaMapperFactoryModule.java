@@ -38,7 +38,7 @@ import java.util.Set;
  * implement your own {@link BeanMapperConfig} and register it via guice multi binder as the example below.
  * This module will configure the shared mapper factory during instantiation.
  * <pre>
- * Multibinder<BeanMapperConfig> multibinder = Multibinder.newSetBinder( binder(), BeanMapperConfig.class );
+ * Multibinder&#60;BeanMapperConfig&#62; multibinder = Multibinder.newSetBinder( binder(), BeanMapperConfig.class );
  * multibinder.addBinding().to( MyBeanMapperConfigImpl.class );
  * </pre>
  *
@@ -54,6 +54,7 @@ public class DefaultOrikaMapperFactoryModule
     {
         return new DefaultMapperFactory.Builder()
                 .dumpStateOnException( false )
+                // this is important in order to support HTTP PATCH functionality
                 .mapNulls( false )
                 .useBuiltinConverters( true )
                 .build();

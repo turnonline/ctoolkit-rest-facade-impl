@@ -102,7 +102,7 @@ public class GuiceTestCase
         Names.bindProperties( binder(), credential );
         Names.bindProperties( binder(), drive );
 
-        install( new FacadeAppEngineModule() );
+        install( new CtoolkitRestFacadeAppEngineModule() );
         install( new GuiceBerryModule() );
         install( new AdapterAppEngineModule() );
     }

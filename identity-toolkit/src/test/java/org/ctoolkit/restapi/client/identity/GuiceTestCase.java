@@ -22,8 +22,8 @@ import com.google.common.testing.TearDown;
 import com.google.guiceberry.GuiceBerryModule;
 import com.google.guiceberry.testng.TestNgGuiceBerry;
 import com.google.inject.Provides;
+import org.ctoolkit.restapi.client.appengine.CtoolkitRestFacadeAppEngineModule;
 import org.ctoolkit.restapi.client.appengine.DefaultOrikaMapperFactoryModule;
-import org.ctoolkit.restapi.client.appengine.FacadeAppEngineModule;
 import org.ctoolkit.test.appengine.ServiceConfigModule;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -67,7 +67,7 @@ public class GuiceTestCase
 
         install( new GuiceBerryModule() );
         install( new DefaultOrikaMapperFactoryModule() );
-        install( new FacadeAppEngineModule() );
+        install( new CtoolkitRestFacadeAppEngineModule() );
     }
 
     @Provides
