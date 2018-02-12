@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2018 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,12 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.restapi.client.identity;
+package org.ctoolkit.restapi.client.analytics;
 
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpStatusCodes;
-import com.google.api.client.repackaged.com.google.common.base.Strings;
-import com.google.api.services.identitytoolkit.IdentityToolkit;
+import com.google.api.services.analytics.Analytics;
+import com.google.api.services.analytics.AnalyticsScopes;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import org.ctoolkit.restapi.client.AccessToken;
@@ -34,25 +34,20 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Set;
 
 /**
- * The Google Identity Toolkit guice module as a default configuration.
+ * The Google Analytics guice module as a default configuration.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class GoogleApiIdentityToolkitModule
+public class GoogleApiAnalyticsModule
         extends AbstractModule
 {
-    public static final String API_PREFIX = "identitytoolkit";
+    public static final String API_PREFIX = "analytics";
 
-    private static final Logger logger = LoggerFactory.getLogger( GoogleApiIdentityToolkitModule.class );
-
-    private static final String IDENTITY_SCOPE = "https://www.googleapis.com/auth/identitytoolkit";
+    private static final Logger logger = LoggerFactory.getLogger( GoogleApiAnalyticsModule.class );
 
     private ApiToken<? extends HttpRequestInitializer> initialized;
 
@@ -63,52 +58,16 @@ public class GoogleApiIdentityToolkitModule
 
     @Provides
     @Singleton
-    IdentityToolkit provideIdentityToolkit( GoogleApiProxyFactory factory )
+    Analytics provideAnalytics( GoogleApiProxyFactory factory )
     {
-        InputStream stream = null;
-        String fileNamePath = factory.getFileName( API_PREFIX );
-        if ( fileNamePath != null )
-        {
-            stream = factory.getServiceAccountPrivateKeyP12Stream( API_PREFIX );
-        }
-
-        if ( stream == null )
-        {
-            String message;
-            if ( fileNamePath == null )
-            {
-                message = "The private key (path to p12) 'credential.default.fileName' is mandatory to instantiate "
-                        + IdentityToolkit.class.getSimpleName();
-            }
-            else
-            {
-                message = "Configured path to private key p12 is incorrect, no file has been found: " + fileNamePath;
-            }
-
-            throw new IllegalArgumentException( message );
-        }
-
-        String serviceAccount = factory.getServiceAccountEmail( API_PREFIX );
-        if ( Strings.isNullOrEmpty( serviceAccount ) )
-        {
-            String message = "The service account email 'credential.default.serviceAccountEmail'" +
-                    " is mandatory to instantiate " + IdentityToolkit.class.getSimpleName();
-
-            throw new IllegalArgumentException( message );
-        }
-
-        HashSet<String> set = new HashSet<>();
-        set.add( IDENTITY_SCOPE );
-        Collections.unmodifiableSet( set );
-        Collection<String> scopes = Collections.unmodifiableSet( set );
-
-        IdentityToolkit.Builder builder;
+        Set<String> scopes = AnalyticsScopes.all();
+        Analytics.Builder builder;
 
         try
         {
             initialized = factory.authorize( scopes, null, API_PREFIX );
             HttpRequestInitializer credential = initialized.getCredential();
-            builder = new IdentityToolkit.Builder( factory.getHttpTransport(), factory.getJsonFactory(), credential );
+            builder = new Analytics.Builder( factory.getHttpTransport(), factory.getJsonFactory(), credential );
             builder.setApplicationName( factory.getApplicationName( API_PREFIX ) );
         }
         catch ( GeneralSecurityException e )
@@ -116,7 +75,6 @@ public class GoogleApiIdentityToolkitModule
             logger.error( "Failed. Scopes: " + scopes.toString()
                     + " Application name: " + factory.getApplicationName( API_PREFIX )
                     + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
-
             throw new UnauthorizedException( e.getMessage() );
         }
         catch ( IOException e )
@@ -133,7 +91,7 @@ public class GoogleApiIdentityToolkitModule
 
     @Provides
     @AccessToken( apiName = API_PREFIX )
-    ApiToken.Data provideIdentityToolkitTokenData( IdentityToolkit client )
+    ApiToken.Data provideAnalyticsTokenData( Analytics client )
     {
         initialized.setServiceUrl( client.getBaseUrl() );
         return initialized.getTokenData();

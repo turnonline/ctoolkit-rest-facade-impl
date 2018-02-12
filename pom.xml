@@ -62,7 +62,7 @@
         <module>agent</module>
         <module>analytics</module>
         <module>drive</module>
-        <module>identity-toolkit</module>
+        <module>firebase</module>
         <module>maps</module>
         <module>pubsub</module>
         <module>sheets</module>
@@ -121,9 +121,9 @@
                 <version>${google-api-services-drive.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.google.apis</groupId>
-                <artifactId>google-api-services-identitytoolkit</artifactId>
-                <version>${google-api-services-identitytoolkit.version}</version>
+                <groupId>com.google.firebase</groupId>
+                <artifactId>firebase-admin</artifactId>
+                <version>${firebase-admin.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.maps</groupId>
@@ -185,7 +185,7 @@
         <ctoolkit-rest-facade-api.version>0.20</ctoolkit-rest-facade-api.version>
         <google-api-services-analytics.version>v3-rev145-1.23.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev98-1.23.0</google-api-services-drive.version>
-        <google-api-services-identitytoolkit.version>v3-rev246-1.23.0</google-api-services-identitytoolkit.version>
+        <firebase-admin.version>5.8.0</firebase-admin.version>
         <google-api-services-sheets.version>v4-rev500-1.23.0</google-api-services-sheets.version>
         <google-maps-services.version>0.2.6</google-maps-services.version>
         <google-api-services-pubsub.version>v1-rev373-1.23.0</google-api-services-pubsub.version>

@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.restapi.client.identity;
+package org.ctoolkit.restapi.client.firebase;
 
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.common.net.HttpHeaders;

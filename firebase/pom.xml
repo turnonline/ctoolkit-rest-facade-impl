@@ -17,7 +17,8 @@
   ~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.ctoolkit.restapi</groupId>
@@ -27,18 +28,16 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ctoolkit-client-identity-toolkit</artifactId>
+    <artifactId>ctoolkit-client-firebase</artifactId>
     <version>0.26-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Google API CtoolkiT Client - Google Identity Toolkit</name>
-    <description>
-        Google API CtoolkiT REST API Client Implementation of Google Identity Toolkit
-    </description>
+    <name>Google API CtoolkiT Client - Google Firebase Auth</name>
+    <description>Google API CtoolkiT Client Implementation of Google Firebase Auth</description>
 
     <dependencies>
         <dependency>
-            <groupId>com.google.apis</groupId>
-            <artifactId>google-api-services-identitytoolkit</artifactId>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.api-client</groupId>
