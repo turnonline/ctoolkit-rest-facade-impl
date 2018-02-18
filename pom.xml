@@ -185,7 +185,7 @@
         <ctoolkit-rest-facade-api.version>0.20</ctoolkit-rest-facade-api.version>
         <google-api-services-analytics.version>v3-rev145-1.23.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev98-1.23.0</google-api-services-drive.version>
-        <firebase-admin.version>5.8.0</firebase-admin.version>
+        <firebase-admin.version>5.9.0</firebase-admin.version>
         <google-api-services-sheets.version>v4-rev500-1.23.0</google-api-services-sheets.version>
         <google-maps-services.version>0.2.6</google-maps-services.version>
         <google-api-services-pubsub.version>v1-rev373-1.23.0</google-api-services-pubsub.version>
