@@ -92,7 +92,12 @@ class GoogleApiProxyFactoryAppEngine
         @Override
         public void intercept( HttpRequest request ) throws IOException
         {
-            super.intercept( request );
+            String authorization = request.getHeaders().getAuthorization();
+            // the authorization header set by facade client has a preference, see Request#authBy(String)
+            if ( authorization == null )
+            {
+                super.intercept( request );
+            }
             eventBus.post( new BeforeRequestEvent( request ) );
         }
 
