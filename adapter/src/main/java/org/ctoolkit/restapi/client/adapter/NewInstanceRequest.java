@@ -18,6 +18,7 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.AuthRequest;
 import org.ctoolkit.restapi.client.ClientErrorException;
 import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.Request;
@@ -53,7 +54,9 @@ class NewInstanceRequest<T>
 
     private Locale withLocale;
 
-    private GoogleRequestHeadersFiller filler;
+    private GoogleRequestHeaders filler;
+
+    private String token;
 
     NewInstanceRequest( @Nonnull Class<T> resource,
                         @Nonnull RestFacadeAdapter adapter,
@@ -65,7 +68,7 @@ class NewInstanceRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = remoteRequest;
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeadersFiller( remoteRequest );
+        this.filler = new GoogleRequestHeaders( remoteRequest );
     }
 
     @Override
@@ -121,6 +124,11 @@ class NewInstanceRequest<T>
         }
 
         filler.acceptLanguage( locale );
+        if ( token != null )
+        {
+            filler.authorization( token );
+        }
+
         return adapter.callbackNewInstance( adaptee, remoteRequest, resource, params, locale );
     }
 
@@ -170,12 +178,12 @@ class NewInstanceRequest<T>
     }
 
     @Override
-    public Request<T> authBy( @Nonnull String authorization )
+    public AuthRequest<T> authBy( @Nonnull String authorization )
     {
         checkNotNull( authorization );
 
-        filler.authorization( authorization );
-        return this;
+        this.token = authorization;
+        return new AuthRequestImpl<>( this, filler );
     }
 
     @Override

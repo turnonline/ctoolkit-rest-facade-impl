@@ -20,6 +20,7 @@ package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.http.HttpHeaders;
+import org.ctoolkit.restapi.client.AuthRequest;
 import org.ctoolkit.restapi.client.DownloadRequest;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.Request;
@@ -62,7 +63,9 @@ class DownloadRequestImpl
 
     private Locale withLocale;
 
-    private GoogleRequestHeadersFiller filler;
+    private GoogleRequestHeaders filler;
+
+    private String token;
 
     /**
      * Constructor.
@@ -93,7 +96,7 @@ class DownloadRequestImpl
         this.output = checkNotNull( output );
         this.interceptor = checkNotNull( interceptor );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeadersFiller( new HttpHeaders() );
+        this.filler = new GoogleRequestHeaders( new HttpHeaders() );
         this.filler.contentType( type );
     }
 
@@ -133,6 +136,11 @@ class DownloadRequestImpl
 
         filler.acceptLanguage( locale );
         filler.fillInCredential( params );
+        if ( token != null )
+        {
+            filler.authorization( token );
+        }
+
         HttpHeaders headers = filler.getHeaders();
 
         return adapter.executeDownload( downloader, adaptee, resource, identifier, output, interceptor,
@@ -185,11 +193,11 @@ class DownloadRequestImpl
     }
 
     @Override
-    public Request<Map<String, Object>> authBy( @Nonnull String authorization )
+    public AuthRequest<Map<String, Object>> authBy( @Nonnull String authorization )
     {
         checkNotNull( authorization );
 
-        filler.authorization( authorization );
-        return this;
+        this.token = authorization;
+        return new AuthRequestImpl<>( this, filler );
     }
 }

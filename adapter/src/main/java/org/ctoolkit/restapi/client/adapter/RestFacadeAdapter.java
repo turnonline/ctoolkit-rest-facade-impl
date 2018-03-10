@@ -82,7 +82,7 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The resource facade implementation as adapter. Executes Java bean mapping
+ * The Fluent facade API implementation as an adapter. Executes Java bean mapping
  * and then delegates the execution to one of the binded adaptee.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>

@@ -35,11 +35,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class GoogleRequestHeadersFiller
+public class GoogleRequestHeaders
 {
     private final HttpHeaders headers;
 
-    public GoogleRequestHeadersFiller( Object remoteRequest )
+    private AuthScheme authScheme;
+
+    public GoogleRequestHeaders( Object remoteRequest )
     {
         if ( remoteRequest instanceof AbstractGoogleClientRequest )
         {
@@ -51,7 +53,7 @@ public class GoogleRequestHeadersFiller
         }
     }
 
-    public GoogleRequestHeadersFiller( HttpHeaders headers )
+    public GoogleRequestHeaders( HttpHeaders headers )
     {
         this.headers = checkNotNull( headers );
     }
@@ -84,15 +86,40 @@ public class GoogleRequestHeadersFiller
     }
 
     /**
+     * Sets the authentication scheme as a prefix to the authorization token.
+     *
+     * @param authScheme the the authentication scheme to be set
+     */
+    public void setAuthScheme( AuthScheme authScheme )
+    {
+        this.authScheme = authScheme;
+    }
+
+    /**
      * Sets the {@code "Authorization"} header to this request.
      *
      * @param token the authorization token to be set, {@code null} value will be ignored
      */
-    public void authorization( String token )
+    public void authorization( @Nullable String token )
     {
+        boolean hasAuthScheme = false;
         if ( !Strings.isNullOrEmpty( token ) )
         {
-            headers.setAuthorization( token );
+            for ( AuthScheme scheme : AuthScheme.values() )
+            {
+                if ( token.startsWith( scheme.value ) )
+                {
+                    headers.setAuthorization( token );
+                    hasAuthScheme = true;
+                    break;
+                }
+            }
+
+            if ( !hasAuthScheme )
+            {
+                String finalToken = authScheme == null ? token : authScheme.value + " " + token;
+                headers.setAuthorization( finalToken );
+            }
         }
     }
 
@@ -119,5 +146,24 @@ public class GoogleRequestHeadersFiller
     public HttpHeaders getHeaders()
     {
         return headers;
+    }
+
+    public enum AuthScheme
+    {
+        BEARER( "Bearer" ),
+
+        OAUTH( "OAuth" );
+
+        private String value;
+
+        AuthScheme( String value )
+        {
+            this.value = value;
+        }
+
+        public String getValue()
+        {
+            return value;
+        }
     }
 }

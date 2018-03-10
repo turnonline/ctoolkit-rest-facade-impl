@@ -18,6 +18,7 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.AuthRequest;
 import org.ctoolkit.restapi.client.ListRetrievalRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
@@ -61,7 +62,9 @@ class ListRequest<T>
 
     private Boolean ascending;
 
-    private GoogleRequestHeadersFiller filler;
+    private GoogleRequestHeaders filler;
+
+    private String token;
 
     ListRequest( @Nonnull Class<T> resource,
                  @Nonnull RestFacadeAdapter adapter,
@@ -73,7 +76,7 @@ class ListRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeadersFiller( remoteRequest );
+        this.filler = new GoogleRequestHeaders( remoteRequest );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -131,6 +134,11 @@ class ListRequest<T>
         }
 
         filler.acceptLanguage( locale );
+        if ( token != null )
+        {
+            filler.authorization( token );
+        }
+
         return adapter.callbackExecuteList( adaptee, remoteRequest, resource, params, locale, start, length,
                 orderBy, ascending );
     }
@@ -181,12 +189,12 @@ class ListRequest<T>
     }
 
     @Override
-    public Request<List<T>> authBy( @Nonnull String authorization )
+    public AuthRequest<List<T>> authBy( @Nonnull String authorization )
     {
         checkNotNull( authorization );
 
-        filler.authorization( authorization );
-        return this;
+        this.token = authorization;
+        return new AuthRequestImpl<>( this, filler );
     }
 
     @Override

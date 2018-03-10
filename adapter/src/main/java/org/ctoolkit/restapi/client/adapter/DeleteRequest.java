@@ -18,6 +18,7 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.AuthRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.SimpleRequest;
@@ -54,7 +55,9 @@ class DeleteRequest
 
     private Locale withLocale;
 
-    private GoogleRequestHeadersFiller filler;
+    private GoogleRequestHeaders filler;
+
+    private String token;
 
     DeleteRequest( @Nonnull Class resource,
                    @Nonnull Object identifier,
@@ -68,7 +71,7 @@ class DeleteRequest
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeadersFiller( remoteRequest );
+        this.filler = new GoogleRequestHeaders( remoteRequest );
     }
 
     @Override
@@ -106,6 +109,11 @@ class DeleteRequest
         }
 
         filler.acceptLanguage( locale );
+        if ( token != null )
+        {
+            filler.authorization( token );
+        }
+
         return adapter.callbackExecuteDelete( adaptee, remoteRequest, resource, identifier, params, locale );
     }
 
@@ -155,11 +163,11 @@ class DeleteRequest
     }
 
     @Override
-    public Request<Void> authBy( @Nonnull String authorization )
+    public AuthRequest<Void> authBy( @Nonnull String authorization )
     {
         checkNotNull( authorization );
 
-        filler.authorization( authorization );
-        return this;
+        this.token = authorization;
+        return new AuthRequestImpl<>( this, filler );
     }
 }

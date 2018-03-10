@@ -18,6 +18,7 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
+import org.ctoolkit.restapi.client.AuthRequest;
 import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
@@ -54,7 +55,9 @@ class UpdateRequest<T>
 
     private Locale withLocale;
 
-    private GoogleRequestHeadersFiller filler;
+    private GoogleRequestHeaders filler;
+
+    private String token;
 
     UpdateRequest( @Nonnull Class<T> resource,
                    @Nonnull Object identifier,
@@ -68,7 +71,7 @@ class UpdateRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeadersFiller( remoteRequest );
+        this.filler = new GoogleRequestHeaders( remoteRequest );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -113,6 +116,11 @@ class UpdateRequest<T>
         }
 
         filler.acceptLanguage( locale );
+        if ( token != null )
+        {
+            filler.authorization( token );
+        }
+
         return adapter.callbackExecuteUpdate( adaptee, remoteRequest, resource, identifier, params, locale );
     }
 
@@ -162,12 +170,12 @@ class UpdateRequest<T>
     }
 
     @Override
-    public Request<T> authBy( @Nonnull String authorization )
+    public AuthRequest<T> authBy( @Nonnull String authorization )
     {
         checkNotNull( authorization );
 
-        filler.authorization( authorization );
-        return this;
+        this.token = authorization;
+        return new AuthRequestImpl<>( this, filler );
     }
 
     @Override
