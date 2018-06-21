@@ -194,7 +194,7 @@
         <google-api-services-drive.version>v3-rev98-1.23.0</google-api-services-drive.version>
         <firebase-admin.version>6.2.0</firebase-admin.version>
         <google-api-services-sheets.version>v4-rev500-1.23.0</google-api-services-sheets.version>
-        <google-maps-services.version>0.2.6</google-maps-services.version>
+        <google-maps-services.version>0.2.7</google-maps-services.version>
         <google-api-services-pubsub.version>v1-rev373-1.23.0</google-api-services-pubsub.version>
         <jmockit.version>1.32</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
