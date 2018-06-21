@@ -18,6 +18,7 @@ public class MigrationSetKindOpRuleSet
         implements Serializable
 {
     public static final String AND = "and";
+
     public static final String OR = "or";
 
     @XmlAttribute( name = "operation" )

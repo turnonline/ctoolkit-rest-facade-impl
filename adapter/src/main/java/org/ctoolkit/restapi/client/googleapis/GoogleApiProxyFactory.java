@@ -406,7 +406,9 @@ public abstract class GoogleApiProxyFactory
      *                    Useful for domain-wide delegation.
      * @return the thread-safe credential instance
      */
-    public ApiToken<? extends HttpRequestInitializer> authorize( Collection<String> scopes, String userAccount, String prefix )
+    public ApiToken<? extends HttpRequestInitializer> authorize( Collection<String> scopes,
+                                                                 String userAccount,
+                                                                 String prefix )
             throws GeneralSecurityException, IOException
     {
         GoogleCredential googleCredential;

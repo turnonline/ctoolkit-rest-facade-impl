@@ -51,10 +51,11 @@ public class FooDeleteAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale )
+    public Object executeDelete( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
+        return null;
     }
 }

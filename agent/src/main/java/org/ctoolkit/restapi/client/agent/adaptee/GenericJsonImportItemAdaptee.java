@@ -143,15 +143,15 @@ public class GenericJsonImportItemAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale ) throws IOException
+    public Object executeDelete( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale ) throws IOException
     {
         checkNotNull( request );
 
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Delete ) request ).execute( credential );
+        return ( ( CustomizedCtoolkitAgent.ImportBatch.Item.Delete ) request ).execute( credential );
     }
 }

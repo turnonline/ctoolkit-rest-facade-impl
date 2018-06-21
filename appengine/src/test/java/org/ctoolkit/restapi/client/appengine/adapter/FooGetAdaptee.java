@@ -64,7 +64,10 @@ public class FooGetAdaptee
     }
 
     @Override
-    public URL prepareDownloadUrl( @Nonnull Identifier identifier, @Nullable String s, @Nullable Map<String, Object> map, @Nullable Locale locale )
+    public URL prepareDownloadUrl( @Nonnull Identifier identifier,
+                                   @Nullable String s,
+                                   @Nullable Map<String, Object> map,
+                                   @Nullable Locale locale )
     {
         try
         {

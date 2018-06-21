@@ -70,8 +70,8 @@ public class GenericJsonMigrationBatchAdaptee
 
     @Override
     public MigrationBatch executeGet( @Nonnull Object request,
-                                   @Nullable Map<String, Object> parameters,
-                                   @Nullable Locale locale )
+                                      @Nullable Map<String, Object> parameters,
+                                      @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -95,8 +95,8 @@ public class GenericJsonMigrationBatchAdaptee
 
     @Override
     public MigrationBatch executeInsert( @Nonnull Object request,
-                                      @Nullable Map<String, Object> parameters,
-                                      @Nullable Locale locale )
+                                         @Nullable Map<String, Object> parameters,
+                                         @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -122,8 +122,8 @@ public class GenericJsonMigrationBatchAdaptee
 
     @Override
     public MigrationBatch executeUpdate( @Nonnull Object request,
-                                      @Nullable Map<String, Object> parameters,
-                                      @Nullable Locale locale )
+                                         @Nullable Map<String, Object> parameters,
+                                         @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -143,9 +143,9 @@ public class GenericJsonMigrationBatchAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale )
+    public Object executeDelete( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -153,7 +153,7 @@ public class GenericJsonMigrationBatchAdaptee
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( parameters, true );
 
-        ( ( CustomizedCtoolkitAgent.ExportBatch.Delete ) request ).execute( credential );
+        return ( ( CustomizedCtoolkitAgent.ExportBatch.Delete ) request ).execute( credential );
     }
 
     @Override
@@ -165,12 +165,12 @@ public class GenericJsonMigrationBatchAdaptee
     @Override
     @SuppressWarnings( "unchecked" )
     public List<MigrationBatch> executeList( @Nonnull Object request,
-                                          @Nullable Map<String, Object> parameters,
-                                          @Nullable Locale locale,
-                                          @Nullable Integer start,
-                                          @Nullable Integer length,
-                                          @Nullable String orderBy,
-                                          @Nullable Boolean ascending )
+                                             @Nullable Map<String, Object> parameters,
+                                             @Nullable Locale locale,
+                                             @Nullable Integer start,
+                                             @Nullable Integer length,
+                                             @Nullable String orderBy,
+                                             @Nullable Boolean ascending )
             throws IOException
     {
         checkNotNull( request );

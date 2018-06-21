@@ -70,8 +70,8 @@ public class GenericJsonMigrationItemAdaptee
 
     @Override
     public MigrationItem executeGet( @Nonnull Object request,
-                                  @Nullable Map<String, Object> parameters,
-                                  @Nullable Locale locale )
+                                     @Nullable Map<String, Object> parameters,
+                                     @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -97,8 +97,8 @@ public class GenericJsonMigrationItemAdaptee
 
     @Override
     public MigrationItem executeInsert( @Nonnull Object request,
-                                     @Nullable Map<String, Object> parameters,
-                                     @Nullable Locale locale )
+                                        @Nullable Map<String, Object> parameters,
+                                        @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -127,8 +127,8 @@ public class GenericJsonMigrationItemAdaptee
 
     @Override
     public MigrationItem executeUpdate( @Nonnull Object request,
-                                     @Nullable Map<String, Object> parameters,
-                                     @Nullable Locale locale )
+                                        @Nullable Map<String, Object> parameters,
+                                        @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -152,9 +152,9 @@ public class GenericJsonMigrationItemAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale ) throws IOException
+    public Object executeDelete( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale ) throws IOException
     {
         checkNotNull( request );
 
@@ -162,5 +162,6 @@ public class GenericJsonMigrationItemAdaptee
         credential.fillInFrom( parameters, true );
 
         ( ( CustomizedCtoolkitAgent.MigrationBatch.Item.Delete ) request ).execute( credential );
+        return null;
     }
 }

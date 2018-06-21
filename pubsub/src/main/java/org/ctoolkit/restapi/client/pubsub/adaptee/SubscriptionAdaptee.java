@@ -139,11 +139,11 @@ public class SubscriptionAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request,
-                               @Nullable Map<String, Object> parameters,
-                               @Nullable Locale locale )
+    public Object executeDelete( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
-        execute( request, parameters );
+        return execute( request, parameters );
     }
 }

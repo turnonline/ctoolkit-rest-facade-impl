@@ -1266,6 +1266,46 @@ public class CustomizedCtoolkitAgent
             return result;
         }
 
+        public Agent.MigrationBatch.Get get( Long id ) throws java.io.IOException
+        {
+            Get result = new Get( id );
+            initialize( result );
+            return result;
+        }
+
+        public Agent.MigrationBatch.Insert insert( org.ctoolkit.api.agent.model.MigrationBatch content )
+                throws java.io.IOException
+        {
+            Insert result = new Insert( content );
+            initialize( result );
+            return result;
+        }
+
+        public Agent.MigrationBatch.List list() throws java.io.IOException
+        {
+            List result = new List();
+            initialize( result );
+            return result;
+        }
+
+        public Agent.MigrationBatch.Update update( Long id, org.ctoolkit.api.agent.model.MigrationBatch content )
+                throws java.io.IOException
+        {
+            Update result = new Update( id, content );
+            initialize( result );
+            return result;
+        }
+
+        public Agent.MigrationBatch.Item item()
+        {
+            return new Item();
+        }
+
+        public Agent.MigrationBatch.Job job()
+        {
+            return new Job();
+        }
+
         public class Delete
                 extends Agent.MigrationBatch.Delete
         {
@@ -1301,13 +1341,6 @@ public class CustomizedCtoolkitAgent
             }
         }
 
-        public Agent.MigrationBatch.Get get( Long id ) throws java.io.IOException
-        {
-            Get result = new Get( id );
-            initialize( result );
-            return result;
-        }
-
         public class Get
                 extends Agent.MigrationBatch.Get
         {
@@ -1318,7 +1351,8 @@ public class CustomizedCtoolkitAgent
                 super( id );
             }
 
-            public org.ctoolkit.api.agent.model.MigrationBatch execute( RequestCredential credential ) throws IOException
+            public org.ctoolkit.api.agent.model.MigrationBatch execute( RequestCredential credential )
+                    throws IOException
             {
                 this.credential = checkNotNull( credential );
                 setRequestApiKey( this, credential );
@@ -1341,14 +1375,6 @@ public class CustomizedCtoolkitAgent
                     return url;
                 }
             }
-        }
-
-        public Agent.MigrationBatch.Insert insert( org.ctoolkit.api.agent.model.MigrationBatch content )
-                throws java.io.IOException
-        {
-            Insert result = new Insert( content );
-            initialize( result );
-            return result;
         }
 
         public class Insert
@@ -1361,7 +1387,8 @@ public class CustomizedCtoolkitAgent
                 super( content );
             }
 
-            public org.ctoolkit.api.agent.model.MigrationBatch execute( RequestCredential credential ) throws IOException
+            public org.ctoolkit.api.agent.model.MigrationBatch execute( RequestCredential credential )
+                    throws IOException
             {
                 this.credential = checkNotNull( credential );
                 setRequestApiKey( this, credential );
@@ -1386,13 +1413,6 @@ public class CustomizedCtoolkitAgent
             }
         }
 
-        public Agent.MigrationBatch.List list() throws java.io.IOException
-        {
-            List result = new List();
-            initialize( result );
-            return result;
-        }
-
         public class List
                 extends Agent.MigrationBatch.List
         {
@@ -1400,7 +1420,7 @@ public class CustomizedCtoolkitAgent
 
             protected List()
             {
-                super( );
+                super();
             }
 
             public MigrationBatchCollection execute( RequestCredential credential ) throws IOException
@@ -1428,14 +1448,6 @@ public class CustomizedCtoolkitAgent
             }
         }
 
-        public Agent.MigrationBatch.Update update( Long id, org.ctoolkit.api.agent.model.MigrationBatch content )
-                throws java.io.IOException
-        {
-            Update result = new Update( id, content );
-            initialize( result );
-            return result;
-        }
-
         public class Update
                 extends Agent.MigrationBatch.Update
         {
@@ -1446,7 +1458,8 @@ public class CustomizedCtoolkitAgent
                 super( id, content );
             }
 
-            public org.ctoolkit.api.agent.model.MigrationBatch execute( RequestCredential credential ) throws IOException
+            public org.ctoolkit.api.agent.model.MigrationBatch execute( RequestCredential credential )
+                    throws IOException
             {
                 this.credential = checkNotNull( credential );
                 setRequestApiKey( this, credential );
@@ -1471,16 +1484,38 @@ public class CustomizedCtoolkitAgent
             }
         }
 
-        public Agent.MigrationBatch.Item item()
-        {
-            return new Item();
-        }
-
-        public class Item extends Agent.MigrationBatch.Item
+        public class Item
+                extends Agent.MigrationBatch.Item
         {
             public Agent.MigrationBatch.Item.Delete delete( Long metadataId, Long id ) throws java.io.IOException
             {
                 Delete result = new Delete( metadataId, id );
+                initialize( result );
+                return result;
+            }
+
+            public Agent.MigrationBatch.Item.Get get( Long metadataId, Long id ) throws java.io.IOException
+            {
+                Get result = new Get( metadataId, id );
+                initialize( result );
+                return result;
+            }
+
+            public Agent.MigrationBatch.Item.Insert insert( Long metadataId,
+                                                            org.ctoolkit.api.agent.model.MigrationItem content )
+                    throws java.io.IOException
+            {
+                Insert result = new Insert( metadataId, content );
+                initialize( result );
+                return result;
+            }
+
+            public Agent.MigrationBatch.Item.Update update( Long metadataId,
+                                                            Long id,
+                                                            org.ctoolkit.api.agent.model.MigrationItem content )
+                    throws java.io.IOException
+            {
+                Update result = new Update( metadataId, id, content );
                 initialize( result );
                 return result;
             }
@@ -1520,13 +1555,6 @@ public class CustomizedCtoolkitAgent
                 }
             }
 
-            public Agent.MigrationBatch.Item.Get get( Long metadataId, Long id ) throws java.io.IOException
-            {
-                Get result = new Get( metadataId, id );
-                initialize( result );
-                return result;
-            }
-
             public class Get
                     extends Agent.MigrationBatch.Item.Get
             {
@@ -1560,14 +1588,6 @@ public class CustomizedCtoolkitAgent
                         return url;
                     }
                 }
-            }
-
-            public Agent.MigrationBatch.Item.Insert insert( Long metadataId, org.ctoolkit.api.agent.model.MigrationItem content )
-                    throws java.io.IOException
-            {
-                Insert result = new Insert( metadataId, content );
-                initialize( result );
-                return result;
             }
 
             public class Insert
@@ -1605,14 +1625,6 @@ public class CustomizedCtoolkitAgent
                 }
             }
 
-            public Agent.MigrationBatch.Item.Update update( Long metadataId, Long id, org.ctoolkit.api.agent.model.MigrationItem content )
-                    throws java.io.IOException
-            {
-                Update result = new Update( metadataId, id, content );
-                initialize( result );
-                return result;
-            }
-
             public class Update
                     extends Agent.MigrationBatch.Item.Update
             {
@@ -1620,7 +1632,7 @@ public class CustomizedCtoolkitAgent
 
                 protected Update( Long metadataId, Long id, org.ctoolkit.api.agent.model.MigrationItem content )
                 {
-                    super( metadataId, id, content);
+                    super( metadataId, id, content );
                 }
 
                 public MigrationItem execute( RequestCredential credential ) throws IOException
@@ -1650,16 +1662,26 @@ public class CustomizedCtoolkitAgent
 
         }
 
-        public Agent.MigrationBatch.Job job()
-        {
-            return new Job();
-        }
-
-        public class Job extends Agent.MigrationBatch.Job
+        public class Job
+                extends Agent.MigrationBatch.Job
         {
             public Agent.MigrationBatch.Job.Cancel cancel( Long id ) throws java.io.IOException
             {
                 Cancel result = new Cancel( id );
+                initialize( result );
+                return result;
+            }
+
+            public Agent.MigrationBatch.Job.Progress progress( Long id ) throws java.io.IOException
+            {
+                Progress result = new Progress( id );
+                initialize( result );
+                return result;
+            }
+
+            public Agent.MigrationBatch.Job.Start start( Long id ) throws java.io.IOException
+            {
+                Start result = new Start( id );
                 initialize( result );
                 return result;
             }
@@ -1699,13 +1721,6 @@ public class CustomizedCtoolkitAgent
                 }
             }
 
-            public Agent.MigrationBatch.Job.Progress progress( Long id ) throws java.io.IOException
-            {
-                Progress result = new Progress( id );
-                initialize( result );
-                return result;
-            }
-
             public class Progress
                     extends Agent.MigrationBatch.Job.Progress
             {
@@ -1739,13 +1754,6 @@ public class CustomizedCtoolkitAgent
                         return url;
                     }
                 }
-            }
-
-            public Agent.MigrationBatch.Job.Start start( Long id ) throws java.io.IOException
-            {
-                Start result = new Start( id );
-                initialize( result );
-                return result;
             }
 
             public class Start

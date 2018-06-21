@@ -24,7 +24,6 @@ import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RestFacade;
 import org.ctoolkit.restapi.client.RetrievalRequest;
-import org.ctoolkit.restapi.client.SimpleRequest;
 import org.ctoolkit.restapi.client.appengine.GuiceTestCase;
 import org.ctoolkit.restapi.client.appengine.adapter.model.Foo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
@@ -152,17 +151,17 @@ public class AdapterAppEngineTest
 
         resources.client( UnderlyingClient.class ).export().execute();
 
-        SimpleRequest singleRequest = resources.delete( Foo.class ).identifiedBy( new Identifier( 1L ) );
-        assertNotNull( singleRequest );
-        singleRequest.finish();
+        PayloadRequest<Foo> deleteRequest = resources.delete( Foo.class ).identifiedBy( new Identifier( 1L ) );
+        assertNotNull( deleteRequest );
+        deleteRequest.finish();
 
-        singleRequest = resources.delete( Foo.class ).identifiedBy( 1L );
-        assertNotNull( singleRequest );
-        singleRequest.finish();
+        deleteRequest = resources.delete( Foo.class ).identifiedBy( 1L );
+        assertNotNull( deleteRequest );
+        deleteRequest.finish();
 
-        singleRequest = resources.delete( Foo.class ).identifiedBy( "identifier" );
-        assertNotNull( singleRequest );
-        singleRequest.finish();
+        deleteRequest = resources.delete( Foo.class ).identifiedBy( "identifier" );
+        assertNotNull( deleteRequest );
+        deleteRequest.finish();
     }
 
     @Test

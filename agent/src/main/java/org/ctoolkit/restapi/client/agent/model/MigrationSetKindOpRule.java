@@ -15,10 +15,15 @@ public class MigrationSetKindOpRule
         implements Serializable
 {
     public final static String EQUALS = "eq";
+
     public final static String LOWER_THAN = "lt";
+
     public final static String LOWER_THAN_EQUALS = "lte";
+
     public final static String GREATER_THAN = "gt";
+
     public final static String GREATER_THAN_EQUALS = "gte";
+
     public final static String REGEXP = "regexp";
 
     @XmlAttribute( name = "property" )

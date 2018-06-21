@@ -19,9 +19,9 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import org.ctoolkit.restapi.client.AuthRequest;
+import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
-import org.ctoolkit.restapi.client.SimpleRequest;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 
 import javax.annotation.Nonnull;
@@ -38,10 +38,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-class DeleteRequest
-        implements SimpleRequest<Void>
+class DeleteRequest<T>
+        implements PayloadRequest<T>
 {
-    private final Class resource;
+    private final Class<T> resource;
 
     private final Object identifier;
 
@@ -59,13 +59,21 @@ class DeleteRequest
 
     private String token;
 
-    DeleteRequest( @Nonnull Class resource,
-                   @Nonnull Object identifier,
+    DeleteRequest( @Nonnull Object identifier,
                    @Nonnull RestFacadeAdapter adapter,
                    @Nonnull DeleteExecutorAdaptee adaptee,
                    @Nonnull Object remoteRequest )
     {
-        this.resource = checkNotNull( resource );
+        this( null, identifier, adapter, adaptee, remoteRequest );
+    }
+
+    private DeleteRequest( @Nullable Class<T> resource,
+                           @Nonnull Object identifier,
+                           @Nonnull RestFacadeAdapter adapter,
+                           @Nonnull DeleteExecutorAdaptee adaptee,
+                           @Nonnull Object remoteRequest )
+    {
+        this.resource = resource;
         this.identifier = checkNotNull( identifier );
         this.adapter = checkNotNull( adapter );
         this.adaptee = checkNotNull( adaptee );
@@ -75,13 +83,13 @@ class DeleteRequest
     }
 
     @Override
-    public Void finish()
+    public T finish()
     {
         return finish( null, withLocale );
     }
 
     @Override
-    public Void finish( @Nonnull RequestCredential credential )
+    public T finish( @Nonnull RequestCredential credential )
     {
         checkNotNull( credential );
         credential.populate( this.params );
@@ -89,19 +97,19 @@ class DeleteRequest
     }
 
     @Override
-    public Void finish( @Nullable Map<String, Object> parameters )
+    public T finish( @Nullable Map<String, Object> parameters )
     {
         return finish( parameters, withLocale );
     }
 
     @Override
-    public Void finish( @Nullable Locale locale )
+    public T finish( @Nullable Locale locale )
     {
         return finish( null, locale );
     }
 
     @Override
-    public Void finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public T finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
     {
         if ( parameters != null )
         {
@@ -114,11 +122,11 @@ class DeleteRequest
             filler.authorization( token );
         }
 
-        return adapter.callbackExecuteDelete( adaptee, remoteRequest, resource, identifier, params, locale );
+        return adapter.callbackExecuteDelete( adaptee, remoteRequest, identifier, resource, params, locale );
     }
 
     @Override
-    public Request<Void> configWith( @Nonnull Properties properties )
+    public Request<T> configWith( @Nonnull Properties properties )
     {
         checkNotNull( properties );
         RequestCredential.populate( properties, this.params );
@@ -126,14 +134,14 @@ class DeleteRequest
     }
 
     @Override
-    public Request<Void> forLang( @Nonnull Locale locale )
+    public Request<T> forLang( @Nonnull Locale locale )
     {
         this.withLocale = checkNotNull( locale );
         return this;
     }
 
     @Override
-    public Request<Void> add( @Nonnull String name, @Nonnull Object value )
+    public Request<T> add( @Nonnull String name, @Nonnull Object value )
     {
         checkNotNull( name );
         checkNotNull( value );
@@ -143,7 +151,7 @@ class DeleteRequest
     }
 
     @Override
-    public Request<Void> add( @Nonnull String name, @Nonnull String value )
+    public Request<T> add( @Nonnull String name, @Nonnull String value )
     {
         checkNotNull( name );
         checkNotNull( value );
@@ -153,7 +161,7 @@ class DeleteRequest
     }
 
     @Override
-    public Request<Void> addHeader( @Nonnull String header, @Nonnull String value )
+    public Request<T> addHeader( @Nonnull String header, @Nonnull String value )
     {
         checkNotNull( header );
         checkNotNull( value );
@@ -163,11 +171,31 @@ class DeleteRequest
     }
 
     @Override
-    public AuthRequest<Void> authBy( @Nonnull String authorization )
+    public AuthRequest<T> authBy( @Nonnull String authorization )
     {
         checkNotNull( authorization );
 
         this.token = authorization;
         return new AuthRequestImpl<>( this, filler );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    @Override
+    public <U> U underlying( Class<U> type )
+    {
+        return ( U ) remoteRequest;
+    }
+
+    @Override
+    public <R> Request<R> answerBy( @Nonnull Class<R> type )
+    {
+        checkNotNull( type );
+        return new DeleteRequest<>( type, identifier, adapter, adaptee, remoteRequest );
+    }
+
+    @Override
+    public <R> R finish( @Nonnull Class<R> type )
+    {
+        return answerBy( type ).finish();
     }
 }

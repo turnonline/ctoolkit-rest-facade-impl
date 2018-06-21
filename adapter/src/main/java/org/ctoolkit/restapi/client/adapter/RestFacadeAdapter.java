@@ -42,7 +42,6 @@ import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.RequestTimeoutException;
 import org.ctoolkit.restapi.client.RestFacade;
 import org.ctoolkit.restapi.client.RetrievalRequest;
-import org.ctoolkit.restapi.client.SimpleRequest;
 import org.ctoolkit.restapi.client.SingleRetrievalIdentification;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.UpdateIdentification;
@@ -663,7 +662,7 @@ public class RestFacadeAdapter
     }
 
     @SuppressWarnings( "unchecked" )
-    <T> SimpleRequest<T> internalDelete( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
+    <T> PayloadRequest<T> internalDelete( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
         checkNotNull( resource );
         checkNotNull( identifier );
@@ -679,27 +678,45 @@ public class RestFacadeAdapter
             throw new ClientErrorException( 400, e.getMessage() );
         }
 
-        return ( SimpleRequest ) new DeleteRequest( resource, identifier, this, adaptee, remoteRequest );
+        // by default response type is not being provided (resulting in null), client can configure if expected
+        return new DeleteRequest( identifier, this, adaptee, remoteRequest );
     }
 
-    Void callbackExecuteDelete( @Nonnull DeleteExecutorAdaptee adaptee,
-                                @Nonnull Object remoteRequest,
-                                @Nonnull Class resource,
-                                @Nonnull Object identifier,
-                                @Nullable Map<String, Object> parameters,
-                                @Nullable Locale locale )
+    <R> R callbackExecuteDelete( @Nonnull DeleteExecutorAdaptee adaptee,
+                                 @Nonnull Object remoteRequest,
+                                 @Nonnull Object identifier,
+                                 @Nullable Class<R> responseType,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
     {
+        checkNotNull( adaptee );
+        checkNotNull( remoteRequest );
         checkNotNull( identifier );
 
+        Object response;
         try
         {
-            adaptee.executeDelete( remoteRequest, parameters, locale );
+            response = adaptee.executeDelete( remoteRequest, parameters, locale );
         }
         catch ( IOException e )
         {
-            throw prepareUpdateException( e, resource, identifier );
+            throw prepareUpdateException( e, responseType, identifier );
         }
-        return null;
+
+        if ( responseType == null || response == null )
+        {
+            return null;
+        }
+
+        if ( response.getClass() == responseType )
+        {
+            //noinspection unchecked
+            return ( R ) response;
+        }
+        else
+        {
+            return mapper.map( response, responseType );
+        }
     }
 
     private RuntimeException prepareRetrievalException( IOException e, Class<?> resource, @Nullable Object identifier )
@@ -713,7 +730,7 @@ public class RestFacadeAdapter
     }
 
     private RuntimeException prepareException( IOException e,
-                                               Class<?> resource,
+                                               @Nullable Class<?> resource,
                                                @Nullable Object identifier,
                                                boolean update )
     {
@@ -747,7 +764,8 @@ public class RestFacadeAdapter
             statusMessage = e.getMessage();
         }
 
-        logger.warn( "Resource " + resource.getName() + ", identifier: " + identifier, e );
+        logger.warn( "Response resource " + ( resource == null ? " none" : resource.getName() )
+                + ", identifier: " + identifier, e );
 
         if ( 400 == statusCode )
         {
@@ -801,8 +819,9 @@ public class RestFacadeAdapter
         return toBeThrown;
     }
 
-    Class<?> evaluateRemoteResource( Class resource )
+    private Class<?> evaluateRemoteResource( Class resource )
     {
+        @SuppressWarnings( "unchecked" )
         Set<Type<?>> types = factory.lookupMappedClasses( TypeFactory.valueOf( resource ) );
         Iterator<Type<?>> iterator = types.iterator();
 

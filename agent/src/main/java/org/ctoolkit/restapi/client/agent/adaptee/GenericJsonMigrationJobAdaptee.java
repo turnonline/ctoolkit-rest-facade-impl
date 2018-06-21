@@ -66,8 +66,8 @@ public class GenericJsonMigrationJobAdaptee
 
     @Override
     public MigrationJob executeGet( @Nonnull Object request,
-                                 @Nullable Map<String, Object> parameters,
-                                 @Nullable Locale locale )
+                                    @Nullable Map<String, Object> parameters,
+                                    @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -93,8 +93,8 @@ public class GenericJsonMigrationJobAdaptee
 
     @Override
     public MigrationJob executeInsert( @Nonnull Object request,
-                                    @Nullable Map<String, Object> parameters,
-                                    @Nullable Locale locale )
+                                       @Nullable Map<String, Object> parameters,
+                                       @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -114,7 +114,9 @@ public class GenericJsonMigrationJobAdaptee
     }
 
     @Override
-    public void executeDelete( @Nonnull Object request, @Nullable Map<String, Object> parameters, @Nullable Locale locale )
+    public Object executeDelete( @Nonnull Object request,
+                                 @Nullable Map<String, Object> parameters,
+                                 @Nullable Locale locale )
             throws IOException
     {
         checkNotNull( request );
@@ -123,5 +125,6 @@ public class GenericJsonMigrationJobAdaptee
         credential.fillInFrom( parameters, true );
 
         ( ( CustomizedCtoolkitAgent.MigrationBatch.Job.Cancel ) request ).execute( credential );
+        return null;
     }
 }
