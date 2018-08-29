@@ -19,7 +19,6 @@
 package org.ctoolkit.restapi.client.agent;
 
 import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpStatusCodes;
 import com.google.api.client.http.HttpTransport;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -41,7 +40,7 @@ import org.ctoolkit.api.agent.model.MigrationJob;
 import org.ctoolkit.api.agent.model.PropertyMetaData;
 import org.ctoolkit.restapi.client.AccessToken;
 import org.ctoolkit.restapi.client.ApiToken;
-import org.ctoolkit.restapi.client.RemoteServerErrorException;
+import org.ctoolkit.restapi.client.ServiceUnavailableException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
@@ -297,7 +296,7 @@ public class CtoolkitApiAgentModule
                     + " Application name: " + applicationName
                     + " Endpoint URL: " + endpointUrl, e );
 
-            throw new RemoteServerErrorException( HttpStatusCodes.STATUS_CODE_SERVER_ERROR, e.getMessage() );
+            throw new ServiceUnavailableException( e.getMessage() );
         }
 
         return builder.build();

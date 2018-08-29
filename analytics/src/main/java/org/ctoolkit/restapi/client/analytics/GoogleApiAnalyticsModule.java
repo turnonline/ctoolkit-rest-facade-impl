@@ -19,14 +19,13 @@
 package org.ctoolkit.restapi.client.analytics;
 
 import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpStatusCodes;
 import com.google.api.services.analytics.Analytics;
 import com.google.api.services.analytics.AnalyticsScopes;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import org.ctoolkit.restapi.client.AccessToken;
 import org.ctoolkit.restapi.client.ApiToken;
-import org.ctoolkit.restapi.client.RemoteServerErrorException;
+import org.ctoolkit.restapi.client.ServiceUnavailableException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.slf4j.Logger;
@@ -83,7 +82,7 @@ public class GoogleApiAnalyticsModule
                     + " Application name: " + factory.getApplicationName( API_PREFIX )
                     + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
 
-            throw new RemoteServerErrorException( HttpStatusCodes.STATUS_CODE_SERVER_ERROR, e.getMessage() );
+            throw new ServiceUnavailableException( e.getMessage() );
         }
 
         return builder.build();

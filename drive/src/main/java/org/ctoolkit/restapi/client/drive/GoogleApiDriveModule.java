@@ -19,7 +19,6 @@
 package org.ctoolkit.restapi.client.drive;
 
 import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpStatusCodes;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
@@ -28,7 +27,7 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import org.ctoolkit.restapi.client.AccessToken;
 import org.ctoolkit.restapi.client.ApiToken;
-import org.ctoolkit.restapi.client.RemoteServerErrorException;
+import org.ctoolkit.restapi.client.ServiceUnavailableException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
@@ -100,7 +99,7 @@ public class GoogleApiDriveModule
                     + " Application name: " + factory.getApplicationName( API_PREFIX )
                     + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
 
-            throw new RemoteServerErrorException( HttpStatusCodes.STATUS_CODE_SERVER_ERROR, e.getMessage() );
+            throw new ServiceUnavailableException( e.getMessage() );
         }
 
         return builder.build();

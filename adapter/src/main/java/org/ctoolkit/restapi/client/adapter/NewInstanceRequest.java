@@ -114,7 +114,7 @@ class NewInstanceRequest<T>
             }
             catch ( InstantiationException | IllegalAccessException e )
             {
-                throw new ClientErrorException( 400, e.getMessage() );
+                throw new ClientErrorException( e.getMessage() );
             }
         }
 

@@ -39,9 +39,9 @@ import org.ctoolkit.restapi.client.NotFoundException;
 import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.RemoteServerErrorException;
 import org.ctoolkit.restapi.client.RequestCredential;
-import org.ctoolkit.restapi.client.RequestTimeoutException;
 import org.ctoolkit.restapi.client.RestFacade;
 import org.ctoolkit.restapi.client.RetrievalRequest;
+import org.ctoolkit.restapi.client.ServiceUnavailableException;
 import org.ctoolkit.restapi.client.SingleRetrievalIdentification;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.UpdateIdentification;
@@ -216,7 +216,7 @@ public class RestFacadeAdapter
             logger.error( "Application name: " + apiFactory.getApplicationName( apiPrefix )
                     + " Endpoint URL: " + apiFactory.getEndpointUrl( apiPrefix ), e );
 
-            throw new RemoteServerErrorException( HttpStatusCodes.STATUS_CODE_SERVER_ERROR, e.getMessage() );
+            throw new RemoteServerErrorException( e.getMessage() );
         }
 
         Identifier root = identifier.root();
@@ -236,7 +236,7 @@ public class RestFacadeAdapter
         }
         catch ( IOException e )
         {
-            throw new ClientErrorException( 400, e.getMessage() );
+            throw new ClientErrorException( e.getMessage() );
         }
 
         return new NewInstanceRequest<>( resource, this, adaptee, remoteRequest );
@@ -312,7 +312,7 @@ public class RestFacadeAdapter
         }
         catch ( IOException e )
         {
-            throw new ClientErrorException( 400, e.getMessage() );
+            throw new ClientErrorException( e.getMessage() );
         }
 
         return new GetRequest<>( resource, identifier.root(), this, adaptee, remoteRequest );
@@ -403,7 +403,7 @@ public class RestFacadeAdapter
         }
         catch ( IOException e )
         {
-            throw new ClientErrorException( 400, e.getMessage() );
+            throw new ClientErrorException( e.getMessage() );
         }
 
         return new ListRequest<>( resource, this, adaptee, remoteRequest );
@@ -522,7 +522,7 @@ public class RestFacadeAdapter
         }
         catch ( IOException e )
         {
-            throw new ClientErrorException( 400, e.getMessage() );
+            throw new ClientErrorException( e.getMessage() );
         }
 
         @SuppressWarnings( "unchecked" )
@@ -601,7 +601,7 @@ public class RestFacadeAdapter
         }
         catch ( IOException e )
         {
-            throw new ClientErrorException( 400, e.getMessage() );
+            throw new ClientErrorException( e.getMessage() );
         }
 
         @SuppressWarnings( "unchecked" )
@@ -675,7 +675,7 @@ public class RestFacadeAdapter
         }
         catch ( IOException e )
         {
-            throw new ClientErrorException( 400, e.getMessage() );
+            throw new ClientErrorException( e.getMessage() );
         }
 
         // by default response type is not being provided (resulting in null), client can configure if expected
@@ -769,7 +769,7 @@ public class RestFacadeAdapter
 
         if ( 400 == statusCode )
         {
-            toBeThrown = new ClientErrorException( statusCode, statusMessage );
+            toBeThrown = new ClientErrorException( statusMessage );
         }
         else if ( HttpStatusCodes.STATUS_CODE_UNAUTHORIZED == statusCode )
         {
@@ -777,7 +777,7 @@ public class RestFacadeAdapter
         }
         else if ( HttpStatusCodes.STATUS_CODE_FORBIDDEN == statusCode )
         {
-            toBeThrown = new ClientErrorException( statusCode, statusMessage );
+            toBeThrown = new ClientErrorException( statusMessage );
         }
         else if ( HttpStatusCodes.STATUS_CODE_NOT_FOUND == statusCode && update )
         {
@@ -789,23 +789,19 @@ public class RestFacadeAdapter
         }
         else if ( 408 == statusCode )
         {
-            toBeThrown = new RequestTimeoutException( statusMessage );
-        }
-        else if ( 409 == statusCode )
-        {
-            toBeThrown = new ClientErrorException( statusCode, statusMessage );
+            toBeThrown = new ServiceUnavailableException( statusMessage );
         }
         else if ( 400 < statusCode && statusCode < 499 )
         {
-            toBeThrown = new ClientErrorException( statusCode, statusMessage );
+            toBeThrown = new HttpFailureException( statusCode, statusMessage );
         }
         else if ( HttpStatusCodes.STATUS_CODE_SERVER_ERROR == statusCode )
         {
-            toBeThrown = new RemoteServerErrorException( statusCode, statusMessage );
+            toBeThrown = new RemoteServerErrorException( statusMessage );
         }
         else if ( HttpStatusCodes.STATUS_CODE_SERVICE_UNAVAILABLE == statusCode )
         {
-            toBeThrown = new RemoteServerErrorException( statusCode, statusMessage );
+            toBeThrown = new ServiceUnavailableException( statusMessage );
         }
         else if ( statusCode > -1 )
         {
