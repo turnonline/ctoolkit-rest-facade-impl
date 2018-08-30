@@ -27,7 +27,6 @@ import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import org.ctoolkit.restapi.client.RestFacade;
-import org.ctoolkit.restapi.client.adapter.ResourceProviderInjector;
 import org.ctoolkit.restapi.client.adapter.RestFacadeAdapter;
 import org.ctoolkit.restapi.client.googleapis.Credential;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
@@ -53,7 +52,6 @@ public class CtoolkitRestFacadeAppEngineModule
     protected void configure()
     {
         bind( RestFacade.class ).to( RestFacadeAdapter.class ).in( Singleton.class );
-        bind( ResourceProviderInjector.class ).to( ResourceProviderGuiceInjector.class );
         bind( EventBus.class ).in( Singleton.class );
         bind( GoogleApiProxyFactory.class ).to( GoogleApiProxyFactoryAppEngine.class ).in( Singleton.class );
     }

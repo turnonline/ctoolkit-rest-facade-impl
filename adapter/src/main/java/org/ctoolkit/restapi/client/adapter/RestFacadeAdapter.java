@@ -25,6 +25,11 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpStatusCodes;
 import com.google.common.collect.Lists;
+import com.google.inject.Binding;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.util.Types;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.metadata.Type;
@@ -67,6 +72,7 @@ import javax.inject.Inject;
 import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.ParameterizedType;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -96,14 +102,14 @@ public class RestFacadeAdapter
 
     private final MapperFactory factory;
 
-    private final ResourceProviderInjector injector;
+    private final Injector injector;
 
     private final GoogleApiProxyFactory apiFactory;
 
     @Inject
     RestFacadeAdapter( MapperFacade mapper,
                        MapperFactory factory,
-                       ResourceProviderInjector injector,
+                       Injector injector,
                        GoogleApiProxyFactory apiFactory )
     {
         this.mapper = mapper;
@@ -333,7 +339,7 @@ public class RestFacadeAdapter
         }
 
         // looking for LocalResourceProvider optional implementation for given resource type
-        LocalResourceProvider<R> provider = injector.getExistingResourceProvider( responseType );
+        LocalResourceProvider<R> provider = getExistingResourceProvider( responseType );
         R response = null;
 
         boolean requestForPersist = false;
@@ -427,7 +433,7 @@ public class RestFacadeAdapter
         }
 
         // looking for LocalResourceProvider optional implementation for given resource type
-        LocalListResourceProvider<R> provider = injector.getExistingListResourceProvider( responseType );
+        LocalListResourceProvider<R> provider = getExistingListResourceProvider( responseType );
         List<R> response = null;
 
         boolean requestForPersist = false;
@@ -839,7 +845,7 @@ public class RestFacadeAdapter
     private <A> A adaptee( Class<A> adapteeType, Class<?> resource )
     {
         Class<?> remoteResource = evaluateRemoteResource( resource );
-        A adaptee = injector.getExecutorAdaptee( adapteeType, remoteResource );
+        A adaptee = getExecutorAdaptee( adapteeType, remoteResource );
 
         if ( adaptee == null && remoteResource == resource )
         {
@@ -857,6 +863,75 @@ public class RestFacadeAdapter
             throw new NotFoundException( msg );
         }
 
+        return adaptee;
+    }
+
+    /**
+     * Returns the binding if it already exists, or null if does not exist.
+     *
+     * @param resource the type of resource to get
+     * @param <T>      the concrete type of the resource
+     * @return the resource provider
+     */
+    <T> LocalResourceProvider<T> getExistingResourceProvider( @Nonnull Class<T> resource )
+    {
+        LocalResourceProvider<T> provider = null;
+
+        ParameterizedType pt = Types.newParameterizedType( LocalResourceProvider.class, resource );
+        Binding<?> binding = injector.getExistingBinding( Key.get( TypeLiteral.get( pt ) ) );
+
+        if ( binding != null )
+        {
+            //noinspection unchecked
+            provider = ( LocalResourceProvider<T> ) binding.getProvider().get();
+        }
+
+        return provider;
+    }
+
+    /**
+     * Returns the binding if it already exists, or null if does not exist.
+     *
+     * @param resource the type of resource to get
+     * @param <T>      the concrete type of the resource
+     * @return the resource provider
+     */
+    <T> LocalListResourceProvider<T> getExistingListResourceProvider( @Nonnull Class<T> resource )
+    {
+        LocalListResourceProvider<T> provider = null;
+
+        ParameterizedType pt = Types.newParameterizedType( LocalListResourceProvider.class, resource );
+        Binding<?> binding = injector.getExistingBinding( Key.get( TypeLiteral.get( pt ) ) );
+
+        if ( binding != null )
+        {
+            //noinspection unchecked
+            provider = ( LocalListResourceProvider<T> ) binding.getProvider().get();
+        }
+
+        return provider;
+    }
+
+    /**
+     * Returns the binding if it already exists, or null if does not exist.
+     *
+     * @param adapteeType the adaptee type to get
+     * @param resource    the generic type of adaptee to get
+     * @param <A>         the type of the adaptee
+     * @return the adaptee implementation for given arguments if any
+     */
+    <A> A getExecutorAdaptee( @Nonnull Class<A> adapteeType, @Nonnull Class<?> resource )
+    {
+        A adaptee = null;
+
+        ParameterizedType pt = Types.newParameterizedType( adapteeType, resource );
+        Binding<?> binding = injector.getExistingBinding( Key.get( TypeLiteral.get( pt ) ) );
+
+        if ( binding != null )
+        {
+            //noinspection unchecked
+            adaptee = ( A ) binding.getProvider().get();
+        }
         return adaptee;
     }
 }

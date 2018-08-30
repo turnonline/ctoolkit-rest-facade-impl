@@ -19,9 +19,11 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
+import com.google.api.client.googleapis.services.AbstractGoogleClient;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpContent;
 import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpResponseInterceptor;
+import com.google.inject.Injector;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -42,6 +44,7 @@ import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -56,9 +59,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
 
 /**
  * Unit tests to test {@link RestFacadeAdapter}.
@@ -78,247 +81,282 @@ public class RestFacadeAdapterTest
     private MapperFactory factory;
 
     @Injectable
-    private ResourceProviderInjector injector;
+    private Injector injector;
 
     @Injectable
     private GoogleApiProxyFactory apiFactory;
 
+    @Mocked
+    private AbstractGoogleClient googleClient;
+
+    @Mocked
+    private NewExecutorAdaptee newAdaptee;
+
+    @Mocked
+    private GetExecutorAdaptee getAdaptee;
+
+    @Mocked
+    private ListExecutorAdaptee listAdaptee;
+
+    @Mocked
+    private InsertExecutorAdaptee insertAdaptee;
+
+    @Mocked
+    private UpdateExecutorAdaptee updateAdaptee;
+
+    @Mocked
+    private DeleteExecutorAdaptee deleteAdaptee;
+
+    @Mocked
+    private DownloadExecutorAdaptee downloadAdaptee;
+
+    @Mocked
+    private MediaHttpDownloader downloader;
+
+    @Mocked
+    private DownloadResponseInterceptor interceptor;
+
+    @Mocked
+    private ResourceNoMapping inputResource;
+
+    @Mocked
+    private ResourceNoMapping responseResource;
+
+    @Mocked
+    private LocalResourceProvider provider;
+
+    @Mocked
+    private OutputStream output;
+
+    @Mocked
+    private HttpContent httpContent;
+
+    private RemoteRequest remoteRequest;
+
+    @BeforeMethod
+    public void before()
+    {
+        remoteRequest = new RemoteRequest( googleClient, "", "", httpContent, ResourceNoMapping.class );
+    }
+
     @Test
-    public void noResourceMappingNewInstance( @Mocked final NewExecutorAdaptee adaptee,
-                                              @Mocked final RemoteRequest request,
-                                              @Mocked final ResourceNoMapping resource )
+    public void noResourceMappingNewInstance()
             throws IOException
     {
         new Expectations()
         {
             {
-                injector.getExecutorAdaptee( NewExecutorAdaptee.class, ResourceNoMapping.class );
-                result = adaptee;
+                tested.getExecutorAdaptee( NewExecutorAdaptee.class, ResourceNoMapping.class );
+                result = newAdaptee;
 
-                adaptee.prepareNew( anyString );
-                result = request;
+                newAdaptee.prepareNew( anyString );
+                result = remoteRequest;
 
-                adaptee.executeNew( any, ( Map<String, Object> ) any, ( Locale ) any );
-                result = resource;
+                newAdaptee.executeNew( any, ( Map<String, Object> ) any, ( Locale ) any );
+                result = responseResource;
             }
         };
 
         tested.newInstance( ResourceNoMapping.class ).finish();
 
-        new NoMappingVerifications();
+        noMappingVerifications();
     }
 
     @Test
-    public void noResourceMappingGet( @Mocked final GetExecutorAdaptee adaptee,
-                                      @Mocked final RemoteRequest request,
-                                      @Mocked final ResourceNoMapping resource )
+    public void noResourceMappingGet()
             throws IOException
     {
-        new Expectations()
+        new Expectations( tested )
         {
             {
-                injector.getExecutorAdaptee( GetExecutorAdaptee.class, ResourceNoMapping.class );
-                result = adaptee;
+                tested.getExecutorAdaptee( GetExecutorAdaptee.class, ResourceNoMapping.class );
+                result = getAdaptee;
 
-                adaptee.prepareGet( ( Identifier ) any );
-                result = request;
+                getAdaptee.prepareGet( ( Identifier ) any );
+                result = remoteRequest;
 
-                injector.getExistingResourceProvider( ( Class<Object> ) any );
+                tested.getExistingResourceProvider( ( Class<Object> ) any );
                 result = null;
 
-                adaptee.executeGet( any, ( Map<String, Object> ) any, ( Locale ) any );
-                result = resource;
+                getAdaptee.executeGet( any, ( Map<String, Object> ) any, ( Locale ) any );
+                result = responseResource;
             }
         };
 
         tested.get( ResourceNoMapping.class ).identifiedBy( new Identifier( 1L ) ).finish();
 
-        new NoMappingVerifications();
+        noMappingVerifications();
     }
 
     @Test
-    public void noResourceMappingEmptyResponseList( @Mocked final ListExecutorAdaptee adaptee,
-                                                    @Mocked final RemoteRequest request )
+    public void noResourceMappingEmptyResponseList()
             throws IOException
     {
-        new Expectations()
+        new Expectations( tested )
         {
             {
-                injector.getExecutorAdaptee( ListExecutorAdaptee.class, ResourceNoMapping.class );
-                result = adaptee;
+                tested.getExecutorAdaptee( ListExecutorAdaptee.class, ResourceNoMapping.class );
+                result = listAdaptee;
 
-                adaptee.prepareList( ( Identifier ) any );
-                result = request;
+                listAdaptee.prepareList( ( Identifier ) any );
+                result = remoteRequest;
 
-                adaptee.executeList( any, ( Map<String, Object> ) any, ( Locale ) any, -1, -1,
+                listAdaptee.executeList( any, ( Map<String, Object> ) any, ( Locale ) any, -1, -1,
                         anyString, anyBoolean );
                 result = new ArrayList<>();
 
                 // returns null to make sure no provider is being injected
-                injector.getExistingListResourceProvider( ( Class ) any );
+                tested.getExistingListResourceProvider( ( Class ) any );
                 result = null;
             }
         };
 
         tested.list( ResourceNoMapping.class ).finish();
 
-        new NoMappingVerifications();
+        noMappingVerifications();
     }
 
     @Test
-    public void noResourceMappingList( @Mocked final ListExecutorAdaptee adaptee,
-                                       @Mocked final RemoteRequest request,
-                                       @Mocked final ResourceNoMapping responseResource )
+    public void noResourceMappingList()
             throws IOException
     {
         final List<ResourceNoMapping> resources = new ArrayList<>();
         resources.add( responseResource );
 
-        new Expectations()
+        new Expectations( tested )
         {
             {
-                injector.getExecutorAdaptee( ListExecutorAdaptee.class, ResourceNoMapping.class );
-                result = adaptee;
+                tested.getExecutorAdaptee( ListExecutorAdaptee.class, ResourceNoMapping.class );
+                result = listAdaptee;
 
-                adaptee.prepareList( ( Identifier ) any );
-                result = request;
+                listAdaptee.prepareList( ( Identifier ) any );
+                result = remoteRequest;
 
-                adaptee.executeList( any, ( Map<String, Object> ) any, ( Locale ) any, -1, -1,
+                listAdaptee.executeList( any, ( Map<String, Object> ) any, ( Locale ) any, -1, -1,
                         anyString, anyBoolean );
                 result = resources;
 
                 // returns null to make sure no provider is being injected
-                injector.getExistingListResourceProvider( ( Class ) any );
+                tested.getExistingListResourceProvider( ( Class ) any );
                 result = null;
             }
         };
 
         tested.list( ResourceNoMapping.class ).finish();
 
-        new NoMappingVerifications();
+        noMappingVerifications();
     }
 
     @Test
-    public void noResourceMappingInsert( @Mocked final InsertExecutorAdaptee adaptee,
-                                         @Mocked final RemoteRequest request,
-                                         @Mocked final ResourceNoMapping inputResource,
-                                         @Mocked final ResourceNoMapping responseResource )
+    public void noResourceMappingInsert()
             throws IOException
     {
         new Expectations()
         {
             {
-                injector.getExecutorAdaptee( InsertExecutorAdaptee.class, ResourceNoMapping.class );
-                result = adaptee;
+                tested.getExecutorAdaptee( InsertExecutorAdaptee.class, ResourceNoMapping.class );
+                result = insertAdaptee;
 
-                adaptee.prepareInsert( inputResource, ( Identifier ) any, ( MediaProvider ) any );
-                result = request;
+                insertAdaptee.prepareInsert( inputResource, ( Identifier ) any, ( MediaProvider ) any );
+                result = remoteRequest;
 
-                adaptee.executeInsert( any, ( Map<String, Object> ) any, ( Locale ) any );
+                insertAdaptee.executeInsert( any, ( Map<String, Object> ) any, ( Locale ) any );
                 result = responseResource;
             }
         };
 
         tested.insert( inputResource, new Identifier( 1L ) ).finish();
 
-        new NoMappingVerifications();
+        noMappingVerifications();
     }
 
     @Test
-    public void noResourceMappingUpdate( @Mocked final UpdateExecutorAdaptee adaptee,
-                                         @Mocked final RemoteRequest request,
-                                         @Mocked final ResourceNoMapping inputResource,
-                                         @Mocked final ResourceNoMapping responseResource )
+    public void noResourceMappingUpdate()
             throws IOException
     {
         new Expectations()
         {
             {
-                injector.getExecutorAdaptee( UpdateExecutorAdaptee.class, ResourceNoMapping.class );
-                result = adaptee;
+                tested.getExecutorAdaptee( UpdateExecutorAdaptee.class, ResourceNoMapping.class );
+                result = updateAdaptee;
 
-                adaptee.prepareUpdate( inputResource, ( Identifier ) any, ( MediaProvider ) any );
-                result = request;
+                updateAdaptee.prepareUpdate( inputResource, ( Identifier ) any, ( MediaProvider ) any );
+                result = remoteRequest;
 
-                adaptee.executeUpdate( any, ( Map<String, Object> ) any, ( Locale ) any );
+                updateAdaptee.executeUpdate( any, ( Map<String, Object> ) any, ( Locale ) any );
                 result = responseResource;
             }
         };
 
         tested.update( inputResource ).identifiedBy( new Identifier( 1L ) ).finish();
 
-        new NoMappingVerifications();
+        noMappingVerifications();
     }
 
     @Test
-    public void noResourceMappingDelete( @Mocked final DeleteExecutorAdaptee adaptee,
-                                         @Mocked final RemoteRequest request )
+    public void noResourceMappingDelete()
             throws IOException
     {
         new Expectations()
         {
             {
-                injector.getExecutorAdaptee( DeleteExecutorAdaptee.class, ResourceNoMapping.class );
-                result = adaptee;
+                tested.getExecutorAdaptee( DeleteExecutorAdaptee.class, ResourceNoMapping.class );
+                result = deleteAdaptee;
 
-                adaptee.prepareDelete( ( Identifier ) any );
-                result = request;
+                deleteAdaptee.prepareDelete( ( Identifier ) any );
+                result = remoteRequest;
             }
         };
 
         tested.delete( ResourceNoMapping.class ).identifiedBy( new Identifier( 1L ) ).finish();
 
-        new NoMappingVerifications();
+        noMappingVerifications();
     }
 
     @Test
-    public void insertReturnsNoContent( @Mocked final InsertExecutorAdaptee adaptee,
-                                        @Mocked final RemoteRequest request,
-                                        @Mocked final ResourceNoMapping inputResource )
+    public void insertReturnsNoContent()
             throws IOException
     {
         new Expectations()
         {
             {
-                injector.getExecutorAdaptee( InsertExecutorAdaptee.class, ResourceNoMapping.class );
-                result = adaptee;
+                tested.getExecutorAdaptee( InsertExecutorAdaptee.class, ResourceNoMapping.class );
+                result = insertAdaptee;
 
-                adaptee.prepareInsert( inputResource, ( Identifier ) any, ( MediaProvider ) any );
-                result = request;
+                insertAdaptee.prepareInsert( inputResource, ( Identifier ) any, ( MediaProvider ) any );
+                result = remoteRequest;
 
-                adaptee.executeInsert( any, ( Map<String, Object> ) any, ( Locale ) any );
+                insertAdaptee.executeInsert( any, ( Map<String, Object> ) any, ( Locale ) any );
                 result = null;
             }
         };
 
-        assertNull( tested.insert( inputResource, new Identifier( 1L ) ).finish() );
+        assertThat( tested.insert( inputResource, new Identifier( 1L ) ).finish() ).isNull();
     }
 
     @Test
-    public void updateReturnsNoContent( @Mocked final UpdateExecutorAdaptee adaptee,
-                                        @Mocked final RemoteRequest request,
-                                        @Mocked final ResourceNoMapping inputResource )
+    public void updateReturnsNoContent()
             throws IOException
     {
         new Expectations()
         {
             {
-                injector.getExecutorAdaptee( UpdateExecutorAdaptee.class, ResourceNoMapping.class );
-                result = adaptee;
+                tested.getExecutorAdaptee( UpdateExecutorAdaptee.class, ResourceNoMapping.class );
+                result = updateAdaptee;
 
-                adaptee.prepareUpdate( inputResource, ( Identifier ) any, ( MediaProvider ) any );
-                result = request;
+                updateAdaptee.prepareUpdate( inputResource, ( Identifier ) any, ( MediaProvider ) any );
+                result = remoteRequest;
 
-                adaptee.executeUpdate( any, ( Map<String, Object> ) any, ( Locale ) any );
+                updateAdaptee.executeUpdate( any, ( Map<String, Object> ) any, ( Locale ) any );
                 result = null;
             }
         };
 
-        assertNull( tested.update( inputResource ).identifiedBy( new Identifier( 1L ) ).finish() );
+        assertThat( tested.update( inputResource ).identifiedBy( new Identifier( 1L ) ).finish() ).isNull();
     }
 
     @Test
-    public void prepareDownloadRequest( @Mocked final DownloadExecutorAdaptee adaptee )
+    public void prepareDownloadRequest()
             throws GeneralSecurityException, IOException
     {
         final String prefix = "myapi";
@@ -326,10 +364,10 @@ public class RestFacadeAdapterTest
         new Expectations()
         {
             {
-                injector.getExecutorAdaptee( DownloadExecutorAdaptee.class, ResourceNoMapping.class );
-                result = adaptee;
+                tested.getExecutorAdaptee( DownloadExecutorAdaptee.class, ResourceNoMapping.class );
+                result = downloadAdaptee;
 
-                adaptee.getApiPrefix();
+                downloadAdaptee.getApiPrefix();
                 result = prefix;
             }
         };
@@ -343,7 +381,7 @@ public class RestFacadeAdapterTest
         new Verifications()
         {
             {
-                apiFactory.newRequestConfig( prefix, ( HttpResponseInterceptor ) withNotNull() );
+                apiFactory.newRequestConfig( prefix, withNotNull() );
                 times = 1;
 
                 apiFactory.getHttpTransport();
@@ -353,15 +391,12 @@ public class RestFacadeAdapterTest
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void executeDownloadNullUrl( @Mocked final MediaHttpDownloader downloader,
-                                        @Mocked final DownloadExecutorAdaptee adaptee,
-                                        @Mocked final DownloadResponseInterceptor interceptor )
-            throws IOException
+    public void executeDownloadNullUrl()
     {
         new Expectations()
         {
             {
-                adaptee.prepareDownloadUrl( ( Identifier ) any, anyString, ( Map<String, Object> ) any, ( Locale ) any );
+                downloadAdaptee.prepareDownloadUrl( ( Identifier ) any, anyString, ( Map<String, Object> ) any, ( Locale ) any );
                 result = null;
             }
         };
@@ -369,14 +404,12 @@ public class RestFacadeAdapterTest
         ByteArrayOutputStream content = new ByteArrayOutputStream();
         Identifier id = new Identifier( 1L );
 
-        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, interceptor, null,
+        tested.executeDownload( downloader, downloadAdaptee, ResourceNoMapping.class, id, content, interceptor, null,
                 null, null );
     }
 
     @Test( expectedExceptions = RuntimeException.class )
-    public void executeDownloadException( @Mocked final MediaHttpDownloader downloader,
-                                          @Mocked final DownloadExecutorAdaptee adaptee,
-                                          @Mocked final DownloadResponseInterceptor interceptor )
+    public void executeDownloadException()
             throws IOException
     {
         final URL url = new URL( "https://www.ctoolkit.org/download" );
@@ -384,7 +417,7 @@ public class RestFacadeAdapterTest
         new Expectations()
         {
             {
-                adaptee.prepareDownloadUrl( ( Identifier ) any, anyString, ( Map<String, Object> ) any, ( Locale ) any );
+                downloadAdaptee.prepareDownloadUrl( ( Identifier ) any, anyString, ( Map<String, Object> ) any, ( Locale ) any );
                 result = url;
 
                 downloader.download( ( GenericUrl ) any, ( HttpHeaders ) any, ( OutputStream ) any );
@@ -395,14 +428,12 @@ public class RestFacadeAdapterTest
         ByteArrayOutputStream content = new ByteArrayOutputStream();
         final Identifier id = new Identifier( 1L );
 
-        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, id, content, interceptor, null,
+        tested.executeDownload( downloader, downloadAdaptee, ResourceNoMapping.class, id, content, interceptor, null,
                 null, null );
     }
 
     @Test
-    public void executeDownload( @Mocked final MediaHttpDownloader downloader,
-                                 @Mocked final DownloadExecutorAdaptee adaptee,
-                                 @Mocked final DownloadResponseInterceptor interceptor )
+    public void executeDownload()
             throws IOException
     {
         final Identifier id = new Identifier( 1L );
@@ -415,17 +446,17 @@ public class RestFacadeAdapterTest
 
         headers.setContentType( type );
 
-        new Expectations( tested )
+        new Expectations()
         {
             {
-                adaptee.prepareDownloadUrl( id, type, params, locale );
+                downloadAdaptee.prepareDownloadUrl( id, type, params, locale );
                 result = url;
             }
         };
 
         final ByteArrayOutputStream content = new ByteArrayOutputStream();
         Class<ResourceNoMapping> resource = ResourceNoMapping.class;
-        tested.executeDownload( downloader, adaptee, resource, id, content, interceptor, headers, params, locale );
+        tested.executeDownload( downloader, downloadAdaptee, resource, id, content, interceptor, headers, params, locale );
 
         new Verifications()
         {
@@ -437,84 +468,50 @@ public class RestFacadeAdapterTest
     }
 
     @Test
-    public void prepareDownloadRequestRootIdentifier( @Mocked final DownloadRequestImpl request,
-                                                      @Mocked final OutputStream output )
-    {
-        final Identifier identifier = new Identifier( 1L, 99L ).leaf();
-        tested.prepareDownloadRequest( ResourceNoMapping.class, identifier, output, null );
-
-        new Verifications()
-        {
-            {
-                new DownloadRequestImpl( ( RestFacadeAdapter ) any, ( DownloadExecutorAdaptee ) any,
-                        ( MediaHttpDownloader ) any, ResourceNoMapping.class,
-                        withSameInstance( identifier.root() ), ( OutputStream ) any,
-                        ( DownloadResponseInterceptor ) any, null );
-            }
-        };
-    }
-
-    @Test
-    public void executeDownloadRootIdentifier( @Mocked final MediaHttpDownloader downloader,
-                                               @Mocked final DownloadExecutorAdaptee adaptee,
-                                               @Mocked final OutputStream output,
-                                               @Mocked final DownloadResponseInterceptor interceptor )
+    public void executeDownloadRootIdentifier()
             throws MalformedURLException
     {
         final Identifier identifier = new Identifier( 1L, 99L ).leaf();
         new Expectations()
         {
             {
-                adaptee.prepareDownloadUrl( ( Identifier ) any, anyString, null, null );
+                downloadAdaptee.prepareDownloadUrl( ( Identifier ) any, anyString, null, null );
                 result = new URL( "http://localhost/download" );
             }
         };
 
-        tested.executeDownload( downloader, adaptee, ResourceNoMapping.class, identifier, output,
+        tested.executeDownload( downloader, downloadAdaptee, ResourceNoMapping.class, identifier, output,
                 interceptor, null, null, null );
 
         new Verifications()
         {
             {
                 Identifier root;
-                adaptee.prepareDownloadUrl( root = withCapture(), null, null, null );
+                downloadAdaptee.prepareDownloadUrl( root = withCapture(), null, null, null );
                 assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
             }
         };
     }
 
     @Test
-    public void internalGetRequestRootIdentifier( @Mocked final GetRequest request )
+    public void callbackExecuteGetRootIdentifier() throws IOException
     {
         final Identifier identifier = new Identifier( 1L, 99L ).leaf();
-        tested.internalGet( ResourceNoMapping.class, identifier );
-
-        new Verifications()
+        new Expectations( tested )
         {
             {
-                new GetRequest( ( Class ) any, withSameInstance( identifier.root() ), ( RestFacadeAdapter ) any,
-                        ( GetExecutorAdaptee ) any, any );
-            }
-        };
-    }
-
-    @Test
-    public void callbackExecuteGetRootIdentifier( @Mocked final GetExecutorAdaptee adaptee,
-                                                  @Mocked final LocalResourceProvider provider )
-    {
-        final Identifier identifier = new Identifier( 1L, 99L ).leaf();
-        new Expectations()
-        {
-            {
-                injector.getExistingResourceProvider( ( Class<Object> ) any );
+                tested.getExistingResourceProvider( ( Class<Object> ) any );
                 result = provider;
+
+                getAdaptee.executeGet( any, ( Map<String, Object> ) any, ( Locale ) any );
+                result = responseResource;
 
                 provider.get( ( Identifier ) any, null, null );
                 result = null;
             }
         };
 
-        tested.callbackExecuteGet( adaptee, new Object(), ResourceNoMapping.class, identifier, null, null );
+        tested.callbackExecuteGet( getAdaptee, new Object(), ResourceNoMapping.class, identifier, null, null );
 
         new Verifications()
         {
@@ -530,15 +527,17 @@ public class RestFacadeAdapterTest
     }
 
     @Test
-    public void listRequestRootIdentifier( @Mocked final ListExecutorAdaptee adaptee,
-                                           @Mocked final RemoteRequest remoteRequest )
+    public void listRequestRootIdentifier()
             throws IOException
     {
         final Identifier identifier = new Identifier( 1L, 99L ).leaf();
         new Expectations()
         {
             {
-                adaptee.prepareList( ( Identifier ) any );
+                tested.getExecutorAdaptee( ListExecutorAdaptee.class, ResourceNoMapping.class );
+                result = listAdaptee;
+
+                listAdaptee.prepareList( ( Identifier ) any );
                 result = remoteRequest;
             }
         };
@@ -549,76 +548,80 @@ public class RestFacadeAdapterTest
         {
             {
                 Identifier root;
-                adaptee.prepareList( root = withCapture() );
+                listAdaptee.prepareList( root = withCapture() );
                 assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
             }
         };
     }
 
     @Test
-    public void internalInsertRequestRootIdentifier( @Mocked final ResourceNoMapping resource,
-                                                     @Mocked final InsertExecutorAdaptee adaptee,
-                                                     @Mocked final RemoteRequest remoteRequest )
+    public void internalInsertRequestRootIdentifier()
             throws IOException
     {
         final Identifier identifier = new Identifier( 1L, 99L ).leaf();
         new Expectations()
         {
             {
-                adaptee.prepareInsert( any, null, null );
+                tested.getExecutorAdaptee( InsertExecutorAdaptee.class, ResourceNoMapping.class );
+                result = insertAdaptee;
+
+                insertAdaptee.prepareInsert( any, null, null );
                 result = remoteRequest;
             }
         };
 
-        tested.internalInsert( resource, identifier, null );
+        tested.internalInsert( inputResource, identifier, null );
 
         new Verifications()
         {
             {
                 Identifier root;
-                adaptee.prepareInsert( any, root = withCapture(), null );
+                insertAdaptee.prepareInsert( any, root = withCapture(), null );
                 assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
             }
         };
     }
 
     @Test
-    public void internalUpdateRequestRootIdentifier( @Mocked final ResourceNoMapping resource,
-                                                     @Mocked final UpdateExecutorAdaptee adaptee,
-                                                     @Mocked final RemoteRequest remoteRequest )
+    public void internalUpdateRequestRootIdentifier()
             throws IOException
     {
         final Identifier identifier = new Identifier( 1L, 99L ).leaf();
         new Expectations()
         {
             {
-                adaptee.prepareUpdate( any, ( Identifier ) any, null );
+                tested.getExecutorAdaptee( UpdateExecutorAdaptee.class, ResourceNoMapping.class );
+                result = updateAdaptee;
+
+                updateAdaptee.prepareUpdate( any, ( Identifier ) any, null );
                 result = remoteRequest;
             }
         };
 
-        tested.internalUpdate( resource, identifier, null );
+        tested.internalUpdate( inputResource, identifier, null );
 
         new Verifications()
         {
             {
                 Identifier root;
-                adaptee.prepareUpdate( any, root = withCapture(), null );
+                updateAdaptee.prepareUpdate( any, root = withCapture(), null );
                 assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
             }
         };
     }
 
     @Test
-    public void internalDeleteRequestRootIdentifier( @Mocked final DeleteExecutorAdaptee adaptee,
-                                                     @Mocked final RemoteRequest remoteRequest )
+    public void internalDeleteRequestRootIdentifier()
             throws IOException
     {
         final Identifier identifier = new Identifier( 1L, 99L ).leaf();
         new Expectations()
         {
             {
-                adaptee.prepareDelete( ( Identifier ) any );
+                tested.getExecutorAdaptee( DeleteExecutorAdaptee.class, ResourceNoMapping.class );
+                result = deleteAdaptee;
+
+                deleteAdaptee.prepareDelete( ( Identifier ) any );
                 result = remoteRequest;
             }
         };
@@ -629,35 +632,36 @@ public class RestFacadeAdapterTest
         {
             {
                 Identifier root;
-                adaptee.prepareDelete( root = withCapture() );
+                deleteAdaptee.prepareDelete( root = withCapture() );
                 assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
             }
         };
     }
 
-    @SuppressWarnings( "ConstantConditions" )
-    private class NoMappingVerifications
-            extends Verifications
+    private void noMappingVerifications()
     {
+        new Verifications()
         {
-            // make sure no mapping is being invoked
-            mapper.map( any, ( Class ) any );
-            times = 0;
+            {
+                // make sure no mapping is being invoked
+                mapper.map( any, ( Class ) any );
+                times = 0;
 
-            mapper.map( any, ( Class ) any, ( MappingContext ) any );
-            times = 0;
+                mapper.map( any, ( Class ) any, ( MappingContext ) any );
+                times = 0;
 
-            mapper.map( any, any );
-            times = 0;
+                mapper.map( any, any );
+                times = 0;
 
-            mapper.map( any, any, ( MappingContext ) any );
-            times = 0;
+                mapper.map( any, any, ( MappingContext ) any );
+                times = 0;
 
-            mapper.mapAsList( ( List ) any, ( Class ) any );
-            times = 0;
+                mapper.mapAsList( ( List ) any, ( Class ) any );
+                times = 0;
 
-            mapper.mapAsList( ( List ) any, ( Class ) any, ( MappingContext ) any );
-            times = 0;
-        }
+                mapper.mapAsList( ( List ) any, ( Class ) any, ( MappingContext ) any );
+                times = 0;
+            }
+        };
     }
 }
