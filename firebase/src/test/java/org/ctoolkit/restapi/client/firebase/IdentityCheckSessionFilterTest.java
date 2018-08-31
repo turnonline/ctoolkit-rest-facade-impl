@@ -68,15 +68,36 @@ public class IdentityCheckSessionFilterTest
     @Injectable
     private Set<IdentityLoginListener> listeners = new HashSet<>();
 
+    @Mocked
+    private HttpServletRequest request;
+
+    @Mocked
+    private HttpServletResponse response;
+
+    @Mocked
+    private HttpSession session;
+
+    @Mocked
+    private FilterChain chain;
+
+    @Mocked
+    private FilterConfig config;
+
+    @Mocked
+    private FirebaseToken token;
+
+    @Mocked
+    private IdentityLoginListener listener;
+
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void initNoSessionAttribute( final @Mocked FilterConfig config )
+    public void initNoSessionAttribute()
             throws Exception
     {
         tested.init( config );
     }
 
     @Test
-    public void fullInit( final @Mocked FilterConfig config ) throws Exception
+    public void fullInit() throws Exception
     {
         filterConfigExpectations( config );
 
@@ -84,10 +105,7 @@ public class IdentityCheckSessionFilterTest
     }
 
     @Test
-    public void ignorePath1( final @Mocked FilterConfig config,
-                             final @Mocked HttpServletRequest request,
-                             final @Mocked HttpServletResponse response,
-                             final @Mocked FilterChain chain ) throws Exception
+    public void ignorePath1() throws Exception
     {
         filterConfigExpectations( config );
 
@@ -105,6 +123,7 @@ public class IdentityCheckSessionFilterTest
         new Verifications()
         {
             {
+                //noinspection ConstantConditions
                 identityHandler.resolveVerifyToken( ( HttpServletRequest ) any );
                 times = 0;
 
@@ -114,13 +133,7 @@ public class IdentityCheckSessionFilterTest
     }
 
     @Test
-    public void processIdentity( final @Mocked HttpServletRequest request,
-                                 final @Mocked HttpServletResponse response,
-                                 final @Mocked HttpSession session,
-                                 final @Mocked FilterChain chain,
-                                 final @Mocked FilterConfig config,
-                                 final @Mocked FirebaseToken token,
-                                 final @Mocked IdentityLoginListener listener ) throws Exception
+    public void processIdentity() throws Exception
     {
         listeners.add( listener );
 
@@ -129,6 +142,7 @@ public class IdentityCheckSessionFilterTest
         new Expectations()
         {
             {
+                //noinspection ConstantConditions
                 identityHandler.resolveVerifyToken( ( HttpServletRequest ) any );
                 result = token;
 
@@ -159,11 +173,7 @@ public class IdentityCheckSessionFilterTest
     }
 
     @Test
-    public void sendRedirect( final @Mocked HttpServletRequest request,
-                              final @Mocked HttpServletResponse response,
-                              final @Mocked FilterChain chain,
-                              final @Mocked FilterConfig config,
-                              final @Mocked IdentityLoginListener listener ) throws Exception
+    public void sendRedirect() throws Exception
     {
         listeners.add( listener );
 
@@ -186,6 +196,7 @@ public class IdentityCheckSessionFilterTest
         new Verifications()
         {
             {
+                //noinspection ConstantConditions
                 listener.processIdentity( ( HttpServletRequest ) any, ( HttpServletResponse ) any,
                         ( FirebaseToken ) any, anyString );
                 times = 0;

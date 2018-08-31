@@ -96,7 +96,7 @@ class DownloadRequestImpl
         this.output = checkNotNull( output );
         this.interceptor = checkNotNull( interceptor );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeaders( new HttpHeaders() );
+        this.filler = new GoogleRequestHeaders();
         this.filler.contentType( type );
     }
 

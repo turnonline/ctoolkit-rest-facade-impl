@@ -28,8 +28,6 @@ import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * The class with convenient methods to populate {@link HttpHeaders} with values.
  *
@@ -53,9 +51,9 @@ public class GoogleRequestHeaders
         }
     }
 
-    public GoogleRequestHeaders( HttpHeaders headers )
+    public GoogleRequestHeaders()
     {
-        this.headers = checkNotNull( headers );
+        this.headers = new HttpHeaders();
     }
 
     /**
