@@ -167,19 +167,13 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>6.9.10</version>
+                <version>6.14.3</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.google.truth</groupId>
                 <artifactId>truth</artifactId>
                 <version>0.40</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.ctoolkit.test</groupId>
-                <artifactId>ctoolkit-test</artifactId>
-                <version>1.2</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -189,13 +183,13 @@
         <ctoolkit-library-bom.version>8</ctoolkit-library-bom.version>
         <appengine.version>1.9.64</appengine.version>
         <ctoolkit-rest-facade-api.version>0.23</ctoolkit-rest-facade-api.version>
-        <google-api-services-analytics.version>v3-rev145-1.23.0</google-api-services-analytics.version>
-        <google-api-services-drive.version>v3-rev98-1.23.0</google-api-services-drive.version>
-        <firebase-admin.version>6.2.0</firebase-admin.version>
-        <google-api-services-sheets.version>v4-rev500-1.23.0</google-api-services-sheets.version>
-        <google-maps-services.version>0.2.7</google-maps-services.version>
-        <google-api-services-pubsub.version>v1-rev373-1.23.0</google-api-services-pubsub.version>
-        <jmockit.version>1.32</jmockit.version>
+        <google-api-services-analytics.version>v3-rev159-1.23.0</google-api-services-analytics.version>
+        <google-api-services-drive.version>v3-rev127-1.23.0</google-api-services-drive.version>
+        <firebase-admin.version>6.4.0</firebase-admin.version>
+        <google-api-services-sheets.version>v4-rev539-1.23.0</google-api-services-sheets.version>
+        <google-maps-services.version>0.2.10</google-maps-services.version>
+        <google-api-services-pubsub.version>v1-rev399-1.23.0</google-api-services-pubsub.version>
+        <jmockit.version>1.41</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
         <jmockit.setting>
             -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar

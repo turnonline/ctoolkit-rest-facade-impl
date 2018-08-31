@@ -19,9 +19,7 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.http.HttpHeaders;
-import mockit.Injectable;
 import mockit.Tested;
-import mockit.Verifications;
 import org.testng.annotations.Test;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -39,24 +37,14 @@ public class GoogleRequestHeadersTest
 
     private static final String oauthToken = GoogleRequestHeaders.AuthScheme.OAUTH.getValue() + " " + fakeToken;
 
-    @Tested
+    @Tested( fullyInitialized = true )
     private GoogleRequestHeaders tested;
-
-    @Injectable
-    private HttpHeaders headers;
 
     @Test
     public void authorizationNone()
     {
         final HttpHeaders httpHeaders = tested.getHeaders();
-
-        new Verifications()
-        {
-            {
-                httpHeaders.setAuthorization( anyString );
-                times = 0;
-            }
-        };
+        assertThat( httpHeaders.getAuthorization() ).isNull();
     }
 
     @Test
@@ -65,15 +53,7 @@ public class GoogleRequestHeadersTest
         tested.authorization( fakeToken );
         final HttpHeaders httpHeaders = tested.getHeaders();
 
-        new Verifications()
-        {
-            {
-                String token;
-                httpHeaders.setAuthorization( token = withCapture() );
-
-                assertThat( token ).isEqualTo( fakeToken );
-            }
-        };
+        assertThat( httpHeaders.getAuthorization() ).isEqualTo( fakeToken );
     }
 
     @Test
@@ -83,15 +63,7 @@ public class GoogleRequestHeadersTest
         tested.authorization( fakeToken );
         final HttpHeaders httpHeaders = tested.getHeaders();
 
-        new Verifications()
-        {
-            {
-                String token;
-                httpHeaders.setAuthorization( token = withCapture() );
-
-                assertThat( token ).isEqualTo( bearerToken );
-            }
-        };
+        assertThat( httpHeaders.getAuthorization() ).isEqualTo( bearerToken );
     }
 
     @Test
@@ -101,15 +73,7 @@ public class GoogleRequestHeadersTest
         tested.authorization( fakeToken );
         final HttpHeaders httpHeaders = tested.getHeaders();
 
-        new Verifications()
-        {
-            {
-                String token;
-                httpHeaders.setAuthorization( token = withCapture() );
-
-                assertThat( token ).isEqualTo( oauthToken );
-            }
-        };
+        assertThat( httpHeaders.getAuthorization() ).isEqualTo( oauthToken );
     }
 
     @Test
@@ -118,15 +82,7 @@ public class GoogleRequestHeadersTest
         tested.authorization( bearerToken );
         final HttpHeaders httpHeaders = tested.getHeaders();
 
-        new Verifications()
-        {
-            {
-                String token;
-                httpHeaders.setAuthorization( token = withCapture() );
-
-                assertThat( token ).isEqualTo( bearerToken );
-            }
-        };
+        assertThat( httpHeaders.getAuthorization() ).isEqualTo( bearerToken );
     }
 
     @Test
@@ -135,14 +91,6 @@ public class GoogleRequestHeadersTest
         tested.authorization( oauthToken );
         final HttpHeaders httpHeaders = tested.getHeaders();
 
-        new Verifications()
-        {
-            {
-                String token;
-                httpHeaders.setAuthorization( token = withCapture() );
-
-                assertThat( token ).isEqualTo( oauthToken );
-            }
-        };
+        assertThat( httpHeaders.getAuthorization() ).isEqualTo( oauthToken );
     }
 }

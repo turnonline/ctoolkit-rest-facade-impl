@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2018 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,9 +21,10 @@ package org.ctoolkit.restapi.client.appengine;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
-import ma.glasnost.orika.MapperFacade;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
+import org.ctoolkit.restapi.client.ApiCredential;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
@@ -32,6 +33,7 @@ import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
+import org.ctoolkit.restapi.client.adapter.BeanMapperConfig;
 import org.ctoolkit.restapi.client.appengine.adapter.BeeGetListAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.FooClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.FooDeleteAdaptee;
@@ -47,19 +49,29 @@ import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteBee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
 import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingClient;
+import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 
+import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
+import java.io.InputStream;
 
 /**
+ * The guice module configuration for testing purpose only.
+ *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class AdapterAppEngineModule
+public class TestModule
         extends AbstractModule
 {
     @Override
     protected void configure()
     {
+        install( new CtoolkitRestFacadeAppEngineModule() );
+        install( new DefaultOrikaMapperFactoryModule() );
+
+        bind( AuthKeyProvider.class ).to( MyAuthKeyProvider.class ).in( Singleton.class );
+
         // Foo adaptee mapping per type
         bind( new TypeLiteral<NewExecutorAdaptee<RemoteFoo>>()
         {
@@ -106,32 +118,59 @@ public class AdapterAppEngineModule
         bind( new TypeLiteral<GetExecutorAdaptee<RemoteOnly>>()
         {
         } ).to( RemoteOnlyAdaptee.class ).in( Singleton.class );
-    }
 
-    @Provides
-    @Singleton
-    MapperFactory provideMapperFactory()
-    {
-        return new DefaultMapperFactory.Builder()
-                .dumpStateOnException( false )
-                .mapNulls( false )
-                .useBuiltinConverters( true )
-                .build();
-    }
 
-    @Provides
-    @Singleton
-    MapperFacade provideMapperFacade( MapperFactory factory )
-    {
-        factory.classMap( Foo.class, RemoteFoo.class ).byDefault().register();
-        factory.classMap( Bee.class, RemoteBee.class ).byDefault().register();
+        // default credential configuration
+        ApiCredential credential = new ApiCredential();
+        credential.setProjectId( "appid-103" );
+        credential.setClientId( "4top4.apps.googleusercontent.com" );
+        credential.setDisableGZipContent( false );
+        credential.setServiceAccountEmail( "service.account@cloud.com" );
+        credential.setFileName( "/org/ctoolkit/restapi/private-key.p12" );
+        credential.setFileNameJsonStream( "/org/ctoolkit/restapi/private-key.json" );
+        credential.setApiKey( "AIzaSz" );
+        credential.setEndpointUrl( "http://localhost:8990/_ah/api/" );
+        credential.setCredentialOn( true );
+        credential.setNumberOfRetries( 3 );
+        credential.setRequestReadTimeout( 15000 );
+        credential.load( "/credential.properties" );
 
-        return factory.getMapperFacade();
+        Names.bindProperties( binder(), credential );
+
+        Multibinder<BeanMapperConfig> multi = Multibinder.newSetBinder( binder(), BeanMapperConfig.class );
+        multi.addBinding().to( InnerBeanMapperConfig.class );
     }
 
     @Provides
     HttpServletRequest provideHttpServletRequest()
     {
         throw new UnsupportedOperationException( "Not implemented as not needed yet" );
+    }
+
+    static class MyAuthKeyProvider
+            implements AuthKeyProvider
+    {
+        @Override
+        public InputStream get( @Nullable String prefix )
+        {
+            return null;
+        }
+
+        @Override
+        public boolean isConfigured( @Nullable String prefix )
+        {
+            return false;
+        }
+    }
+
+    private static class InnerBeanMapperConfig
+            implements BeanMapperConfig
+    {
+        @Override
+        public void config( MapperFactory factory )
+        {
+            factory.classMap( Foo.class, RemoteFoo.class ).byDefault().register();
+            factory.classMap( Bee.class, RemoteBee.class ).byDefault().register();
+        }
     }
 }

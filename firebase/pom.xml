@@ -79,10 +79,6 @@
             <artifactId>appengine-api-stubs</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.ctoolkit.test</groupId>
-            <artifactId>ctoolkit-test</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.ctoolkit.restapi</groupId>
             <artifactId>ctoolkit-rest-facade-appengine</artifactId>
             <version>${project.version}</version>

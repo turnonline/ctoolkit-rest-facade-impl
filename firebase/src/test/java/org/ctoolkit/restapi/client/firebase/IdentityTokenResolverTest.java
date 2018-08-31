@@ -42,31 +42,44 @@ import static org.testng.Assert.assertNull;
  */
 public class IdentityTokenResolverTest
 {
+    private static final String TOKEN = "tokenvalue";
+
     @Tested
     private IdentityTokenResolver tested;
 
     @Injectable
     private TokenVerifier<Identity> tokenVerifier;
 
+    @Mocked
+    private Identity identity;
+
+    @Mocked
+    private HttpServletRequest request;
+
+    @Mocked
+    private HttpServletResponse response;
+
+    @Mocked
+    private Cookie cookie;
+
     @Test( expectedExceptions = UnauthorizedException.class )
-    public void verifyOrThrowTokenNotFound( @Mocked final HttpServletRequest request ) throws Exception
+    public void verifyOrThrowTokenNotFound()
     {
         tested.verifyOrThrow( request );
     }
 
     @Test( expectedExceptions = UnauthorizedException.class )
-    public void verifyOrThrowTokenExpired( @Mocked final HttpServletRequest request,
-                                           @Mocked final Cookie cookie,
-                                           @Mocked final Identity identity ) throws Exception
+    public void verifyOrThrowTokenExpired()
     {
-        new GetToken( request, cookie );
+        getTokenExpectations();
 
         new Expectations()
         {
             {
-                tokenVerifier.verifyAndGet( GetToken.TOKEN );
+                tokenVerifier.verifyAndGet( TOKEN );
                 result = identity;
 
+                //noinspection ConstantConditions
                 identity.getExpiration().after( ( Date ) any );
                 result = false;
             }
@@ -76,10 +89,9 @@ public class IdentityTokenResolverTest
     }
 
     @Test( expectedExceptions = UnauthorizedException.class )
-    public void verifyOrThrowNotValid( @Mocked final HttpServletRequest request,
-                                       @Mocked final Cookie cookie ) throws Exception
+    public void verifyOrThrowNotValid()
     {
-        new GetToken( request, cookie );
+        getTokenExpectations();
 
         new Expectations()
         {
@@ -93,18 +105,17 @@ public class IdentityTokenResolverTest
     }
 
     @Test
-    public void verifyOrThrow( @Mocked final HttpServletRequest request,
-                               @Mocked final Cookie cookie,
-                               @Mocked final Identity identity ) throws Exception
+    public void verifyOrThrow()
     {
-        new GetToken( request, cookie );
+        getTokenExpectations();
 
         new Expectations()
         {
             {
-                tokenVerifier.verifyAndGet( GetToken.TOKEN );
+                tokenVerifier.verifyAndGet( TOKEN );
                 result = identity;
 
+                //noinspection ConstantConditions
                 identity.getExpiration().after( ( Date ) any );
                 result = true;
             }
@@ -115,24 +126,23 @@ public class IdentityTokenResolverTest
     }
 
     @Test
-    public void verifyAndGetTokenNotFound( @Mocked final HttpServletRequest request ) throws Exception
+    public void verifyAndGetTokenNotFound()
     {
         assertNull( tested.verifyAndGet( request ) );
     }
 
     @Test
-    public void verifyAndGetTokenExpired( @Mocked final HttpServletRequest request,
-                                          @Mocked final Cookie cookie,
-                                          @Mocked final Identity identity ) throws Exception
+    public void verifyAndGetTokenExpired()
     {
-        new GetToken( request, cookie );
+        getTokenExpectations();
 
         new Expectations()
         {
             {
-                tokenVerifier.verifyAndGet( GetToken.TOKEN );
+                tokenVerifier.verifyAndGet( TOKEN );
                 result = identity;
 
+                //noinspection ConstantConditions
                 identity.getExpiration().after( ( Date ) any );
                 result = false;
             }
@@ -142,10 +152,9 @@ public class IdentityTokenResolverTest
     }
 
     @Test
-    public void verifyAndGetNotValid( @Mocked final HttpServletRequest request,
-                                      @Mocked final Cookie cookie ) throws Exception
+    public void verifyAndGetNotValid()
     {
-        new GetToken( request, cookie );
+        getTokenExpectations();
 
         new Expectations()
         {
@@ -159,18 +168,17 @@ public class IdentityTokenResolverTest
     }
 
     @Test
-    public void verifyAndGet( @Mocked final HttpServletRequest request,
-                              @Mocked final Cookie cookie,
-                              @Mocked final Identity identity ) throws Exception
+    public void verifyAndGet()
     {
-        new GetToken( request, cookie );
+        getTokenExpectations();
 
         new Expectations()
         {
             {
-                tokenVerifier.verifyAndGet( GetToken.TOKEN );
+                tokenVerifier.verifyAndGet( TOKEN );
                 result = identity;
 
+                //noinspection ConstantConditions
                 identity.getExpiration().after( ( Date ) any );
                 result = true;
             }
@@ -181,12 +189,12 @@ public class IdentityTokenResolverTest
     }
 
     @Test
-    public void verifyAndGetInputTokenNull( @Mocked final Identity identity ) throws Exception
+    public void verifyAndGetInputTokenNull()
     {
         new Expectations()
         {
             {
-                tokenVerifier.verifyAndGet( GetToken.TOKEN );
+                tokenVerifier.verifyAndGet( TOKEN );
                 result = identity;
                 times = 0;
             }
@@ -196,57 +204,58 @@ public class IdentityTokenResolverTest
     }
 
     @Test
-    public void verifyAndGetInputTokenExpired( @Mocked final Identity identity ) throws Exception
+    public void verifyAndGetInputTokenExpired()
     {
         new Expectations()
         {
             {
-                tokenVerifier.verifyAndGet( GetToken.TOKEN );
+                tokenVerifier.verifyAndGet( TOKEN );
                 result = identity;
 
+                //noinspection ConstantConditions
                 identity.getExpiration().after( ( Date ) any );
                 result = false;
             }
         };
 
-        assertNull( tested.verifyAndGet( GetToken.TOKEN ) );
+        assertNull( tested.verifyAndGet( TOKEN ) );
     }
 
     @Test
-    public void verifyAndGetInputTokenNotValid() throws Exception
+    public void verifyAndGetInputTokenNotValid()
     {
         new Expectations()
         {
             {
-                tokenVerifier.verifyAndGet( GetToken.TOKEN );
+                tokenVerifier.verifyAndGet( TOKEN );
                 result = new UnauthorizedException();
             }
         };
 
-        assertNull( tested.verifyAndGet( GetToken.TOKEN ) );
+        assertNull( tested.verifyAndGet( TOKEN ) );
     }
 
     @Test
-    public void verifyAndGetInputToken( @Mocked final Identity identity ) throws Exception
+    public void verifyAndGetInputToken()
     {
         new Expectations()
         {
             {
-                tokenVerifier.verifyAndGet( GetToken.TOKEN );
+                tokenVerifier.verifyAndGet( TOKEN );
                 result = identity;
 
+                //noinspection ConstantConditions
                 identity.getExpiration().after( ( Date ) any );
                 result = true;
             }
         };
 
-        Identity result = tested.verifyAndGet( GetToken.TOKEN );
+        Identity result = tested.verifyAndGet( TOKEN );
         assertEquals( result, identity );
     }
 
     @Test
-    public void deleteNoCookie( @Mocked final HttpServletRequest request,
-                                @Mocked final HttpServletResponse response ) throws Exception
+    public void deleteNoCookie()
     {
         new Expectations()
         {
@@ -260,15 +269,9 @@ public class IdentityTokenResolverTest
     }
 
     @Test
-    public void delete( @Mocked final HttpServletRequest request,
-                        @Mocked final HttpServletResponse response,
-                        @Mocked final Cookie cookie ) throws Exception
+    public void delete()
     {
-        new GetToken( request, cookie )
-        {
-            {
-            }
-        };
+        getTokenExpectations();
 
         tested.delete( request, response );
 
@@ -290,24 +293,23 @@ public class IdentityTokenResolverTest
         };
     }
 
-    private static class GetToken
-            extends Expectations
+    private void getTokenExpectations()
     {
-        final static String TOKEN = "tokenvalue";
-
-        GetToken( HttpServletRequest request, Cookie cookie )
+        new Expectations()
         {
-            request.getCookies();
-            result = new Cookie[]{cookie};
-            minTimes = 0;
+            {
+                request.getCookies();
+                result = new Cookie[]{cookie};
+                minTimes = 0;
 
-            cookie.getName();
-            result = Identity.GTOKEN;
-            minTimes = 0;
+                cookie.getName();
+                result = Identity.GTOKEN;
+                minTimes = 0;
 
-            cookie.getValue();
-            result = TOKEN;
-            minTimes = 0;
-        }
+                cookie.getValue();
+                result = TOKEN;
+                minTimes = 0;
+            }
+        };
     }
 }

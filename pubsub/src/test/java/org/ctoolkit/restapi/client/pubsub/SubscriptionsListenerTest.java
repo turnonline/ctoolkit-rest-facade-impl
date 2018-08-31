@@ -9,7 +9,6 @@ import mockit.Tested;
 import mockit.Verifications;
 import org.testng.annotations.Test;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -31,9 +30,20 @@ public class SubscriptionsListenerTest
     @Injectable
     private Map<String, PubsubMessageListener> listeners = new HashMap<>();
 
+    @Mocked
+    private HttpServletRequest request;
+
+    @Mocked
+    private HttpServletResponse response;
+
+    @Mocked
+    private PubsubMessageListener listener;
+
+    @Mocked
+    private JsonParser parser;
+
     @Test
-    public void getSubscriptionSuffix( @Mocked final HttpServletRequest request )
-            throws ServletException
+    public void getSubscriptionSuffix()
     {
         new Expectations()
         {
@@ -48,8 +58,7 @@ public class SubscriptionsListenerTest
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void getSubscriptionNoSuffix( @Mocked final HttpServletRequest request )
-            throws ServletException
+    public void getSubscriptionNoSuffix()
     {
         new Expectations()
         {
@@ -63,8 +72,7 @@ public class SubscriptionsListenerTest
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void onSubscriptionMessageNoListenerRegistered( @Mocked final HttpServletRequest request,
-                                                           @Mocked final HttpServletResponse response )
+    public void onSubscriptionMessageNoListenerRegistered()
             throws IOException
     {
         new Expectations()
@@ -81,23 +89,22 @@ public class SubscriptionsListenerTest
     }
 
     @Test
-    public void onSubscriptionMessage( @Mocked final HttpServletRequest request,
-                                       @Mocked final HttpServletResponse response,
-                                       @Mocked final PubsubMessageListener listener,
-                                       @Mocked final PubsubMessage message,
-                                       @Mocked final JsonParser parser )
+    public void onSubscriptionMessage()
             throws Exception
     {
         final String subscription = "content.delete";
         listeners.put( subscription, listener );
 
-        new Expectations()
+        PubsubMessage message = new PubsubMessage();
+
+        new Expectations( tested )
         {
             {
                 request.getRequestURI();
                 result = SubscriptionsListener.PUSH_HANDLERS_URL_PATH + subscription;
 
-                parser.parseAndClose( PubsubMessage.class );
+                //noinspection unchecked,ConstantConditions
+                parser.parseAndClose( ( Class<PubsubMessage> ) any );
                 result = message;
             }
         };

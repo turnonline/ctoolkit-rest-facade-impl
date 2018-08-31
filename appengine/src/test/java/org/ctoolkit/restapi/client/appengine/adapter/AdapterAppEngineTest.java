@@ -24,7 +24,7 @@ import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RestFacade;
 import org.ctoolkit.restapi.client.RetrievalRequest;
-import org.ctoolkit.restapi.client.appengine.GuiceTestCase;
+import org.ctoolkit.restapi.client.appengine.BackendServiceTestCase;
 import org.ctoolkit.restapi.client.appengine.adapter.model.Foo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
 import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingClient;
@@ -47,7 +47,7 @@ import static org.testng.Assert.assertTrue;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class AdapterAppEngineTest
-        extends GuiceTestCase
+        extends BackendServiceTestCase
 {
     @Inject
     @Named( "credential.default.projectId" )
