@@ -193,6 +193,12 @@ class DownloadRequestImpl
     }
 
     @Override
+    public Request<Map<String, Object>> onBehalf( @Nonnull String email, @Nonnull String identityId )
+    {
+        return addHeader( Request.ON_BEHALF_OF_EMAIL, email ).addHeader( Request.ON_BEHALF_OF_USER_ID, identityId );
+    }
+
+    @Override
     public AuthRequest<Map<String, Object>> authBy( @Nonnull String authorization )
     {
         checkNotNull( authorization );

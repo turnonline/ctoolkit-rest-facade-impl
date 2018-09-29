@@ -171,6 +171,12 @@ class GetRequest<T>
     }
 
     @Override
+    public Request<T> onBehalf( @Nonnull String email, @Nonnull String identityId )
+    {
+        return addHeader( Request.ON_BEHALF_OF_EMAIL, email ).addHeader( Request.ON_BEHALF_OF_USER_ID, identityId );
+    }
+
+    @Override
     public AuthRequest<T> authBy( @Nonnull String authorization )
     {
         checkNotNull( authorization );
