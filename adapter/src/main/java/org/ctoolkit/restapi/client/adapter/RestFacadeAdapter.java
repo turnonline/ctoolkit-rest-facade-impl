@@ -106,16 +106,21 @@ public class RestFacadeAdapter
 
     private final GoogleApiProxyFactory apiFactory;
 
+    private final Substitute substitute;
+
     @Inject
     RestFacadeAdapter( MapperFacade mapper,
                        MapperFactory factory,
                        Injector injector,
-                       GoogleApiProxyFactory apiFactory )
+                       GoogleApiProxyFactory apiFactory,
+                       SubstituteInit substitute )
     {
         this.mapper = mapper;
         this.factory = factory;
         this.injector = injector;
         this.apiFactory = apiFactory;
+        // substitute is optional thus might have a null value
+        this.substitute = substitute.substitute;
     }
 
     /**
@@ -140,7 +145,7 @@ public class RestFacadeAdapter
      * @param headers     the HTTP request headers
      * @param params      the optional resource params
      * @param locale      the language the client has configured to prefer in results if applicable
-     * @return Void
+     * @return the download's response headers.
      */
     Map<String, Object> executeDownload( @Nonnull MediaHttpDownloader downloader,
                                          @Nonnull DownloadExecutorAdaptee adaptee,
@@ -173,7 +178,23 @@ public class RestFacadeAdapter
 
         try
         {
-            downloader.download( new GenericUrl( path ), headers, output );
+            boolean remote = substitute == null;
+            if ( !remote )
+            {
+                try
+                {
+                    substitute.download( resource, identifier, output, headers, params, locale );
+                }
+                catch ( Substitute.ProceedWithRemoteCall e )
+                {
+                    remote = true;
+                }
+            }
+
+            if ( remote )
+            {
+                downloader.download( new GenericUrl( path ), headers, output );
+            }
         }
         catch ( IOException e )
         {
@@ -277,16 +298,33 @@ public class RestFacadeAdapter
             parameters = new HashMap<>();
         }
 
-        Object remoteInstance;
+        Object remoteInstance = null;
         try
         {
-            remoteInstance = adaptee.executeNew( remoteRequest, parameters, locale );
+            boolean remote = substitute == null;
+            if ( !remote )
+            {
+                try
+                {
+                    remoteInstance = substitute.newInstance( remoteRequest, responseType, parameters, locale );
+                }
+                catch ( Substitute.ProceedWithRemoteCall e )
+                {
+                    remote = true;
+                }
+            }
+
+            if ( remote )
+            {
+                remoteInstance = adaptee.executeNew( remoteRequest, parameters, locale );
+            }
         }
         catch ( IOException e )
         {
             throw prepareUpdateException( e, responseType, null );
         }
 
+        checkNotNull( remoteInstance, "Callback must not return null" );
         if ( remoteInstance.getClass() == responseType )
         {
             //noinspection unchecked
@@ -352,10 +390,26 @@ public class RestFacadeAdapter
 
         if ( response == null )
         {
-            Object remoteObject;
+            Object remoteObject = null;
             try
             {
-                remoteObject = adaptee.executeGet( remoteRequest, parameters, locale );
+                boolean remote = substitute == null;
+                if ( !remote )
+                {
+                    try
+                    {
+                        remoteObject = substitute.get( remoteRequest, responseType, identifier, parameters, locale );
+                    }
+                    catch ( Substitute.ProceedWithRemoteCall e )
+                    {
+                        remote = true;
+                    }
+                }
+
+                if ( remote )
+                {
+                    remoteObject = adaptee.executeGet( remoteRequest, parameters, locale );
+                }
             }
             catch ( IOException e )
             {
@@ -369,6 +423,8 @@ public class RestFacadeAdapter
                     throw exception;
                 }
             }
+
+            checkNotNull( remoteObject, "Callback must not return null" );
             if ( remoteObject.getClass() == responseType )
             {
                 //noinspection unchecked
@@ -446,10 +502,28 @@ public class RestFacadeAdapter
 
         if ( response == null )
         {
-            List<?> remoteList;
+            List<R> remoteList = null;
             try
             {
-                remoteList = adaptee.executeList( remoteRequest, criteria, locale, start, length, orderBy, ascending );
+                boolean remote = substitute == null;
+                if ( !remote )
+                {
+                    try
+                    {
+                        remoteList = substitute.list( remoteRequest, responseType, criteria,
+                                locale, start, length, orderBy, ascending );
+                    }
+                    catch ( Substitute.ProceedWithRemoteCall e )
+                    {
+                        remote = true;
+                    }
+                }
+
+                if ( remote )
+                {
+                    //noinspection unchecked
+                    remoteList = adaptee.executeList( remoteRequest, criteria, locale, start, length, orderBy, ascending );
+                }
             }
             catch ( IOException e )
             {
@@ -471,8 +545,7 @@ public class RestFacadeAdapter
             {
                 if ( remoteList.get( 0 ).getClass() == responseType )
                 {
-                    //noinspection unchecked
-                    response = ( List<R> ) remoteList;
+                    response = remoteList;
                 }
                 else
                 {
@@ -547,10 +620,26 @@ public class RestFacadeAdapter
         checkNotNull( remoteRequest );
         checkNotNull( responseType );
 
-        Object source;
+        Object source = null;
         try
         {
-            source = adaptee.executeInsert( remoteRequest, parameters, locale );
+            boolean remote = substitute == null;
+            if ( !remote )
+            {
+                try
+                {
+                    source = substitute.insert( remoteRequest, responseType, parentKey, parameters, locale );
+                }
+                catch ( Substitute.ProceedWithRemoteCall e )
+                {
+                    remote = true;
+                }
+            }
+
+            if ( remote )
+            {
+                source = adaptee.executeInsert( remoteRequest, parameters, locale );
+            }
         }
         catch ( IOException e )
         {
@@ -627,10 +716,26 @@ public class RestFacadeAdapter
         checkNotNull( responseType );
         checkNotNull( identifier );
 
-        Object source;
+        Object source = null;
         try
         {
-            source = adaptee.executeUpdate( remoteRequest, parameters, locale );
+            boolean remote = substitute == null;
+            if ( !remote )
+            {
+                try
+                {
+                    source = substitute.update( remoteRequest, responseType, identifier, parameters, locale );
+                }
+                catch ( Substitute.ProceedWithRemoteCall e )
+                {
+                    remote = true;
+                }
+            }
+
+            if ( remote )
+            {
+                source = adaptee.executeUpdate( remoteRequest, parameters, locale );
+            }
         }
         catch ( IOException e )
         {
@@ -699,10 +804,26 @@ public class RestFacadeAdapter
         checkNotNull( remoteRequest );
         checkNotNull( identifier );
 
-        Object response;
+        Object response = null;
         try
         {
-            response = adaptee.executeDelete( remoteRequest, parameters, locale );
+            boolean remote = substitute == null;
+            if ( !remote )
+            {
+                try
+                {
+                    response = substitute.delete( remoteRequest, identifier, responseType, parameters, locale );
+                }
+                catch ( Substitute.ProceedWithRemoteCall e )
+                {
+                    remote = true;
+                }
+            }
+
+            if ( remote )
+            {
+                response = adaptee.executeDelete( remoteRequest, parameters, locale );
+            }
         }
         catch ( IOException e )
         {
@@ -933,5 +1054,11 @@ public class RestFacadeAdapter
             adaptee = ( A ) binding.getProvider().get();
         }
         return adaptee;
+    }
+
+    static class SubstituteInit
+    {
+        @com.google.inject.Inject( optional = true )
+        Substitute substitute = null;
     }
 }

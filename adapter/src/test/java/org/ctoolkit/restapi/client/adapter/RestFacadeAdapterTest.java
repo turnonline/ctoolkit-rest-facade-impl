@@ -86,6 +86,9 @@ public class RestFacadeAdapterTest
     @Injectable
     private GoogleApiProxyFactory apiFactory;
 
+    @Injectable
+    private RestFacadeAdapter.SubstituteInit substitute = new RestFacadeAdapter.SubstituteInit();
+
     @Mocked
     private AbstractGoogleClient googleClient;
 
