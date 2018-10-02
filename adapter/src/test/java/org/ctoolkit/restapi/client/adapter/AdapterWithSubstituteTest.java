@@ -38,7 +38,6 @@ import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -74,7 +73,7 @@ public class AdapterWithSubstituteTest
     private GoogleApiProxyFactory apiFactory;
 
     @Injectable
-    private RestFacadeAdapter.SubstituteInit init = new RestFacadeAdapter.SubstituteInit();
+    private Substitute substitute;
 
     @Mocked
     private GetExecutorAdaptee getAdaptee;
@@ -102,15 +101,6 @@ public class AdapterWithSubstituteTest
 
     @Mocked
     private DownloadResponseInterceptor interceptor;
-
-    @Mocked
-    private Substitute substitute;
-
-    @BeforeMethod
-    public void before()
-    {
-        init.substitute = substitute;
-    }
 
     @Test
     public void callbackNewInstance()

@@ -103,12 +103,14 @@ public abstract class GoogleApiProxyFactory
     /**
      * Create factory instance.
      */
-    protected GoogleApiProxyFactory( @Nonnull Map<String, String> credential,
-                                     @Nonnull EventBus eventBus,
-                                     @Nullable AuthKeyProvider keyProvider )
+    protected GoogleApiProxyFactory( @Nonnull Map<String, String> credential, @Nonnull EventBus eventBus )
     {
         this.credential = credential;
         this.eventBus = eventBus;
+    }
+
+    protected void setKeyProvider( AuthKeyProvider keyProvider )
+    {
         this.keyProvider = keyProvider;
     }
 

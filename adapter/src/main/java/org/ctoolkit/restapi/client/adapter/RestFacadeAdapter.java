@@ -106,21 +106,24 @@ public class RestFacadeAdapter
 
     private final GoogleApiProxyFactory apiFactory;
 
-    private final Substitute substitute;
+    private Substitute substitute;
 
     @Inject
     RestFacadeAdapter( MapperFacade mapper,
                        MapperFactory factory,
                        Injector injector,
-                       GoogleApiProxyFactory apiFactory,
-                       SubstituteInit substitute )
+                       GoogleApiProxyFactory apiFactory )
     {
         this.mapper = mapper;
         this.factory = factory;
         this.injector = injector;
         this.apiFactory = apiFactory;
-        // substitute is optional thus might have a null value
-        this.substitute = substitute.substitute;
+    }
+
+    @com.google.inject.Inject( optional = true )
+    public void setSubstitute( Substitute substitute )
+    {
+        this.substitute = substitute;
     }
 
     /**
@@ -1054,11 +1057,5 @@ public class RestFacadeAdapter
             adaptee = ( A ) binding.getProvider().get();
         }
         return adaptee;
-    }
-
-    static class SubstituteInit
-    {
-        @com.google.inject.Inject( optional = true )
-        Substitute substitute = null;
     }
 }

@@ -46,11 +46,9 @@ class GoogleApiProxyFactoryAppEngine
      * Create factory instance.
      */
     @Inject
-    protected GoogleApiProxyFactoryAppEngine( @Credential Map<String, String> properties,
-                                              EventBus eventBus,
-                                              FacadeApiInit facadeInit )
+    protected GoogleApiProxyFactoryAppEngine( @Credential Map<String, String> properties, EventBus eventBus )
     {
-        super( properties, eventBus, facadeInit.keyProvider );
+        super( properties, eventBus );
     }
 
     @Override
@@ -69,10 +67,10 @@ class GoogleApiProxyFactoryAppEngine
         }
     }
 
-    static class FacadeApiInit
+    @com.google.inject.Inject( optional = true )
+    public void setKeyProvider( AuthKeyProvider keyProvider )
     {
-        @com.google.inject.Inject( optional = true )
-        AuthKeyProvider keyProvider = null;
+        super.setKeyProvider( keyProvider );
     }
 
     private class ConfiguredAppIdentityCredential
