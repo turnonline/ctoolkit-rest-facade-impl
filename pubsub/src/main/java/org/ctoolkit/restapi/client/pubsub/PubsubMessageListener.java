@@ -18,9 +18,14 @@
 
 package org.ctoolkit.restapi.client.pubsub;
 
+import com.google.api.client.json.JsonParser;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.Charsets;
 import com.google.api.services.pubsub.model.PubsubMessage;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -42,4 +47,29 @@ public interface PubsubMessageListener
      */
     void onMessage( @Nonnull PubsubMessage message, @Nonnull String subscription )
             throws Exception;
+
+    /**
+     * Parses an encoded string value as a JSON object, array, or value into a new instance of the given
+     * destination class using {@link JsonParser#parse(Class)}.
+     *
+     * @param content          encoded (might be Base64) JSON string value
+     * @param destinationClass destination class that has an accessible default constructor to use to
+     *                         create a new instance
+     * @return the new instance of the parsed destination class
+     */
+    default <T> T fromString( String content, Class<T> destinationClass )
+            throws IOException
+    {
+        String decoded;
+        if ( Base64.isBase64( content.getBytes() ) )
+        {
+            decoded = new String( new PubsubMessage().setData( content ).decodeData(), Charsets.UTF_8 );
+        }
+        else
+        {
+            decoded = content;
+        }
+        return JacksonFactory.getDefaultInstance().fromString( decoded, destinationClass );
+    }
+
 }

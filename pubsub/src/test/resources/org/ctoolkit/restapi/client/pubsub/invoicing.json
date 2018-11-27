@@ -1,0 +1,15 @@
+{
+    "id": "13579246810291",
+    "currency": "EUR",
+    "hasBillingAddress": true,
+    "numberOfDays": 30,
+    "billingAddress": {
+        "businessName": "My own business, Ltd",
+        "street": "Bajkalská 717/29",
+        "city": "Bratislava",
+        "country": "SK",
+        "postcode": "82105",
+        "latitude": 48.1570754,
+        "longitude": 17.1662531
+    }
+}

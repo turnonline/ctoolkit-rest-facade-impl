@@ -173,7 +173,7 @@
             <dependency>
                 <groupId>com.google.truth</groupId>
                 <artifactId>truth</artifactId>
-                <version>0.40</version>
+                <version>0.42</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -181,7 +181,7 @@
 
     <properties>
         <ctoolkit-library-bom.version>9</ctoolkit-library-bom.version>
-        <appengine.version>1.9.65</appengine.version>
+        <appengine.version>1.9.66</appengine.version>
         <ctoolkit-rest-facade-api.version>0.24</ctoolkit-rest-facade-api.version>
         <google-api-services-analytics.version>v3-rev159-1.25.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev130-1.25.0</google-api-services-drive.version>
