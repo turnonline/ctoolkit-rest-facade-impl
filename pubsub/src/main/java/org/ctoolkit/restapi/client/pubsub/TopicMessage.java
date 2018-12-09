@@ -335,7 +335,13 @@ public class TopicMessage
                 throw new IllegalArgumentException( "No " + PubsubMessage.class.getSimpleName() + " message added yet." );
             }
 
-            buildAttributes( key, value, message.getAttributes() );
+            Map<String, String> attributes = message.getAttributes();
+            boolean init = attributes == null;
+            attributes = buildAttributes( key, value, attributes );
+            if ( init )
+            {
+                message.setAttributes( attributes );
+            }
             return this;
         }
 
