@@ -189,9 +189,14 @@ class ListRequest<T>
     }
 
     @Override
-    public Request<List<T>> onBehalf( @Nonnull String email, @Nonnull String identityId )
+    public Request<List<T>> onBehalf( @Nonnull String email, @Nullable String identityId )
     {
-        return addHeader( Request.ON_BEHALF_OF_EMAIL, email ).addHeader( Request.ON_BEHALF_OF_USER_ID, identityId );
+        addHeader( Request.ON_BEHALF_OF_EMAIL, email );
+        if ( identityId != null )
+        {
+            addHeader( Request.ON_BEHALF_OF_USER_ID, identityId );
+        }
+        return this;
     }
 
     @Override

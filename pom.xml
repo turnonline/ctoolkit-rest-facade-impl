@@ -73,7 +73,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.17</version>
                 <configuration>
                     <argLine>-Xmx128m ${jmockit.setting}</argLine>
                 </configuration>
@@ -181,14 +180,15 @@
 
     <properties>
         <ctoolkit-library-bom.version>9</ctoolkit-library-bom.version>
-        <appengine.version>1.9.66</appengine.version>
-        <ctoolkit-rest-facade-api.version>0.24</ctoolkit-rest-facade-api.version>
+        <appengine.version>1.9.67</appengine.version>
+        <ctoolkit-rest-facade-api.version>0.25</ctoolkit-rest-facade-api.version>
         <google-api-services-analytics.version>v3-rev159-1.25.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev130-1.25.0</google-api-services-drive.version>
         <firebase-admin.version>6.5.0</firebase-admin.version>
         <google-api-services-sheets.version>v4-rev543-1.25.0</google-api-services-sheets.version>
         <google-maps-services.version>0.2.11</google-maps-services.version>
         <google-api-services-pubsub.version>v1-rev401-1.25.0</google-api-services-pubsub.version>
+        <maven-surefire-plugin.version>3.0.0-M2</maven-surefire-plugin.version>
         <jmockit.version>1.41</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
         <jmockit.setting>
