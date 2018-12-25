@@ -21,6 +21,7 @@ package org.ctoolkit.restapi.client.pubsub;
 import com.google.api.services.pubsub.model.PubsubMessage;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.net.HttpHeaders;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -75,6 +76,11 @@ public class PubsubCommand
      * This attribute with value TRUE will come only once per an account lifetime.
      */
     public static final String ACCOUNT_SIGN_UP = "NewAccountSign-Up";
+
+    /**
+     * The HTTP {@code Accept-Language} attribute.
+     */
+    public static final String ACCEPT_LANGUAGE = HttpHeaders.ACCEPT_LANGUAGE;
 
     private Map<String, String> attributes;
 
@@ -136,6 +142,17 @@ public class PubsubCommand
             String error = "These attributes are mandatory but missing: ";
             throw new IllegalArgumentException( error + missing );
         }
+    }
+
+    /**
+     * Returns the locale configured by the sender, or {@code null} if not provided.
+     *
+     * @return the Accept-Language locale, or {@code null} if not provided
+     * @see HttpHeaders#ACCEPT_LANGUAGE
+     */
+    public String getAcceptLanguage()
+    {
+        return attributes.get( ACCEPT_LANGUAGE );
     }
 
     /**

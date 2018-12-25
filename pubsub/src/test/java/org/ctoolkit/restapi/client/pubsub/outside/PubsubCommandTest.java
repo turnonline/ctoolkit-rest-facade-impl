@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCEPT_LANGUAGE;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCOUNT_EMAIL;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCOUNT_SIGN_UP;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCOUNT_UNIQUE_ID;
@@ -277,6 +278,26 @@ public class PubsubCommandTest
         tested.validate( ENCODED_UNIQUE_KEY );
 
         tested.idFromKeyLong( 0 );
+    }
+
+    @Test
+    public void getAcceptLanguage()
+    {
+        HashMap<String, String> attributes = new HashMap<>();
+        attributes.put( ACCEPT_LANGUAGE, "sk_SK" );
+        PubsubCommand tested = new PubsubCommand( attributes );
+
+        String locale = tested.getAcceptLanguage();
+        assertThat( locale ).isEqualTo( "sk_SK" );
+    }
+
+    @Test
+    public void getAcceptLanguage_Null()
+    {
+        PubsubCommand tested = new PubsubCommand( new HashMap<>() );
+
+        String locale = tested.getAcceptLanguage();
+        assertThat( locale ).isNull();
     }
 
     private PubsubCommand command( boolean deletion, long... ids )
