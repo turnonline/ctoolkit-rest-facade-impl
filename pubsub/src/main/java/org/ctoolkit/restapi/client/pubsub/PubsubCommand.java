@@ -46,7 +46,7 @@ public class PubsubCommand
     public static final String ENTITY_ID = "Entity_ID";
 
     /**
-     * The attribute that signals entity deletion of the incoming data type and its identification.
+     * The attribute that signals entity deletion of the data type and its identification.
      */
     public static final String ENTITY_DELETION = "DataDeletion";
 
@@ -57,7 +57,7 @@ public class PubsubCommand
     public static final String ENCODED_UNIQUE_KEY = "EncodedUnique_Key";
 
     /**
-     * The concrete name of the incoming entity data type (kind).
+     * The concrete name of the entity data type (kind).
      */
     public static final String DATA_TYPE = "DataType";
 
@@ -72,7 +72,7 @@ public class PubsubCommand
     public static final String ACCOUNT_UNIQUE_ID = "AccountUnique_ID";
 
     /**
-     * The attribute to signal an incoming account is a new account sign-up.
+     * The attribute to signal an account is a new account sign-up.
      * This attribute with value TRUE will come only once per an account lifetime.
      */
     public static final String ACCOUNT_SIGN_UP = "NewAccountSign-Up";
@@ -224,9 +224,9 @@ public class PubsubCommand
     }
 
     /**
-     * Returns the concrete name of the incoming entity data type (kind).
+     * Returns the concrete name of the entity data type (kind).
      *
-     * @return the incoming entity data type
+     * @return the entity data type
      */
     public String getDataType()
     {
@@ -259,9 +259,9 @@ public class PubsubCommand
     }
 
     /**
-     * Returns the boolean indication whether incoming account represents a new account sign-up.
+     * Returns the boolean indication whether account represents a new account sign-up.
      *
-     * @return true if incoming account is a new account sign-up
+     * @return true if account is a new account sign-up
      */
     public boolean isAccountSignUp()
     {
@@ -269,7 +269,7 @@ public class PubsubCommand
     }
 
     /**
-     * Returns the boolean indication whether incoming event represents an entity deletion.
+     * Returns the boolean indication whether event represents an entity deletion.
      * Identified by data type and its identification.
      *
      * @return true if it signals an entity deletion
