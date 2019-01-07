@@ -34,28 +34,28 @@ public class PubsubCommandTest
     public void validate_NothingValidate()
     {
         PubsubCommand tested = new PubsubCommand( ( Map<String, String> ) null );
-        tested.validate();
+        assertThat( tested.validate() ).isTrue();
     }
 
-    @Test( expectedExceptions = NullPointerException.class )
+    @Test
     public void validate_NullOrEmpty()
     {
         PubsubCommand tested = new PubsubCommand( ( Map<String, String> ) null );
-        tested.validate( "", null );
+        assertThat( tested.validate( "", null ) ).isFalse();
     }
 
-    @Test( expectedExceptions = IllegalArgumentException.class )
+    @Test
     public void validate_NoAttributesDefined()
     {
         PubsubCommand tested = new PubsubCommand( ( Map<String, String> ) null );
-        tested.validate( DATA_TYPE );
+        assertThat( tested.validate( DATA_TYPE ) ).isFalse();
     }
 
-    @Test( expectedExceptions = IllegalArgumentException.class )
+    @Test
     public void validate_MissingAttributes()
     {
         PubsubCommand tested = command( false );
-        tested.validate( DATA_TYPE, ENCODED_UNIQUE_KEY );
+        assertThat( tested.validate( DATA_TYPE, ENCODED_UNIQUE_KEY ) ).isFalse();
     }
 
     @Test

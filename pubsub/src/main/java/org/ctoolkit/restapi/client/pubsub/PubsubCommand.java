@@ -22,6 +22,8 @@ import com.google.api.services.pubsub.model.PubsubMessage;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.net.HttpHeaders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -82,6 +84,8 @@ public class PubsubCommand
      */
     public static final String ACCEPT_LANGUAGE = HttpHeaders.ACCEPT_LANGUAGE;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger( PubsubCommand.class );
+
     private Map<String, String> attributes;
 
     public PubsubCommand( @Nonnull PubsubMessage message )
@@ -99,28 +103,29 @@ public class PubsubCommand
      *
      * @param mandatory the expected attributes
      */
-    public void validate( @Nonnull String... mandatory )
+    public boolean validate( @Nonnull String... mandatory )
     {
         checkNotNull( mandatory );
 
         if ( mandatory.length == 0 )
         {
             // there is nothing to validate
-            return;
+            return true;
         }
 
         for ( String next : mandatory )
         {
             if ( Strings.isNullOrEmpty( next ) )
             {
-                throw new NullPointerException( "Any of the attribute cannot be null or empty! "
-                        + Arrays.toString( mandatory ) );
+                LOGGER.warn( "Any of the attribute cannot be null or empty! " + Arrays.toString( mandatory ) );
+                return false;
             }
         }
 
         if ( attributes.isEmpty() )
         {
-            throw new IllegalArgumentException( "No incoming attributes" );
+            LOGGER.warn( "No incoming attributes" );
+            return false;
         }
 
         List<String> missing = null;
@@ -139,9 +144,11 @@ public class PubsubCommand
 
         if ( missing != null && !missing.isEmpty() )
         {
-            String error = "These attributes are mandatory but missing: ";
-            throw new IllegalArgumentException( error + missing );
+            LOGGER.warn( "These attributes are mandatory but missing: " + missing );
+            return false;
         }
+
+        return true;
     }
 
     /**

@@ -52,11 +52,6 @@ public class GoogleApiPubSubModule
 
     private ApiToken<? extends HttpRequestInitializer> initialized;
 
-    @Override
-    protected void configure()
-    {
-    }
-
     @Provides
     @Singleton
     Pubsub providePubsub( GoogleApiProxyFactory factory )
