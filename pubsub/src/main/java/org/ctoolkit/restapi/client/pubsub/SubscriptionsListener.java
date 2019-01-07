@@ -32,8 +32,6 @@ public class SubscriptionsListener
 {
     public static final String PUSH_HANDLERS_URL_PATH = "/_ah/push-handlers/";
 
-    public static final String PUB_SUB_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-
     private static final long serialVersionUID = -4754611197274771298L;
 
     private static final Logger logger = LoggerFactory.getLogger( SubscriptionsListener.class );

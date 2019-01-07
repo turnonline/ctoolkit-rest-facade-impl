@@ -36,6 +36,8 @@ import java.io.Serializable;
 public interface PubsubMessageListener
         extends Serializable
 {
+    String PUB_SUB_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
     /**
      * Called once a message has been received for given subscription.
      * In case of message processing failure it throws exception to signal re-try.
