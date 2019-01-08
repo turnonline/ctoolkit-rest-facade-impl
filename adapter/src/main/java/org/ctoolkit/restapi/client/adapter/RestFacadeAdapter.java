@@ -38,6 +38,7 @@ import org.ctoolkit.restapi.client.ClientErrorException;
 import org.ctoolkit.restapi.client.DeleteIdentification;
 import org.ctoolkit.restapi.client.DownloadMediaProvider;
 import org.ctoolkit.restapi.client.DownloadRequest;
+import org.ctoolkit.restapi.client.ForbiddenException;
 import org.ctoolkit.restapi.client.HttpFailureException;
 import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.NotFoundException;
@@ -907,7 +908,7 @@ public class RestFacadeAdapter
         }
         else if ( HttpStatusCodes.STATUS_CODE_FORBIDDEN == statusCode )
         {
-            toBeThrown = new ClientErrorException( statusMessage );
+            toBeThrown = new ForbiddenException( statusMessage );
         }
         else if ( HttpStatusCodes.STATUS_CODE_NOT_FOUND == statusCode && update )
         {
