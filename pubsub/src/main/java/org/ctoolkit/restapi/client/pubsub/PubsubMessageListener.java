@@ -51,6 +51,26 @@ public interface PubsubMessageListener
             throws Exception;
 
     /**
+     * Encode Base64 based string. If not encoded, value will be returned as been provided.
+     *
+     * @param data optionally encoded string value
+     * @return the decoded data
+     */
+    default String decode( String data )
+    {
+        String decoded;
+        if ( Base64.isBase64( data.getBytes() ) )
+        {
+            decoded = new String( new PubsubMessage().setData( data ).decodeData(), Charsets.UTF_8 );
+        }
+        else
+        {
+            decoded = data;
+        }
+        return decoded;
+    }
+
+    /**
      * Parses an encoded string value as a JSON object, array, or value into a new instance of the given
      * destination class using {@link JsonParser#parse(Class)}.
      *
@@ -62,16 +82,7 @@ public interface PubsubMessageListener
     default <T> T fromString( String content, Class<T> destinationClass )
             throws IOException
     {
-        String decoded;
-        if ( Base64.isBase64( content.getBytes() ) )
-        {
-            decoded = new String( new PubsubMessage().setData( content ).decodeData(), Charsets.UTF_8 );
-        }
-        else
-        {
-            decoded = content;
-        }
+        String decoded = decode( content );
         return JacksonFactory.getDefaultInstance().fromString( decoded, destinationClass );
     }
-
 }
