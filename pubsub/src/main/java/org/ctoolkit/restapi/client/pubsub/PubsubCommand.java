@@ -102,6 +102,7 @@ public class PubsubCommand
      * Validates whether all of the specified attributes are being present.
      *
      * @param mandatory the expected attributes
+     * @return returns true, if all specified mandatory attributes are present in the current message
      */
     public boolean validate( @Nonnull String... mandatory )
     {
