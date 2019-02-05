@@ -45,7 +45,7 @@ import java.util.Set;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see BeanMapperConfig
  */
-public class DefaultOrikaMapperFactoryModule
+public class CtoolkitRestFacadeDefaultOrikaModule
         extends AbstractModule
 {
     @Provides

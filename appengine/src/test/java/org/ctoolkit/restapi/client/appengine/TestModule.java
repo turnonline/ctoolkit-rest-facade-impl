@@ -68,7 +68,7 @@ public class TestModule
     protected void configure()
     {
         install( new CtoolkitRestFacadeAppEngineModule() );
-        install( new DefaultOrikaMapperFactoryModule() );
+        install( new CtoolkitRestFacadeDefaultOrikaModule() );
 
         bind( AuthKeyProvider.class ).to( MyAuthKeyProvider.class ).in( Singleton.class );
 
