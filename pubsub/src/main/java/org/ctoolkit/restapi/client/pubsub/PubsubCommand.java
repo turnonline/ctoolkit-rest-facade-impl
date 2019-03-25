@@ -298,13 +298,30 @@ public class PubsubCommand
      *
      * @return the date at which the message was published
      */
-    public Date getPublishTime()
+    public Date getPublishDate()
     {
         Date parsed = null;
         if ( !Strings.isNullOrEmpty( publishTime ) )
         {
             DateTime dateTime = DateTime.parseRfc3339( publishTime );
             parsed = new Date( dateTime.getValue() );
+        }
+
+        return parsed;
+    }
+
+    /**
+     * Returns the time at which the message was published, populated by the server
+     * when it receives the 'Publish' call.
+     *
+     * @return the date at which the message was published
+     */
+    public DateTime getPublishDateTime()
+    {
+        DateTime parsed = null;
+        if ( !Strings.isNullOrEmpty( publishTime ) )
+        {
+            parsed = DateTime.parseRfc3339( publishTime );
         }
 
         return parsed;

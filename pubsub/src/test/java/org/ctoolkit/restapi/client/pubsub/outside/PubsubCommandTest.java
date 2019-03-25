@@ -1,5 +1,6 @@
 package org.ctoolkit.restapi.client.pubsub.outside;
 
+import com.google.api.client.util.DateTime;
 import com.google.api.services.pubsub.model.PubsubMessage;
 import org.ctoolkit.restapi.client.pubsub.PubsubCommand;
 import org.ctoolkit.restapi.client.pubsub.TopicMessage;
@@ -172,24 +173,47 @@ public class PubsubCommandTest
     }
 
     @Test
-    public void getPublishTime()
+    public void getPublishDate()
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
         PubsubCommand tested = new PubsubCommand( attributes, "2019-03-25T16:01:31.992Z" );
 
-        Date publishTime = tested.getPublishTime();
+        Date publishTime = tested.getPublishDate();
         assertThat( publishTime ).isEqualTo( new Date( 1553529691992L ) );
     }
 
     @Test
-    public void getPublishTime_NullNoPublishTime()
+    public void getPublishDate_NullNoPublishTime()
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
         PubsubCommand tested = new PubsubCommand( attributes, null );
 
-        Date publishTime = tested.getPublishTime();
+        Date publishTime = tested.getPublishDate();
+        assertThat( publishTime ).isNull();
+    }
+
+    @Test
+    public void getPublishDateTime()
+    {
+        HashMap<String, String> attributes = new HashMap<>();
+        attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
+        String input = "2019-03-25T16:01:31.992Z";
+        PubsubCommand tested = new PubsubCommand( attributes, input );
+
+        DateTime publishTime = tested.getPublishDateTime();
+        assertThat( publishTime.toStringRfc3339() ).isEqualTo( input );
+    }
+
+    @Test
+    public void getPublishDateTime_NullNoPublishTime()
+    {
+        HashMap<String, String> attributes = new HashMap<>();
+        attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
+        PubsubCommand tested = new PubsubCommand( attributes, null );
+
+        DateTime publishTime = tested.getPublishDateTime();
         assertThat( publishTime ).isNull();
     }
 
