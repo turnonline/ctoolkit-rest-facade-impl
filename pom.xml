@@ -179,15 +179,15 @@
     </dependencyManagement>
 
     <properties>
-        <ctoolkit-library-bom.version>9</ctoolkit-library-bom.version>
-        <appengine.version>1.9.67</appengine.version>
+        <ctoolkit-library-bom.version>10</ctoolkit-library-bom.version>
+        <appengine.version>1.9.71</appengine.version>
         <ctoolkit-rest-facade-api.version>0.26</ctoolkit-rest-facade-api.version>
-        <google-api-services-analytics.version>v3-rev159-1.25.0</google-api-services-analytics.version>
-        <google-api-services-drive.version>v3-rev130-1.25.0</google-api-services-drive.version>
-        <firebase-admin.version>6.6.0</firebase-admin.version>
-        <google-api-services-sheets.version>v4-rev543-1.25.0</google-api-services-sheets.version>
+        <google-api-services-analytics.version>v3-rev161-1.25.0</google-api-services-analytics.version>
+        <google-api-services-drive.version>v3-rev156-1.25.0</google-api-services-drive.version>
+        <firebase-admin.version>6.8.0</firebase-admin.version>
+        <google-api-services-sheets.version>v4-rev569-1.25.0</google-api-services-sheets.version>
         <google-maps-services.version>0.2.11</google-maps-services.version>
-        <google-api-services-pubsub.version>v1-rev401-1.25.0</google-api-services-pubsub.version>
+        <google-api-services-pubsub.version>v1-rev418-1.25.0</google-api-services-pubsub.version>
         <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
         <jmockit.version>1.41</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
