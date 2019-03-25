@@ -5,9 +5,9 @@ import org.ctoolkit.restapi.client.pubsub.PubsubCommand;
 import org.ctoolkit.restapi.client.pubsub.TopicMessage;
 import org.testng.annotations.Test;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCEPT_LANGUAGE;
@@ -33,21 +33,21 @@ public class PubsubCommandTest
     @Test
     public void validate_NothingValidate()
     {
-        PubsubCommand tested = new PubsubCommand( ( Map<String, String> ) null );
+        PubsubCommand tested = new PubsubCommand( null, null );
         assertThat( tested.validate() ).isTrue();
     }
 
     @Test
     public void validate_NullOrEmpty()
     {
-        PubsubCommand tested = new PubsubCommand( ( Map<String, String> ) null );
+        PubsubCommand tested = new PubsubCommand( null, null );
         assertThat( tested.validate( "", null ) ).isFalse();
     }
 
     @Test
     public void validate_NoAttributesDefined()
     {
-        PubsubCommand tested = new PubsubCommand( ( Map<String, String> ) null );
+        PubsubCommand tested = new PubsubCommand( null, null );
         assertThat( tested.validate( DATA_TYPE ) ).isFalse();
     }
 
@@ -75,7 +75,7 @@ public class PubsubCommandTest
     @Test
     public void deletion_Missing()
     {
-        PubsubCommand tested = new PubsubCommand( new HashMap<>() );
+        PubsubCommand tested = new PubsubCommand( new HashMap<>(), null );
         assertThat( tested.isDelete() ).isFalse();
     }
 
@@ -85,7 +85,7 @@ public class PubsubCommandTest
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ACCOUNT_SIGN_UP, String.valueOf( true ) );
 
-        PubsubCommand tested = new PubsubCommand( attributes );
+        PubsubCommand tested = new PubsubCommand( attributes, null );
         assertThat( tested.isAccountSignUp() ).isTrue();
     }
 
@@ -95,14 +95,14 @@ public class PubsubCommandTest
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ACCOUNT_SIGN_UP, String.valueOf( false ) );
 
-        PubsubCommand tested = new PubsubCommand( attributes );
+        PubsubCommand tested = new PubsubCommand( attributes, null );
         assertThat( tested.isAccountSignUp() ).isFalse();
     }
 
     @Test
     public void accountSignUp_Missing()
     {
-        PubsubCommand tested = new PubsubCommand( new HashMap<>() );
+        PubsubCommand tested = new PubsubCommand( new HashMap<>(), null );
         assertThat( tested.isAccountSignUp() ).isFalse();
     }
 
@@ -129,7 +129,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
-        PubsubCommand tested = new PubsubCommand( attributes );
+        PubsubCommand tested = new PubsubCommand( attributes, null );
 
         assertThat( tested.getEntityLongId() ).isNull();
     }
@@ -166,9 +166,31 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
-        PubsubCommand tested = new PubsubCommand( attributes );
+        PubsubCommand tested = new PubsubCommand( attributes, null );
 
         assertThat( tested.getAccountId() ).isNull();
+    }
+
+    @Test
+    public void getPublishTime()
+    {
+        HashMap<String, String> attributes = new HashMap<>();
+        attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
+        PubsubCommand tested = new PubsubCommand( attributes, "2019-03-25T16:01:31.992Z" );
+
+        Date publishTime = tested.getPublishTime();
+        assertThat( publishTime ).isEqualTo( new Date( 1553529691992L ) );
+    }
+
+    @Test
+    public void getPublishTime_NullNoPublishTime()
+    {
+        HashMap<String, String> attributes = new HashMap<>();
+        attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
+        PubsubCommand tested = new PubsubCommand( attributes, null );
+
+        Date publishTime = tested.getPublishTime();
+        assertThat( publishTime ).isNull();
     }
 
     @Test
@@ -213,7 +235,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "/5678987/4680/1358/" );
-        PubsubCommand tested = new PubsubCommand( attributes );
+        PubsubCommand tested = new PubsubCommand( attributes, null );
 
         List<String> uniqueKey = tested.getUniqueKey();
         assertThat( uniqueKey ).hasSize( 3 );
@@ -240,7 +262,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "/456bn/5678" );
-        PubsubCommand tested = new PubsubCommand( attributes );
+        PubsubCommand tested = new PubsubCommand( attributes, null );
         tested.validate( ENCODED_UNIQUE_KEY );
 
         assertThat( tested.idFromKey( 0 ) ).isEqualTo( "456bn" );
@@ -252,7 +274,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "5678987" );
-        PubsubCommand tested = new PubsubCommand( attributes );
+        PubsubCommand tested = new PubsubCommand( attributes, null );
         tested.validate( ENCODED_UNIQUE_KEY );
 
         assertThat( tested.idFromKeyLong( 0 ) ).isEqualTo( 5678987L );
@@ -263,7 +285,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "/5678987" );
-        PubsubCommand tested = new PubsubCommand( attributes );
+        PubsubCommand tested = new PubsubCommand( attributes, null );
         tested.validate( ENCODED_UNIQUE_KEY );
 
         assertThat( tested.idFromKeyLong( 0 ) ).isEqualTo( 5678987L );
@@ -274,7 +296,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123ab/456bn" );
-        PubsubCommand tested = new PubsubCommand( attributes );
+        PubsubCommand tested = new PubsubCommand( attributes, null );
         tested.validate( ENCODED_UNIQUE_KEY );
 
         tested.idFromKeyLong( 0 );
@@ -285,7 +307,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ACCEPT_LANGUAGE, "sk_SK" );
-        PubsubCommand tested = new PubsubCommand( attributes );
+        PubsubCommand tested = new PubsubCommand( attributes, null );
 
         String locale = tested.getAcceptLanguage();
         assertThat( locale ).isEqualTo( "sk_SK" );
@@ -294,7 +316,7 @@ public class PubsubCommandTest
     @Test
     public void getAcceptLanguage_Null()
     {
-        PubsubCommand tested = new PubsubCommand( new HashMap<>() );
+        PubsubCommand tested = new PubsubCommand( new HashMap<>(), null );
 
         String locale = tested.getAcceptLanguage();
         assertThat( locale ).isNull();

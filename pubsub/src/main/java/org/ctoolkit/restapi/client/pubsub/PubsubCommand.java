@@ -18,6 +18,7 @@
 
 package org.ctoolkit.restapi.client.pubsub;
 
+import com.google.api.client.util.DateTime;
 import com.google.api.services.pubsub.model.PubsubMessage;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -29,6 +30,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,14 +90,17 @@ public class PubsubCommand
 
     private Map<String, String> attributes;
 
+    private String publishTime;
+
     public PubsubCommand( @Nonnull PubsubMessage message )
     {
-        this( message.getAttributes() );
+        this( message.getAttributes(), message.getPublishTime() );
     }
 
-    public PubsubCommand( @Nullable Map<String, String> attributes )
+    public PubsubCommand( @Nullable Map<String, String> attributes, @Nullable String publishTime )
     {
         this.attributes = attributes == null ? new HashMap<>() : attributes;
+        this.publishTime = publishTime;
     }
 
     /**
@@ -285,5 +290,23 @@ public class PubsubCommand
     public boolean isDelete()
     {
         return Boolean.parseBoolean( attributes.get( ENTITY_DELETION ) );
+    }
+
+    /**
+     * Returns the time at which the message was published, populated by the server
+     * when it receives the 'Publish' call.
+     *
+     * @return the date at which the message was published
+     */
+    public Date getPublishTime()
+    {
+        Date parsed = null;
+        if ( !Strings.isNullOrEmpty( publishTime ) )
+        {
+            DateTime dateTime = DateTime.parseRfc3339( publishTime );
+            parsed = new Date( dateTime.getValue() );
+        }
+
+        return parsed;
     }
 }
