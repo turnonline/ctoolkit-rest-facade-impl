@@ -70,8 +70,8 @@ public class AdapterAppEngineTest
     String fileName;
 
     @Inject
-    @Named( "credential.default.fileNameJsonStream" )
-    String fileNameJsonStream;
+    @Named( "credential.default.fileNameJson" )
+    String fileNameJson;
 
     @Inject
     @Named( "credential.default.apiKey" )
@@ -188,8 +188,8 @@ public class AdapterAppEngineTest
 
         assertTrue( builder.isJsonConfiguration( null ) );
 
-        String fileNameJsonStream = builder.getFileNameJsonStream( null );
-        assertEquals( fileNameJsonStream, this.fileNameJsonStream );
+        String fileNameJson = builder.getFileNameJson( null );
+        assertEquals( fileNameJson, this.fileNameJson );
 
         String apiKey = builder.getApiKey( null );
         assertEquals( apiKey, this.apiKey );
@@ -232,8 +232,8 @@ public class AdapterAppEngineTest
 
         assertTrue( builder.isJsonConfiguration( prefix ) );
 
-        String fileNameJsonStream = builder.getFileNameJsonStream( prefix );
-        assertEquals( fileNameJsonStream, "/org/ctoolkit/restapi/key.json" );
+        String fileNameJson = builder.getFileNameJson( prefix );
+        assertEquals( fileNameJson, "/org/ctoolkit/restapi/key.json" );
 
         String apiKey = builder.getApiKey( prefix );
         assertEquals( apiKey, "AIzaSzXYbn" );
@@ -276,8 +276,8 @@ public class AdapterAppEngineTest
 
         assertTrue( builder.isJsonConfiguration( prefix ) );
 
-        String fileNameJsonStream = builder.getFileNameJsonStream( prefix );
-        assertEquals( fileNameJsonStream, this.fileNameJsonStream );
+        String fileNameJson = builder.getFileNameJson( prefix );
+        assertEquals( fileNameJson, this.fileNameJson );
 
         String apiKey = builder.getApiKey( prefix );
         assertEquals( apiKey, this.apiKey );

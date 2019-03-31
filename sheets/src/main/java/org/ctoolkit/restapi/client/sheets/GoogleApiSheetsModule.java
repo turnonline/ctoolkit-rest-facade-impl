@@ -23,8 +23,6 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import org.ctoolkit.restapi.client.AccessToken;
-import org.ctoolkit.restapi.client.ApiToken;
 import org.ctoolkit.restapi.client.ServiceUnavailableException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
@@ -49,8 +47,6 @@ public class GoogleApiSheetsModule
 
     private static final Logger logger = LoggerFactory.getLogger( GoogleApiSheetsModule.class );
 
-    private ApiToken<? extends HttpRequestInitializer> initialized;
-
     @Override
     protected void configure()
     {
@@ -65,8 +61,7 @@ public class GoogleApiSheetsModule
 
         try
         {
-            initialized = factory.authorize( scopes, null, API_PREFIX );
-            HttpRequestInitializer credential = initialized.getCredential();
+            HttpRequestInitializer credential = factory.authorize( scopes, null, API_PREFIX );
             builder = new Sheets.Builder( factory.getHttpTransport(), factory.getJsonFactory(), credential );
             builder.setApplicationName( factory.getApplicationName( API_PREFIX ) );
         }
@@ -87,13 +82,5 @@ public class GoogleApiSheetsModule
         }
 
         return builder.build();
-    }
-
-    @Provides
-    @AccessToken( apiName = API_PREFIX )
-    ApiToken.Data provideSheetsTokenData( Sheets client )
-    {
-        initialized.setServiceUrl( client.getBaseUrl() );
-        return initialized.getTokenData();
     }
 }

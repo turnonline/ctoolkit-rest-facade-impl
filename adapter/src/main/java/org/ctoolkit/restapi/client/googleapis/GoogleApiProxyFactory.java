@@ -35,7 +35,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import org.ctoolkit.restapi.client.ApiCredential;
-import org.ctoolkit.restapi.client.ApiToken;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
 import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 
@@ -70,7 +69,7 @@ import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_CREDENTIAL_ON;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_DISABLE_GZIP_CONTENT;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_ENDPOINT_URL;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_FILE_NAME;
-import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_FILE_NAME_JSON_STREAM;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_FILE_NAME_JSON;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_NUMBER_OF_RETRIES;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_PROJECT_ID;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_READ_TIMEOUT;
@@ -226,7 +225,7 @@ public abstract class GoogleApiProxyFactory
     }
 
     /**
-     * Returns value set by {@link ApiCredential#setFileNameJsonStream(String)}
+     * Returns value set by {@link ApiCredential#setFileNameJson(String)}
      * or defined by property file.
      * If specific credential wouldn't not be found, default will be returned.
      *
@@ -234,9 +233,9 @@ public abstract class GoogleApiProxyFactory
      * @return the file name path
      * @throws MissingResourceException if default credential was requested and haven't been found
      */
-    public final String getFileNameJsonStream( @Nullable String prefix )
+    public final String getFileNameJson( @Nullable String prefix )
     {
-        return getStringValue( prefix, PROPERTY_FILE_NAME_JSON_STREAM );
+        return getStringValue( prefix, PROPERTY_FILE_NAME_JSON );
     }
 
     /**
@@ -408,9 +407,9 @@ public abstract class GoogleApiProxyFactory
      *                    Useful for domain-wide delegation.
      * @return the thread-safe credential instance
      */
-    public ApiToken<? extends HttpRequestInitializer> authorize( Collection<String> scopes,
-                                                                 String userAccount,
-                                                                 String prefix )
+    public HttpRequestInitializer authorize( Collection<String> scopes,
+                                             String userAccount,
+                                             String prefix )
             throws GeneralSecurityException, IOException
     {
         GoogleCredential googleCredential;
@@ -448,7 +447,7 @@ public abstract class GoogleApiProxyFactory
                     .build();
         }
 
-        return new CredentialApiToken( googleCredential );
+        return googleCredential;
     }
 
     public boolean isJsonConfiguration( String prefix )
@@ -461,7 +460,7 @@ public abstract class GoogleApiProxyFactory
 
         try
         {
-            return getFileNameJsonStream( prefix ) != null;
+            return getFileNameJson( prefix ) != null;
         }
         catch ( MissingResourceException e )
         {
@@ -491,7 +490,7 @@ public abstract class GoogleApiProxyFactory
         }
         else
         {
-            String fileName = getFileNameJsonStream( prefix );
+            String fileName = getFileNameJson( prefix );
             stream = GoogleApiProxyFactory.class.getResourceAsStream( fileName );
 
             if ( stream == null )

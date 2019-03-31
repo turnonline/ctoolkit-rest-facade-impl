@@ -127,7 +127,7 @@ public class TestModule
         credential.setDisableGZipContent( false );
         credential.setServiceAccountEmail( "service.account@cloud.com" );
         credential.setFileName( "/org/ctoolkit/restapi/private-key.p12" );
-        credential.setFileNameJsonStream( "/org/ctoolkit/restapi/private-key.json" );
+        credential.setFileNameJson( "/org/ctoolkit/restapi/private-key.json" );
         credential.setApiKey( "AIzaSz" );
         credential.setEndpointUrl( "http://localhost:8990/_ah/api/" );
         credential.setCredentialOn( true );

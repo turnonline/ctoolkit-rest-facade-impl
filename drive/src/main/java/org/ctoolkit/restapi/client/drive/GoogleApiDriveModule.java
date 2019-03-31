@@ -25,8 +25,6 @@ import com.google.api.services.drive.model.File;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
-import org.ctoolkit.restapi.client.AccessToken;
-import org.ctoolkit.restapi.client.ApiToken;
 import org.ctoolkit.restapi.client.ServiceUnavailableException;
 import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
@@ -54,8 +52,6 @@ public class GoogleApiDriveModule
 
     private static final Logger logger = LoggerFactory.getLogger( GoogleApiDriveModule.class );
 
-    private ApiToken<? extends HttpRequestInitializer> initialized;
-
     @Override
     protected void configure()
     {
@@ -81,8 +77,7 @@ public class GoogleApiDriveModule
 
         try
         {
-            initialized = factory.authorize( scopes, null, API_PREFIX );
-            HttpRequestInitializer credential = initialized.getCredential();
+            HttpRequestInitializer credential = factory.authorize( scopes, null, API_PREFIX );
             builder = new Drive.Builder( factory.getHttpTransport(), factory.getJsonFactory(), credential );
             builder.setApplicationName( factory.getApplicationName( API_PREFIX ) );
         }
@@ -103,13 +98,5 @@ public class GoogleApiDriveModule
         }
 
         return builder.build();
-    }
-
-    @Provides
-    @AccessToken( apiName = API_PREFIX )
-    ApiToken.Data provideDriveTokenData( Drive client )
-    {
-        initialized.setServiceUrl( client.getBaseUrl() );
-        return initialized.getTokenData();
     }
 }
