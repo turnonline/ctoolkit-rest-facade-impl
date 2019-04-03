@@ -27,7 +27,7 @@ import com.google.maps.DistanceMatrixApiRequest;
 import com.google.maps.GaeRequestHandler;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApiRequest;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
+import org.ctoolkit.restapi.client.adapter.GoogleApiProxyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -27,6 +27,7 @@ import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteRequest;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class FooDeleteAdaptee
         implements DeleteExecutorAdaptee<RemoteFoo>
 {
     @Inject
-    public FooDeleteAdaptee( FakeClient client )
+    public FooDeleteAdaptee( Provider<FakeClient> client )
     {
         super( client );
     }

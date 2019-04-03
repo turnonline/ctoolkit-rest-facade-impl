@@ -27,6 +27,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -42,7 +43,7 @@ public class GenericJsonPropertyMetaDataAdaptee
         implements ListExecutorAdaptee<PropertyMetaData>
 {
     @Inject
-    public GenericJsonPropertyMetaDataAdaptee( CustomizedCtoolkitAgent client )
+    public GenericJsonPropertyMetaDataAdaptee( Provider<CustomizedCtoolkitAgent> client )
     {
         super( client );
     }

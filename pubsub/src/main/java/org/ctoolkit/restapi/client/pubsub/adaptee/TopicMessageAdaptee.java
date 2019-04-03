@@ -30,6 +30,7 @@ import org.ctoolkit.restapi.client.pubsub.TopicMessage;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Locale;
@@ -48,7 +49,7 @@ public class TopicMessageAdaptee
         implements InsertExecutorAdaptee<TopicMessage>
 {
     @Inject
-    public TopicMessageAdaptee( Pubsub client )
+    public TopicMessageAdaptee( Provider<Pubsub> client )
     {
         super( client );
     }

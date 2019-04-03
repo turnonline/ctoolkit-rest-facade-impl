@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2019 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,25 +16,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.restapi.client.googleapis;
+package org.ctoolkit.restapi.client.sheets.adaptee;
 
-import javax.inject.Qualifier;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import com.google.api.services.sheets.v4.Sheets;
+import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
+import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
- * The annotation used differentiate configurations as credential.
+ * Underlying {@link Sheets} client adaptee binding.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-@Qualifier
-@Target( {CONSTRUCTOR, METHOD, PARAMETER, FIELD} )
-@Retention( java.lang.annotation.RetentionPolicy.RUNTIME )
-public @interface Credential
+@Singleton
+public class ClientAdaptee
+        extends AbstractGoogleClientAdaptee<Sheets>
+        implements UnderlyingClientAdaptee<Sheets>
 {
+    @Inject
+    ClientAdaptee( Provider<Sheets> client )
+    {
+        super( client );
+    }
+
+    @Override
+    public Sheets getUnderlyingClient()
+    {
+        return client();
+    }
 }

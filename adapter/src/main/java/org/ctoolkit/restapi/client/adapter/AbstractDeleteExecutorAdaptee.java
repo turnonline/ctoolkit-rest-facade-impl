@@ -4,6 +4,7 @@ import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -20,7 +21,7 @@ public abstract class AbstractDeleteExecutorAdaptee<C, M>
         extends AbstractGoogleClientAdaptee<C>
         implements DeleteExecutorAdaptee<M>
 {
-    public AbstractDeleteExecutorAdaptee( C client )
+    public AbstractDeleteExecutorAdaptee( Provider<C> client )
     {
         super( client );
     }

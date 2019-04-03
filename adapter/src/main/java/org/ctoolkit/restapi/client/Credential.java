@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2019 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,26 +16,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.restapi.client.adapter;
+package org.ctoolkit.restapi.client;
 
-import java.io.IOException;
+import javax.inject.Qualifier;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
 
 /**
- * fake underlying request for testing purpose.
+ * The annotation used differentiate configurations as credential.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class UnderlyingRequest
+@Qualifier
+@Target( {CONSTRUCTOR, METHOD, PARAMETER, FIELD} )
+@Retention( java.lang.annotation.RetentionPolicy.RUNTIME )
+public @interface Credential
 {
-    public Export export() throws IOException
-    {
-        return new Export();
-    }
-
-    public class Export
-    {
-        public void execute() throws IOException
-        {
-        }
-    }
 }

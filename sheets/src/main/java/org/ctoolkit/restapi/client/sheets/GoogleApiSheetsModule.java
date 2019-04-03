@@ -18,21 +18,11 @@
 
 package org.ctoolkit.restapi.client.sheets;
 
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import org.ctoolkit.restapi.client.ServiceUnavailableException;
-import org.ctoolkit.restapi.client.UnauthorizedException;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.Set;
+import com.google.inject.TypeLiteral;
+import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
+import org.ctoolkit.restapi.client.sheets.adaptee.ClientAdaptee;
 
 /**
  * The Google Sheets guice module as a default configuration.
@@ -45,42 +35,13 @@ public class GoogleApiSheetsModule
 {
     public static final String API_PREFIX = "sheets";
 
-    private static final Logger logger = LoggerFactory.getLogger( GoogleApiSheetsModule.class );
-
     @Override
     protected void configure()
     {
-    }
+        bind( Sheets.class ).toProvider( SheetsProvider.class );
 
-    @Provides
-    @Singleton
-    Sheets provideSheets( GoogleApiProxyFactory factory )
-    {
-        Set<String> scopes = SheetsScopes.all();
-        Sheets.Builder builder;
-
-        try
+        bind( new TypeLiteral<UnderlyingClientAdaptee<Sheets>>()
         {
-            HttpRequestInitializer credential = factory.authorize( scopes, null, API_PREFIX );
-            builder = new Sheets.Builder( factory.getHttpTransport(), factory.getJsonFactory(), credential );
-            builder.setApplicationName( factory.getApplicationName( API_PREFIX ) );
-        }
-        catch ( GeneralSecurityException e )
-        {
-            logger.error( "Failed. Scopes: " + scopes.toString()
-                    + " Application name: " + factory.getApplicationName( API_PREFIX )
-                    + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
-            throw new UnauthorizedException( e.getMessage() );
-        }
-        catch ( IOException e )
-        {
-            logger.error( "Failed. Scopes: " + scopes.toString()
-                    + " Application name: " + factory.getApplicationName( API_PREFIX )
-                    + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
-
-            throw new ServiceUnavailableException( e.getMessage() );
-        }
-
-        return builder.build();
+        } ).to( ClientAdaptee.class );
     }
 }

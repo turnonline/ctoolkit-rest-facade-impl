@@ -4,6 +4,7 @@ import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -20,7 +21,7 @@ public abstract class AbstractInsertExecutorAdaptee<C, M>
         extends AbstractGoogleClientAdaptee<C>
         implements InsertExecutorAdaptee<M>
 {
-    public AbstractInsertExecutorAdaptee( C client )
+    public AbstractInsertExecutorAdaptee( Provider<C> client )
     {
         super( client );
     }

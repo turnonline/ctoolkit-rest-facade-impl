@@ -4,6 +4,7 @@ import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -20,7 +21,7 @@ public abstract class AbstractUpdateExecutorAdaptee<C, M>
         extends AbstractGoogleClientAdaptee<C>
         implements UpdateExecutorAdaptee<M>
 {
-    public AbstractUpdateExecutorAdaptee( C client )
+    public AbstractUpdateExecutorAdaptee( Provider<C> client )
     {
         super( client );
     }

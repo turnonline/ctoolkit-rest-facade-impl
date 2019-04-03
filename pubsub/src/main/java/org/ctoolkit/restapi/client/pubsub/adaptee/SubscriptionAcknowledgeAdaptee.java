@@ -28,6 +28,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractInsertExecutorAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.IOException;
 
@@ -41,7 +42,7 @@ public class SubscriptionAcknowledgeAdaptee
         extends AbstractInsertExecutorAdaptee<Pubsub, AcknowledgeRequest>
 {
     @Inject
-    public SubscriptionAcknowledgeAdaptee( Pubsub client )
+    public SubscriptionAcknowledgeAdaptee( Provider<Pubsub> client )
     {
         super( client );
     }

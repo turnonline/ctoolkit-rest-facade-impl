@@ -18,27 +18,16 @@
 
 package org.ctoolkit.restapi.client.drive;
 
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
-import org.ctoolkit.restapi.client.ServiceUnavailableException;
-import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
 import org.ctoolkit.restapi.client.drive.adaptee.FileAdaptee;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.Set;
 
 /**
  * The Google Drive guice module as a default configuration.
@@ -50,11 +39,11 @@ public class GoogleApiDriveModule
 {
     public static final String API_PREFIX = "drive";
 
-    private static final Logger logger = LoggerFactory.getLogger( GoogleApiDriveModule.class );
-
     @Override
     protected void configure()
     {
+        bind( Drive.class ).toProvider( DriveProvider.class );
+
         bind( new TypeLiteral<InsertExecutorAdaptee<File>>()
         {
         } ).to( FileAdaptee.class ).in( Singleton.class );
@@ -66,37 +55,5 @@ public class GoogleApiDriveModule
         bind( new TypeLiteral<UnderlyingClientAdaptee<Drive>>()
         {
         } ).to( FileAdaptee.class ).in( Singleton.class );
-    }
-
-    @Provides
-    @Singleton
-    Drive provideDrive( GoogleApiProxyFactory factory )
-    {
-        Set<String> scopes = DriveScopes.all();
-        Drive.Builder builder;
-
-        try
-        {
-            HttpRequestInitializer credential = factory.authorize( scopes, null, API_PREFIX );
-            builder = new Drive.Builder( factory.getHttpTransport(), factory.getJsonFactory(), credential );
-            builder.setApplicationName( factory.getApplicationName( API_PREFIX ) );
-        }
-        catch ( GeneralSecurityException e )
-        {
-            logger.error( "Failed. Scopes: " + scopes.toString()
-                    + " Application name: " + factory.getApplicationName( API_PREFIX )
-                    + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
-            throw new UnauthorizedException( e.getMessage() );
-        }
-        catch ( IOException e )
-        {
-            logger.error( "Failed. Scopes: " + scopes.toString()
-                    + " Application name: " + factory.getApplicationName( API_PREFIX )
-                    + " Service account: " + factory.getServiceAccountEmail( API_PREFIX ), e );
-
-            throw new ServiceUnavailableException( e.getMessage() );
-        }
-
-        return builder.build();
     }
 }

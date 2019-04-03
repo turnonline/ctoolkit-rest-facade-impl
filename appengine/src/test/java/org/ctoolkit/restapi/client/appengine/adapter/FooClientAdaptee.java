@@ -23,6 +23,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingClient;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
@@ -32,7 +33,7 @@ public class FooClientAdaptee
         implements UnderlyingClientAdaptee<UnderlyingClient>
 {
     @Inject
-    public FooClientAdaptee( FakeClient client )
+    public FooClientAdaptee( Provider<FakeClient> client )
     {
         super( client );
     }

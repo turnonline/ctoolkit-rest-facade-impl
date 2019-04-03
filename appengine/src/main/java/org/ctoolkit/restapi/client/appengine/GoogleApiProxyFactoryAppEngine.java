@@ -22,11 +22,13 @@ import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIden
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.common.eventbus.EventBus;
+import org.ctoolkit.restapi.client.Credential;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
-import org.ctoolkit.restapi.client.googleapis.Credential;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
+import org.ctoolkit.restapi.client.adapter.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -51,9 +53,9 @@ class GoogleApiProxyFactoryAppEngine
     }
 
     @Override
-    public HttpRequestInitializer authorize( Collection<String> scopes,
-                                             String userAccount,
-                                             final String prefix )
+    public HttpRequestInitializer authorize( @Nonnull Collection<String> scopes,
+                                             @Nullable String userAccount,
+                                             @Nonnull String prefix )
             throws GeneralSecurityException, IOException
     {
         if ( super.isCredentialOn( prefix ) )

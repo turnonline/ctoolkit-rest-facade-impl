@@ -26,6 +26,7 @@ import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteRequest;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class FooNewAdaptee
         implements NewExecutorAdaptee<RemoteFoo>
 {
     @Inject
-    public FooNewAdaptee( FakeClient client )
+    public FooNewAdaptee( Provider<FakeClient> client )
     {
         super( client );
     }

@@ -29,6 +29,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Locale;
@@ -47,7 +48,7 @@ public class PublishAdaptee
         implements InsertExecutorAdaptee<PublishRequest>
 {
     @Inject
-    public PublishAdaptee( Pubsub client )
+    public PublishAdaptee( Provider<Pubsub> client )
     {
         super( client );
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2019 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,26 +16,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.restapi.client.pubsub;
+package org.ctoolkit.restapi.client.analytics.adaptee;
 
-import com.google.api.services.pubsub.Pubsub;
-import com.google.inject.AbstractModule;
-import org.ctoolkit.restapi.client.pubsub.adaptee.PubSubAdapteesModule;
+import com.google.api.services.analytics.Analytics;
+import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
+import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
- * The Google Pub/Sub guice module as a default configuration.
+ * Underlying {@link Analytics} client adaptee binding.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
- * @see PubSubAdapteesModule
  */
-public class GoogleApiPubSubModule
-        extends AbstractModule
+@Singleton
+public class ClientAdaptee
+        extends AbstractGoogleClientAdaptee<Analytics>
+        implements UnderlyingClientAdaptee<Analytics>
 {
-    public static final String API_PREFIX = "pubsub";
+    @Inject
+    ClientAdaptee( Provider<Analytics> client )
+    {
+        super( client );
+    }
 
     @Override
-    protected void configure()
+    public Analytics getUnderlyingClient()
     {
-        bind( Pubsub.class ).toProvider( PubsubProvider.class );
+        return client();
     }
 }

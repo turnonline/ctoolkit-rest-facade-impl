@@ -24,6 +24,7 @@ import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Map;
 
@@ -37,16 +38,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class AbstractGoogleClientAdaptee<C>
 {
-    private final C client;
+    private final Provider<C> client;
 
-    public AbstractGoogleClientAdaptee( C client )
+    public AbstractGoogleClientAdaptee( Provider<C> client )
     {
         this.client = client;
     }
 
     protected final C client()
     {
-        return client;
+        return client.get();
     }
 
     /**

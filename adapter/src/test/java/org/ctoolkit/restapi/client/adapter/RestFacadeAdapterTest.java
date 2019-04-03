@@ -23,6 +23,7 @@ import com.google.api.client.googleapis.services.AbstractGoogleClient;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpContent;
 import com.google.api.client.http.HttpHeaders;
+import com.google.common.collect.Lists;
 import com.google.inject.Injector;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -42,7 +43,6 @@ import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -54,6 +54,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -130,6 +131,9 @@ public class RestFacadeAdapterTest
 
     @Mocked
     private HttpContent httpContent;
+
+    @Mocked
+    private ClientApiProvider apiProvider;
 
     private RemoteRequest remoteRequest;
 
@@ -636,6 +640,43 @@ public class RestFacadeAdapterTest
                 assertEquals( root.getLong(), Long.valueOf( 1L ), "Root Identifier" );
             }
         };
+    }
+
+    @Test
+    public void impersonate_Ok()
+    {
+        String apiName = "drive";
+        String userEmail = "email@turnonline.biz";
+
+        new Expectations()
+        {
+            {
+                apiFactory.getClientApi( apiName );
+                apiProvider.init( ( Collection<String> ) any, userEmail );
+            }
+        };
+
+        tested.impersonate( Lists.newArrayList(), userEmail, apiName );
+    }
+
+    @Test( expectedExceptions = IllegalArgumentException.class )
+    public void impersonate_ClientApiNotFound()
+    {
+        String apiName = "drive";
+        String userEmail = "email@turnonline.biz";
+
+        new Expectations()
+        {
+            {
+                apiFactory.getClientApi( apiName );
+                result = null;
+
+                apiProvider.init( ( Collection<String> ) any, userEmail );
+                times = 0;
+            }
+        };
+
+        tested.impersonate( Lists.newArrayList(), userEmail, apiName );
     }
 
     private void noMappingVerifications()

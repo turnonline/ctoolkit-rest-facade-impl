@@ -32,6 +32,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.List;
@@ -51,7 +52,7 @@ public class TopicAdaptee
         InsertExecutorAdaptee<Topic>, DeleteExecutorAdaptee<Topic>
 {
     @Inject
-    public TopicAdaptee( Pubsub client )
+    public TopicAdaptee( Provider<Pubsub> client )
     {
         super( client );
     }

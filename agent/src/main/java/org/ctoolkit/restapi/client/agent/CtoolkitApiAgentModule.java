@@ -18,13 +18,9 @@
 
 package org.ctoolkit.restapi.client.agent;
 
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
-import org.ctoolkit.api.agent.Agent;
-import org.ctoolkit.api.agent.AgentScopes;
 import org.ctoolkit.api.agent.model.ExportBatch;
 import org.ctoolkit.api.agent.model.ExportItem;
 import org.ctoolkit.api.agent.model.ExportJob;
@@ -37,8 +33,6 @@ import org.ctoolkit.api.agent.model.MigrationBatch;
 import org.ctoolkit.api.agent.model.MigrationItem;
 import org.ctoolkit.api.agent.model.MigrationJob;
 import org.ctoolkit.api.agent.model.PropertyMetaData;
-import org.ctoolkit.restapi.client.ServiceUnavailableException;
-import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.GetExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
@@ -59,14 +53,10 @@ import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMigrationItemAdaptee
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMigrationJobAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonPropertyMetaDataAdaptee;
 import org.ctoolkit.restapi.client.agent.model.ResourcesMapper;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.Set;
 
 /**
  * The CtoolkiT Migration API Client guice module as a default configuration.
@@ -86,6 +76,8 @@ public class CtoolkitApiAgentModule
         // bind resource mapper which maps generated rest client model objects into rest model objects
         Multibinder<BeanMapperConfig> multibinder = Multibinder.newSetBinder( binder(), BeanMapperConfig.class );
         multibinder.addBinding().to( ResourcesMapper.class ).in( Singleton.class );
+
+        bind( CustomizedCtoolkitAgent.class ).toProvider( AgentProvider.class );
 
         // ImportBatch
         bind( new TypeLiteral<GetExecutorAdaptee<ImportBatch>>()
@@ -254,43 +246,5 @@ public class CtoolkitApiAgentModule
         bind( new TypeLiteral<ListExecutorAdaptee<MetadataAudit>>()
         {
         } ).to( GenericJsonMetadataAuditAdaptee.class ).in( Singleton.class );
-    }
-
-    @Provides
-    @Singleton
-    CustomizedCtoolkitAgent provideCtoolkitAgent( GoogleApiProxyFactory factory )
-    {
-        Set<String> scopes = AgentScopes.all();
-        CustomizedCtoolkitAgent.Builder builder;
-
-        String applicationName = factory.getApplicationName( API_PREFIX );
-        String endpointUrl = factory.getEndpointUrl( API_PREFIX );
-
-        try
-        {
-            HttpRequestInitializer credential = factory.authorize( scopes, null, API_PREFIX );
-            builder = new CustomizedCtoolkitAgent.Builder( factory.getHttpTransport(), factory.getJsonFactory(), credential );
-            builder.setApplicationName( applicationName )
-                    .setRootUrl( endpointUrl )
-                    .setServicePath( Agent.DEFAULT_SERVICE_PATH );
-        }
-        catch ( GeneralSecurityException e )
-        {
-            logger.error( "Scopes: " + scopes.toString()
-                    + " Application name: " + applicationName
-                    + " Endpoint URL: " + endpointUrl, e );
-
-            throw new UnauthorizedException( e.getMessage() );
-        }
-        catch ( IOException e )
-        {
-            logger.error( "Failed. Scopes: " + scopes.toString()
-                    + " Application name: " + applicationName
-                    + " Endpoint URL: " + endpointUrl, e );
-
-            throw new ServiceUnavailableException( e.getMessage() );
-        }
-
-        return builder.build();
     }
 }

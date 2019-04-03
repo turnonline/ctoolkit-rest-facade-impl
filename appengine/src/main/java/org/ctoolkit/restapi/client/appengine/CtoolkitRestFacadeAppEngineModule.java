@@ -26,10 +26,10 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
+import org.ctoolkit.restapi.client.Credential;
 import org.ctoolkit.restapi.client.RestFacade;
+import org.ctoolkit.restapi.client.adapter.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.adapter.RestFacadeAdapter;
-import org.ctoolkit.restapi.client.googleapis.Credential;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 
 import javax.inject.Singleton;
 import java.util.Collection;

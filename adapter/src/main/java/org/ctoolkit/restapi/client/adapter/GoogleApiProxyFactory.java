@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2019 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.restapi.client.googleapis;
+package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -32,10 +32,10 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.PemReader;
 import com.google.api.client.util.SecurityUtils;
 import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import org.ctoolkit.restapi.client.ApiCredential;
-import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
 import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 
 import javax.annotation.Nonnull;
@@ -53,6 +53,8 @@ import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
 
@@ -73,6 +75,7 @@ import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_FILE_NAME_JSON;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_NUMBER_OF_RETRIES;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_PROJECT_ID;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_READ_TIMEOUT;
+import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_SCOPES;
 import static org.ctoolkit.restapi.client.ApiCredential.PROPERTY_SERVICE_ACCOUNT_EMAIL;
 
 /**
@@ -90,6 +93,8 @@ public abstract class GoogleApiProxyFactory
 
     private final Map<String, String> credential;
 
+    private final Map<String, ClientApiProvider> apis;
+
     private HttpTransport httpTransport;
 
     private JsonFactory jsonFactory;
@@ -106,11 +111,36 @@ public abstract class GoogleApiProxyFactory
     {
         this.credential = credential;
         this.eventBus = eventBus;
+        apis = new HashMap<>();
     }
 
     protected void setKeyProvider( AuthKeyProvider keyProvider )
     {
         this.keyProvider = keyProvider;
+    }
+
+    /**
+     * Populate the map of client API identified by API short name.
+     *
+     * @param api    the short name of an API that has been installed with facade
+     * @param client the concrete API provider implementation
+     */
+    void put( @Nonnull String api, @Nonnull ClientApiProvider client )
+    {
+        String aErrorMessage = "API name cannot be null";
+        String pErrorMessage = "Client API provider cannot be null";
+        apis.put( checkNotNull( api, aErrorMessage ), checkNotNull( client, pErrorMessage ) );
+    }
+
+    /**
+     * Returns the client API provider.
+     *
+     * @param api the short name of an API that has been installed with facade
+     * @return the client API provider
+     */
+    ClientApiProvider getClientApi( @Nonnull String api )
+    {
+        return apis.get( checkNotNull( api, "API name cannot be null" ) );
     }
 
     /**
@@ -180,6 +210,23 @@ public abstract class GoogleApiProxyFactory
     public final boolean isDisableGZipContent( @Nullable String prefix )
     {
         return getBoolean( PROPERTY_DISABLE_GZIP_CONTENT, prefix );
+    }
+
+    /**
+     * Returns value set by {@link ApiCredential#setScopes(String)}
+     * or defined by property file.
+     * If specific credential wouldn't not be found, default will be returned.
+     *
+     * @param prefix the prefix used to identify specific credential or null for default
+     * @return the unmodifiable list of API scopes
+     * @throws MissingResourceException if default credential was requested and haven't been found
+     */
+    public List<String> getScopes( @Nullable String prefix )
+    {
+        String values = getStringValue( prefix, PROPERTY_SCOPES );
+        @SuppressWarnings( "UnstableApiUsage" )
+        List<String> list = Splitter.on( "," ).trimResults().omitEmptyStrings().splitToList( values );
+        return java.util.Collections.unmodifiableList( list );
     }
 
     /**
@@ -302,22 +349,20 @@ public abstract class GoogleApiProxyFactory
      */
     private int getInteger( @Nonnull String property, @Nonnull String defaultValue, @Nullable String prefix )
     {
-        checkNotNull( property );
-        checkNotNull( defaultValue );
-
         if ( Strings.isNullOrEmpty( prefix ) )
         {
             prefix = DEFAULT_CREDENTIAL_PREFIX;
         }
 
-        String value = credential.get( CREDENTIAL_ATTR + prefix + "." + property );
+        String errorMessage = "Property name is expected";
+        String value = credential.get( CREDENTIAL_ATTR + prefix + "." + checkNotNull( property, errorMessage ) );
         if ( value == null )
         {
-            value = credential.get( CREDENTIAL_ATTR + DEFAULT_CREDENTIAL_PREFIX + "." + property );
+            value = credential.get( CREDENTIAL_ATTR + DEFAULT_CREDENTIAL_PREFIX + "." + checkNotNull( property ) );
         }
         if ( value == null )
         {
-            value = defaultValue;
+            value = checkNotNull( defaultValue, "Default value is expected" );
         }
         return Integer.valueOf( value );
     }
@@ -407,17 +452,18 @@ public abstract class GoogleApiProxyFactory
      *                    Useful for domain-wide delegation.
      * @return the thread-safe credential instance
      */
-    public HttpRequestInitializer authorize( Collection<String> scopes,
-                                             String userAccount,
-                                             String prefix )
+    public HttpRequestInitializer authorize( @Nonnull Collection<String> scopes,
+                                             @Nullable String userAccount,
+                                             @Nonnull String prefix )
             throws GeneralSecurityException, IOException
     {
         GoogleCredential googleCredential;
+        checkNotNull( scopes, "Scopes is mandatory" );
 
-        if ( isJsonConfiguration( prefix ) )
+        if ( isJsonConfiguration( checkNotNull( prefix, "API short name is mandatory" ) ) )
         {
             // json file load right before usage
-            InputStream json = getServiceAccountJsonStream( prefix );
+            InputStream json = getServiceAccountJson( prefix );
 
             googleCredential = new ConfiguredByJsonGoogleCredential( json, prefix )
                     .setTransport( getHttpTransport() )
@@ -480,7 +526,7 @@ public abstract class GoogleApiProxyFactory
      * @param prefix the prefix used to identify specific credential
      * @return the service account key as JSON
      */
-    public InputStream getServiceAccountJsonStream( String prefix )
+    public InputStream getServiceAccountJson( String prefix )
     {
         InputStream stream;
 
@@ -561,7 +607,7 @@ public abstract class GoogleApiProxyFactory
         HttpExecuteInterceptor interceptor = new HttpExecuteInterceptor()
         {
             @Override
-            public void intercept( HttpRequest request ) throws IOException
+            public void intercept( HttpRequest request )
             {
                 eventBus.post( new BeforeRequestEvent( request ) );
             }

@@ -24,20 +24,23 @@ import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RestFacade;
 import org.ctoolkit.restapi.client.RetrievalRequest;
+import org.ctoolkit.restapi.client.adapter.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.appengine.BackendServiceTestCase;
 import org.ctoolkit.restapi.client.appengine.adapter.model.Foo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
 import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingClient;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
@@ -56,6 +59,10 @@ public class AdapterAppEngineTest
     @Inject
     @Named( "credential.default.clientId" )
     String clientId;
+
+    @Inject
+    @Named( "credential.default.scopes" )
+    String scopes;
 
     @Inject
     @Named( "credential.default.disableGZipContent" )
@@ -173,6 +180,11 @@ public class AdapterAppEngineTest
         String clientId = builder.getClientId( null );
         assertEquals( clientId, this.clientId );
 
+        List<String> scopes = builder.getScopes( null );
+        assertThat( scopes )
+                .containsAllOf( "https://www.googleapis.com/auth/drive",
+                        "https://www.googleapis.com/auth/drive.metadata" );
+
         boolean disableGZipContent = builder.isDisableGZipContent( null );
         assertEquals( disableGZipContent, Boolean.valueOf( this.disableGZipContent ).booleanValue() );
 
@@ -218,8 +230,13 @@ public class AdapterAppEngineTest
         String clientId = builder.getClientId( prefix );
         assertEquals( clientId, "clientId.apps.googleusercontent.com" );
 
+        List<String> scopes = builder.getScopes( prefix );
+        assertThat( scopes )
+                .containsAllOf( "https://www.googleapis.com/auth/drive",
+                        "https://www.googleapis.com/auth/drive.metadata" );
+
         boolean disableGZipContent = builder.isDisableGZipContent( prefix );
-        assertEquals( disableGZipContent, true );
+        assertTrue( disableGZipContent );
 
         String serviceEmail = builder.getServiceAccountEmail( prefix );
         assertEquals( serviceEmail, "service.account@googleusercontent.com" );
@@ -242,7 +259,7 @@ public class AdapterAppEngineTest
         assertEquals( endpointUrl, "http://drive.localhost:8990/_ah/api/" );
 
         boolean credentialOn = builder.isCredentialOn( prefix );
-        assertEquals( credentialOn, false );
+        assertFalse( credentialOn );
 
         int numberOfRetries = builder.getNumberOfRetries( prefix );
         assertEquals( numberOfRetries, 2 );
@@ -261,6 +278,11 @@ public class AdapterAppEngineTest
 
         String clientId = builder.getClientId( prefix );
         assertEquals( clientId, this.clientId );
+
+        List<String> scopes = builder.getScopes( prefix );
+        assertThat( scopes )
+                .containsAllOf( "https://www.googleapis.com/auth/drive",
+                        "https://www.googleapis.com/auth/drive.metadata" );
 
         boolean disableGZipContent = builder.isDisableGZipContent( prefix );
         assertEquals( disableGZipContent, Boolean.valueOf( this.disableGZipContent ).booleanValue() );

@@ -124,6 +124,7 @@ public class TestModule
         ApiCredential credential = new ApiCredential();
         credential.setProjectId( "appid-103" );
         credential.setClientId( "4top4.apps.googleusercontent.com" );
+        credential.setScopes( "https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/drive.metadata" );
         credential.setDisableGZipContent( false );
         credential.setServiceAccountEmail( "service.account@cloud.com" );
         credential.setFileName( "/org/ctoolkit/restapi/private-key.p12" );

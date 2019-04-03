@@ -61,7 +61,6 @@ import org.ctoolkit.restapi.client.adaptee.MediaProvider;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
-import org.ctoolkit.restapi.client.googleapis.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.provider.LocalListResourceProvider;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
 import org.slf4j.Logger;
@@ -78,6 +77,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -86,6 +86,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * The Fluent facade API implementation as an adapter. Executes Java bean mapping
@@ -161,19 +162,12 @@ public class RestFacadeAdapter
                                          @Nullable Map<String, Object> params,
                                          @Nullable Locale locale )
     {
-        checkNotNull( downloader );
-        checkNotNull( adaptee );
-        checkNotNull( resource );
-        checkNotNull( identifier );
-        checkNotNull( output );
-        checkNotNull( interceptor );
-
         //noinspection MismatchedQueryAndUpdateOfCollection
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( params, false );
         String type = headers == null ? null : headers.getContentType();
 
-        URL path = adaptee.prepareDownloadUrl( identifier.root(), type, params, locale );
+        URL path = requireNonNull( adaptee ).prepareDownloadUrl( identifier.root(), type, params, locale );
         if ( path == null )
         {
             String msg = "URL to download a resource content cannot be null. Identifier: ";
@@ -187,7 +181,12 @@ public class RestFacadeAdapter
             {
                 try
                 {
-                    substitute.download( resource, identifier, output, headers, params, locale );
+                    substitute.download( checkNotNull( resource ),
+                            identifier,
+                            checkNotNull( output ),
+                            headers,
+                            params,
+                            locale );
                 }
                 catch ( Substitute.ProceedWithRemoteCall e )
                 {
@@ -197,7 +196,7 @@ public class RestFacadeAdapter
 
             if ( remote )
             {
-                downloader.download( new GenericUrl( path ), headers, output );
+                requireNonNull( downloader ).download( new GenericUrl( path ), headers, output );
             }
         }
         catch ( IOException e )
@@ -222,12 +221,8 @@ public class RestFacadeAdapter
                                             @Nonnull OutputStream output,
                                             @Nullable String type )
     {
-        checkNotNull( resource );
-        checkNotNull( identifier );
-        checkNotNull( output );
-
         DownloadResponseInterceptor interceptor = new DownloadResponseInterceptor();
-        DownloadExecutorAdaptee adaptee = adaptee( DownloadExecutorAdaptee.class, resource );
+        DownloadExecutorAdaptee adaptee = adaptee( DownloadExecutorAdaptee.class, checkNotNull( resource ) );
         String apiPrefix = adaptee.getApiPrefix();
         MediaHttpDownloader downloader;
 
@@ -250,16 +245,15 @@ public class RestFacadeAdapter
             throw new RemoteServerErrorException( e.getMessage() );
         }
 
-        Identifier root = identifier.root();
-        return new DownloadRequestImpl( this, adaptee, downloader, resource, root, output, interceptor, type );
+        Identifier root = checkNotNull( identifier ).root();
+        OutputStream os = checkNotNull( output );
+        return new DownloadRequestImpl( this, adaptee, downloader, resource, root, os, interceptor, type );
     }
 
     @Override
     public <T> PayloadRequest<T> newInstance( @Nonnull Class<T> resource )
     {
-        checkNotNull( resource );
-
-        NewExecutorAdaptee adaptee = adaptee( NewExecutorAdaptee.class, resource );
+        NewExecutorAdaptee adaptee = adaptee( NewExecutorAdaptee.class, checkNotNull( resource ) );
         Object remoteRequest;
         try
         {
@@ -276,15 +270,13 @@ public class RestFacadeAdapter
     @Override
     public <T> UploadMediaProvider<T> upload( @Nonnull T resource )
     {
-        checkNotNull( resource );
-        return new InputStreamUploadMediaRequestProvider<>( this, resource );
+        return new InputStreamUploadMediaRequestProvider<>( this, checkNotNull( resource ) );
     }
 
     @Override
     public <T> DownloadMediaProvider download( @Nonnull Class<T> resource )
     {
-        checkNotNull( resource );
-        return new OutputStreamDownloadMediaRequestProvider( this, resource );
+        return new OutputStreamDownloadMediaRequestProvider( this, checkNotNull( resource ) );
     }
 
     <R> R callbackNewInstance( @Nonnull NewExecutorAdaptee adaptee,
@@ -293,10 +285,6 @@ public class RestFacadeAdapter
                                @Nullable Map<String, Object> parameters,
                                @Nullable Locale locale )
     {
-        checkNotNull( adaptee );
-        checkNotNull( remoteRequest );
-        checkNotNull( responseType );
-
         if ( parameters == null )
         {
             parameters = new HashMap<>();
@@ -310,7 +298,10 @@ public class RestFacadeAdapter
             {
                 try
                 {
-                    remoteInstance = substitute.newInstance( remoteRequest, responseType, parameters, locale );
+                    remoteInstance = substitute.newInstance( checkNotNull( remoteRequest ),
+                            checkNotNull( responseType ),
+                            parameters,
+                            locale );
                 }
                 catch ( Substitute.ProceedWithRemoteCall e )
                 {
@@ -348,15 +339,12 @@ public class RestFacadeAdapter
 
     <T> RetrievalRequest<T> internalGet( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
-        checkNotNull( resource );
-        checkNotNull( identifier, Identifier.class.getSimpleName() + " for GET operation cannot be null." );
-
-        GetExecutorAdaptee adaptee = adaptee( GetExecutorAdaptee.class, resource );
+        GetExecutorAdaptee adaptee = adaptee( GetExecutorAdaptee.class, checkNotNull( resource ) );
         Object remoteRequest;
         try
         {
-            //noinspection unchecked
-            remoteRequest = adaptee.prepareGet( identifier );
+            String errorMessage = "Identifier for GET operation cannot be null.";
+            remoteRequest = adaptee.prepareGet( checkNotNull( identifier, errorMessage ) );
         }
         catch ( IOException e )
         {
@@ -373,15 +361,13 @@ public class RestFacadeAdapter
                               @Nullable Map<String, Object> parameters,
                               @Nullable Locale locale )
     {
-        checkNotNull( responseType );
-
         if ( parameters == null )
         {
             parameters = new HashMap<>();
         }
 
         // looking for LocalResourceProvider optional implementation for given resource type
-        LocalResourceProvider<R> provider = getExistingResourceProvider( responseType );
+        LocalResourceProvider<R> provider = getExistingResourceProvider( checkNotNull( responseType ) );
         R response = null;
 
         boolean requestForPersist = false;
@@ -458,13 +444,10 @@ public class RestFacadeAdapter
     @Override
     public <T> ListRequest<T> list( @Nonnull Class<T> resource, @Nullable Identifier parent )
     {
-        checkNotNull( resource );
-
-        ListExecutorAdaptee adaptee = adaptee( ListExecutorAdaptee.class, resource );
+        ListExecutorAdaptee adaptee = adaptee( ListExecutorAdaptee.class, checkNotNull( resource ) );
         Object remoteRequest;
         try
         {
-            //noinspection unchecked
             remoteRequest = adaptee.prepareList( parent == null ? null : parent.root() );
         }
         catch ( IOException e )
@@ -485,15 +468,13 @@ public class RestFacadeAdapter
                                      @Nullable String orderBy,
                                      @Nullable Boolean ascending )
     {
-        checkNotNull( responseType );
-
         if ( criteria == null )
         {
             criteria = new HashMap<>();
         }
 
         // looking for LocalResourceProvider optional implementation for given resource type
-        LocalListResourceProvider<R> provider = getExistingListResourceProvider( responseType );
+        LocalListResourceProvider<R> provider = getExistingListResourceProvider( checkNotNull( responseType ) );
         List<R> response = null;
 
         boolean requestForPersist = false;
@@ -582,9 +563,7 @@ public class RestFacadeAdapter
                                           @Nullable Identifier parentKey,
                                           @Nullable MediaProvider provider )
     {
-        checkNotNull( resource );
-
-        Class<?> remoteResource = evaluateRemoteResource( resource.getClass() );
+        Class<?> remoteResource = evaluateRemoteResource( checkNotNull( resource ).getClass() );
         Object source;
 
         if ( resource.getClass() == remoteResource )
@@ -620,10 +599,6 @@ public class RestFacadeAdapter
                                  @Nullable Map<String, Object> parameters,
                                  @Nullable Locale locale )
     {
-        checkNotNull( adaptee );
-        checkNotNull( remoteRequest );
-        checkNotNull( responseType );
-
         Object source = null;
         try
         {
@@ -632,7 +607,11 @@ public class RestFacadeAdapter
             {
                 try
                 {
-                    source = substitute.insert( remoteRequest, responseType, parentKey, parameters, locale );
+                    source = substitute.insert( checkNotNull( remoteRequest ),
+                            checkNotNull( responseType ),
+                            parentKey,
+                            parameters,
+                            locale );
                 }
                 catch ( Substitute.ProceedWithRemoteCall e )
                 {
@@ -676,9 +655,6 @@ public class RestFacadeAdapter
                                           @Nonnull Identifier identifier,
                                           @Nullable MediaProvider provider )
     {
-        checkNotNull( resource );
-        checkNotNull( identifier, Identifier.class.getSimpleName() + " for UPDATE operation cannot be null." );
-
         Class<?> remoteResource = evaluateRemoteResource( resource.getClass() );
         Object source;
 
@@ -696,7 +672,8 @@ public class RestFacadeAdapter
         Object remoteRequest;
         try
         {
-            remoteRequest = adaptee.prepareUpdate( source, identifier.root(), provider );
+            String errorMessage = "Identifier for UPDATE operation cannot be null.";
+            remoteRequest = adaptee.prepareUpdate( source, checkNotNull( identifier, errorMessage ).root(), provider );
         }
         catch ( IOException e )
         {
@@ -715,11 +692,6 @@ public class RestFacadeAdapter
                                  @Nullable Map<String, Object> parameters,
                                  @Nullable Locale locale )
     {
-        checkNotNull( adaptee );
-        checkNotNull( remoteRequest );
-        checkNotNull( responseType );
-        checkNotNull( identifier );
-
         Object source = null;
         try
         {
@@ -728,7 +700,7 @@ public class RestFacadeAdapter
             {
                 try
                 {
-                    source = substitute.update( remoteRequest, responseType, identifier, parameters, locale );
+                    source = substitute.update( checkNotNull( remoteRequest ), checkNotNull( responseType ), checkNotNull( identifier ), parameters, locale );
                 }
                 catch ( Substitute.ProceedWithRemoteCall e )
                 {
@@ -776,17 +748,32 @@ public class RestFacadeAdapter
         return adaptee.getUnderlyingClient();
     }
 
+    @Override
+    public void impersonate( @Nonnull Collection<String> scopes, @Nonnull String userEmail, @Nonnull String api )
+    {
+        ClientApiProvider provider = apiFactory.getClientApi( api );
+        if ( provider == null )
+        {
+            throw new IllegalArgumentException( "No API client found for '"
+                    + api
+                    + "'. Make sure API is installed in module, for example: install( new GoogleApiDriveModule() );" );
+        }
+
+        String scopesError = "Scopes cannot be null";
+        String emailError = "User email cannot be null";
+        provider.init( checkNotNull( scopes, scopesError ), checkNotNull( userEmail, emailError ) );
+    }
+
+
     @SuppressWarnings( "unchecked" )
     <T> PayloadRequest<T> internalDelete( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
-        checkNotNull( resource );
-        checkNotNull( identifier );
-
-        DeleteExecutorAdaptee adaptee = adaptee( DeleteExecutorAdaptee.class, resource );
+        DeleteExecutorAdaptee adaptee = adaptee( DeleteExecutorAdaptee.class, checkNotNull( resource ) );
         Object remoteRequest;
         try
         {
-            remoteRequest = adaptee.prepareDelete( identifier.root() );
+            String errorMessage = "Identifier for DELETE operation cannot be null.";
+            remoteRequest = adaptee.prepareDelete( checkNotNull( identifier, errorMessage ).root() );
         }
         catch ( IOException e )
         {
@@ -804,10 +791,6 @@ public class RestFacadeAdapter
                                  @Nullable Map<String, Object> parameters,
                                  @Nullable Locale locale )
     {
-        checkNotNull( adaptee );
-        checkNotNull( remoteRequest );
-        checkNotNull( identifier );
-
         Object response = null;
         try
         {
@@ -816,7 +799,11 @@ public class RestFacadeAdapter
             {
                 try
                 {
-                    response = substitute.delete( remoteRequest, identifier, responseType, parameters, locale );
+                    response = substitute.delete( checkNotNull( remoteRequest ),
+                            checkNotNull( identifier ),
+                            responseType,
+                            parameters,
+                            locale );
                 }
                 catch ( Substitute.ProceedWithRemoteCall e )
                 {

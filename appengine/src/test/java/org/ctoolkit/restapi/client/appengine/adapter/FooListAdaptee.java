@@ -27,6 +27,7 @@ import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteRequest;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class FooListAdaptee
         implements ListExecutorAdaptee<RemoteFoo>
 {
     @Inject
-    public FooListAdaptee( FakeClient client )
+    public FooListAdaptee( Provider<FakeClient> client )
     {
         super( client );
     }

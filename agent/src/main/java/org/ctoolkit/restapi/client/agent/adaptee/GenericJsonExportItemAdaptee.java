@@ -31,6 +31,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractGoogleClientAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class GenericJsonExportItemAdaptee
         DeleteExecutorAdaptee<ExportItem>
 {
     @Inject
-    public GenericJsonExportItemAdaptee( CustomizedCtoolkitAgent ctoolkitAgent )
+    public GenericJsonExportItemAdaptee( Provider<CustomizedCtoolkitAgent> ctoolkitAgent )
     {
         super( ctoolkitAgent );
     }

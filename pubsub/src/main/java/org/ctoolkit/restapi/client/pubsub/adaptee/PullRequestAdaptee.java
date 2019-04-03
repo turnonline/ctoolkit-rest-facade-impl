@@ -28,6 +28,7 @@ import org.ctoolkit.restapi.client.adapter.AbstractInsertExecutorAdaptee;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.IOException;
 
@@ -41,7 +42,7 @@ public class PullRequestAdaptee
         extends AbstractInsertExecutorAdaptee<Pubsub, PullRequest>
 {
     @Inject
-    public PullRequestAdaptee( Pubsub client )
+    public PullRequestAdaptee( Provider<Pubsub> client )
     {
         super( client );
     }
