@@ -32,7 +32,6 @@ import javax.inject.Provider;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -68,7 +67,6 @@ public abstract class ClientApiProvider<C>
     @Override
     public C get()
     {
-        LOGGER.info( "threadLocal.access: " + new Date() );
         return threadLocal.get();
     }
 
@@ -79,7 +77,7 @@ public abstract class ClientApiProvider<C>
      * @param api the short name of an API
      * @return the scopes configured for default client
      */
-    private Collection<String> getScopes( String api )
+    private Collection<String> getScopes( @Nullable String api )
     {
         Collection<String> scopes = this.factory.getScopes( api );
         if ( scopes == null || scopes.isEmpty() )
@@ -143,8 +141,10 @@ public abstract class ClientApiProvider<C>
 
     /**
      * The list of API scopes to be used to initialize default API client instance.
+     * If scopes are defined via credential properties it takes precedence.
      *
      * @return the list of API default scopes
+     * @see org.ctoolkit.restapi.client.ApiCredential
      */
     protected abstract Collection<String> defaultScopes();
 
