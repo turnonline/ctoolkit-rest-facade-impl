@@ -22,12 +22,17 @@ import com.google.common.eventbus.EventBus;
 import mockit.Injectable;
 import mockit.Tested;
 import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 /**
  * Unit tests to test {@link GoogleApiProxyFactory}.
@@ -43,10 +48,16 @@ public class GoogleApiProxyFactoryTest
     private EventBus eventBus;
 
     @Injectable
-    private Map<String, String> credential;
+    private Map<String, String> credential = new HashMap<>();
 
     @Injectable
     private AuthKeyProvider keyProvider;
+
+    @BeforeMethod
+    public void before()
+    {
+        credential.clear();
+    }
 
     @Test( expectedExceptions = MissingResourceException.class )
     public void getProjectIdMissingConfig()
@@ -55,7 +66,7 @@ public class GoogleApiProxyFactoryTest
     }
 
     @Test( expectedExceptions = MissingResourceException.class )
-    public void getClientIdMissingConfig() throws Exception
+    public void getClientIdMissingConfig()
     {
         tested.getClientId( null );
     }
@@ -108,6 +119,38 @@ public class GoogleApiProxyFactoryTest
     public void isCredentialOnMissingConfig()
     {
         boolean credentialOn = tested.isCredentialOn( null );
-        assertEquals( credentialOn, false );
+        assertFalse( credentialOn );
+    }
+
+    @Test
+    public void getScopes_DefaultOk()
+    {
+        credential.put( "credential.default.scopes", "a,b,c" );
+        List<String> scopes = tested.getScopes( null );
+        assertThat( scopes ).isNotNull();
+        assertThat( scopes ).hasSize( 3 );
+    }
+
+    @Test
+    public void getScopes_NonDefaultOk()
+    {
+        credential.put( "credential.sheets.scopes", "a,b,c" );
+        List<String> scopes = tested.getScopes( "sheets" );
+        assertThat( scopes ).isNotNull();
+        assertThat( scopes ).hasSize( 3 );
+    }
+
+    @Test
+    public void getScopes_NonDefaultMissingEntry()
+    {
+        List<String> scopes = tested.getScopes( "sheets" );
+        assertThat( scopes ).isNotNull();
+        assertThat( scopes ).isEmpty();
+    }
+
+    @Test( expectedExceptions = MissingResourceException.class )
+    public void getScopes_MissingEntry()
+    {
+        tested.getScopes( null );
     }
 }

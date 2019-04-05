@@ -32,6 +32,7 @@ import javax.inject.Provider;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -40,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * The manager that helps to provide an underlying API client instance either with default or specific configuration.
  * A standard use case is to provide default client configuration.
  * Once {@link #init(Collection, String)} has been called, a newly built client instance
- * with stated configuration will be valid while current thread is in use.
+ * with stated configuration will be valid as long as the thread is alive.
  *
  * @param <C> the concrete type of API client to be managed
  */
@@ -51,24 +52,42 @@ public abstract class ClientApiProvider<C>
 
     private final GoogleApiProxyFactory factory;
 
-    private ThreadLocal<C> threadLocal = new ThreadLocal<>();
+    private final ThreadLocal<C> threadLocal;
 
-    private AtomicReference<C> defaultClient = new AtomicReference<>();
-
-    public ClientApiProvider( GoogleApiProxyFactory factory )
+    public ClientApiProvider( @Nonnull GoogleApiProxyFactory factory )
     {
-        this.factory = factory;
-        this.factory.put( apiPrefix(), this );
-        defaultClient.set( init( defaultScopes(), null ) );
+        String api = checkNotNull( api(), "API name cannot be null" );
+        this.factory = checkNotNull( factory, "API factory cannot be null" );
+        this.factory.put( api, this );
+
+        AtomicReference<C> defaultClient = new AtomicReference<>();
+        this.threadLocal = ThreadLocal.withInitial( defaultClient::get );
+        defaultClient.set( init( getScopes( api ), null, false ) );
     }
 
     @Override
     public C get()
     {
-        C client = threadLocal.get();
-        return client == null ? defaultClient.get() : client;
+        LOGGER.info( "threadLocal.access: " + new Date() );
+        return threadLocal.get();
     }
 
+    /**
+     * First gets scopes from the configuration (properties file), if not specified then
+     * takes scopes defined by {@link #defaultScopes()}.
+     *
+     * @param api the short name of an API
+     * @return the scopes configured for default client
+     */
+    private Collection<String> getScopes( String api )
+    {
+        Collection<String> scopes = this.factory.getScopes( api );
+        if ( scopes == null || scopes.isEmpty() )
+        {
+            scopes = defaultScopes();
+        }
+        return scopes;
+    }
 
     /**
      * Initialize a client API instance with specified parameters and sets
@@ -80,7 +99,12 @@ public abstract class ClientApiProvider<C>
      */
     C init( @Nonnull Collection<String> scopes, @Nullable String userEmail )
     {
-        String prefix = checkNotNull( apiPrefix(), "API short name is mandatory" );
+        return init( scopes, userEmail, true );
+    }
+
+    private C init( @Nonnull Collection<String> scopes, @Nullable String userEmail, boolean updateLocal )
+    {
+        String prefix = checkNotNull( api(), "API short name is mandatory" );
         String applicationName = factory.getApplicationName( prefix );
         String serviceAccountEmail = factory.getServiceAccountEmail( prefix );
 
@@ -94,7 +118,10 @@ public abstract class ClientApiProvider<C>
                     credential,
                     prefix );
 
-            threadLocal.set( client );
+            if ( updateLocal )
+            {
+                threadLocal.set( client );
+            }
             return client;
         }
         catch ( GeneralSecurityException e )
@@ -126,7 +153,7 @@ public abstract class ClientApiProvider<C>
      *
      * @return the short API name
      */
-    protected abstract String apiPrefix();
+    protected abstract String api();
 
     /**
      * Builds the API specific client instance.

@@ -20,10 +20,13 @@ package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.common.collect.Lists;
+import mockit.Expectations;
 import mockit.Injectable;
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
+import org.ctoolkit.restapi.client.ServiceUnavailableException;
+import org.ctoolkit.restapi.client.UnauthorizedException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -81,8 +84,8 @@ public class ClientApiProviderTest
 
         // test call
         tested.init( scopes, userEmail );
-
         MockedClientApiProvider.FakeClient client = tested.get();
+
         assertThat( client ).isNotNull();
         assertThat( client.getCredential() ).isSameAs( credential );
 
@@ -100,5 +103,33 @@ public class ClientApiProviderTest
                 assertThat( scopes ).containsAllOf( SCOPE, scope );
             }
         };
+    }
+
+    @Test( expectedExceptions = UnauthorizedException.class )
+    public void init_SecurityFailure() throws GeneralSecurityException, IOException
+    {
+        new Expectations()
+        {
+            {
+                factory.getHttpTransport();
+                result = new GeneralSecurityException();
+            }
+        };
+
+        tested.init( Lists.newArrayList( SCOPE ), "specific@turnonline.biz" );
+    }
+
+    @Test( expectedExceptions = ServiceUnavailableException.class )
+    public void init_ConnectionError() throws GeneralSecurityException, IOException
+    {
+        new Expectations()
+        {
+            {
+                factory.getHttpTransport();
+                result = new IOException();
+            }
+        };
+
+        tested.init( Lists.newArrayList( SCOPE ), "specific@turnonline.biz" );
     }
 }

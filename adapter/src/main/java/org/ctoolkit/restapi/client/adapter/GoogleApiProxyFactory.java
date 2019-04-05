@@ -53,6 +53,7 @@ import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -224,9 +225,13 @@ public abstract class GoogleApiProxyFactory
     public List<String> getScopes( @Nullable String prefix )
     {
         String values = getStringValue( prefix, PROPERTY_SCOPES );
+        if ( values == null )
+        {
+            return Collections.emptyList();
+        }
         @SuppressWarnings( "UnstableApiUsage" )
         List<String> list = Splitter.on( "," ).trimResults().omitEmptyStrings().splitToList( values );
-        return java.util.Collections.unmodifiableList( list );
+        return Collections.unmodifiableList( list );
     }
 
     /**

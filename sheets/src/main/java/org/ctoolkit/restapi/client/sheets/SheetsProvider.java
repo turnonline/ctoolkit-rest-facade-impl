@@ -55,7 +55,7 @@ class SheetsProvider
     }
 
     @Override
-    protected String apiPrefix()
+    protected String api()
     {
         return API_PREFIX;
     }

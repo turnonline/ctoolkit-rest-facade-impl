@@ -50,7 +50,7 @@ public class MockedClientApiProvider
     }
 
     @Override
-    protected String apiPrefix()
+    protected String api()
     {
         return API;
     }
