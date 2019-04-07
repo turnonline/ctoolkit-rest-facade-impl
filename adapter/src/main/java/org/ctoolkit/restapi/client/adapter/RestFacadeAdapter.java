@@ -108,18 +108,22 @@ public class RestFacadeAdapter
 
     private final GoogleApiProxyFactory apiFactory;
 
+    private final Map<String, ClientApi> apis;
+
     private Substitute substitute;
 
     @Inject
     RestFacadeAdapter( MapperFacade mapper,
                        MapperFactory factory,
                        Injector injector,
-                       GoogleApiProxyFactory apiFactory )
+                       GoogleApiProxyFactory apiFactory,
+                       Map<String, ClientApi> apis )
     {
         this.mapper = mapper;
         this.factory = factory;
         this.injector = injector;
         this.apiFactory = apiFactory;
+        this.apis = apis;
     }
 
     @com.google.inject.Inject( optional = true )
@@ -751,7 +755,7 @@ public class RestFacadeAdapter
     @Override
     public void impersonate( @Nonnull Collection<String> scopes, @Nonnull String userEmail, @Nonnull String api )
     {
-        ClientApiProvider provider = apiFactory.getClientApi( api );
+        ClientApi provider = apis.get( api );
         if ( provider == null )
         {
             throw new IllegalArgumentException( "No API client found for '"

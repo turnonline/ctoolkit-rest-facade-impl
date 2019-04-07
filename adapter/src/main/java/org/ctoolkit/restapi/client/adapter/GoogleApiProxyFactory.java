@@ -54,7 +54,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -94,8 +93,6 @@ public abstract class GoogleApiProxyFactory
 
     private final Map<String, String> credential;
 
-    private final Map<String, ClientApiProvider> apis;
-
     private HttpTransport httpTransport;
 
     private JsonFactory jsonFactory;
@@ -112,36 +109,11 @@ public abstract class GoogleApiProxyFactory
     {
         this.credential = credential;
         this.eventBus = eventBus;
-        apis = new HashMap<>();
     }
 
     protected void setKeyProvider( AuthKeyProvider keyProvider )
     {
         this.keyProvider = keyProvider;
-    }
-
-    /**
-     * Populate the map of client API identified by API short name.
-     *
-     * @param api    the short name of an API that has been installed with facade
-     * @param client the concrete API provider implementation
-     */
-    void put( @Nonnull String api, @Nonnull ClientApiProvider client )
-    {
-        String aErrorMessage = "API name cannot be null";
-        String pErrorMessage = "Client API provider cannot be null";
-        apis.put( checkNotNull( api, aErrorMessage ), checkNotNull( client, pErrorMessage ) );
-    }
-
-    /**
-     * Returns the client API provider.
-     *
-     * @param api the short name of an API that has been installed with facade
-     * @return the client API provider
-     */
-    ClientApiProvider getClientApi( @Nonnull String api )
-    {
-        return apis.get( checkNotNull( api, "API name cannot be null" ) );
     }
 
     /**

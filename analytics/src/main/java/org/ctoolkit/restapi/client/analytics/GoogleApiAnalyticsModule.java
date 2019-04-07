@@ -21,7 +21,9 @@ package org.ctoolkit.restapi.client.analytics;
 import com.google.api.services.analytics.Analytics;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
+import org.ctoolkit.restapi.client.adapter.ClientApi;
 import org.ctoolkit.restapi.client.analytics.adaptee.ClientAdaptee;
 
 /**
@@ -37,7 +39,13 @@ public class GoogleApiAnalyticsModule
     @Override
     protected void configure()
     {
+        // ClientApi config
         bind( Analytics.class ).toProvider( AnalyticsProvider.class );
+
+        MapBinder<String, ClientApi> mapBinder;
+        mapBinder = MapBinder.newMapBinder( binder(), String.class, ClientApi.class );
+        mapBinder.addBinding( API_PREFIX ).to( AnalyticsProvider.class );
+        // ClientApi config end
 
         bind( new TypeLiteral<UnderlyingClientAdaptee<Analytics>>()
         {

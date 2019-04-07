@@ -23,4 +23,10 @@ package org.ctoolkit.restapi.client.appengine.adapter;
  */
 public class FakeClient
 {
+    private final String api;
+
+    public FakeClient( String api )
+    {
+        this.api = api;
+    }
 }

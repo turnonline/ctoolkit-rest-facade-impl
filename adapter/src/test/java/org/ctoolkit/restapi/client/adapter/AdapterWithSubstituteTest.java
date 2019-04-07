@@ -43,6 +43,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -70,6 +71,9 @@ public class AdapterWithSubstituteTest
 
     @Injectable
     private GoogleApiProxyFactory apiFactory;
+
+    @Injectable
+    private Map<String, ClientApi> apis = new HashMap<>();
 
     @Injectable
     private Substitute substitute;

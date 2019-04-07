@@ -72,6 +72,8 @@ import static org.testng.Assert.assertNotNull;
 @SuppressWarnings( {"unchecked", "ConstantConditions"} )
 public class RestFacadeAdapterTest
 {
+    private static final String API_NAME = "drive";
+
     @Tested
     private RestFacadeAdapter tested;
 
@@ -86,6 +88,9 @@ public class RestFacadeAdapterTest
 
     @Injectable
     private GoogleApiProxyFactory apiFactory;
+
+    @Injectable
+    private Map<String, ClientApi> apis = new HashMap<>();
 
     @Mocked
     private AbstractGoogleClient googleClient;
@@ -133,7 +138,7 @@ public class RestFacadeAdapterTest
     private HttpContent httpContent;
 
     @Mocked
-    private ClientApiProvider apiProvider;
+    private ClientApi clientApi;
 
     private RemoteRequest remoteRequest;
 
@@ -141,6 +146,7 @@ public class RestFacadeAdapterTest
     public void before()
     {
         remoteRequest = new RemoteRequest( googleClient, "", "", httpContent, ResourceNoMapping.class );
+        apis.put( API_NAME, clientApi );
     }
 
     @Test
@@ -645,38 +651,32 @@ public class RestFacadeAdapterTest
     @Test
     public void impersonate_Ok()
     {
-        String apiName = "drive";
         String userEmail = "email@turnonline.biz";
 
         new Expectations()
         {
             {
-                apiFactory.getClientApi( apiName );
-                apiProvider.init( ( Collection<String> ) any, userEmail );
+                clientApi.init( ( Collection<String> ) any, userEmail );
             }
         };
 
-        tested.impersonate( Lists.newArrayList(), userEmail, apiName );
+        tested.impersonate( Lists.newArrayList(), userEmail, API_NAME );
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
     public void impersonate_ClientApiNotFound()
     {
-        String apiName = "drive";
         String userEmail = "email@turnonline.biz";
 
         new Expectations()
         {
             {
-                apiFactory.getClientApi( apiName );
-                result = null;
-
-                apiProvider.init( ( Collection<String> ) any, userEmail );
+                clientApi.init( ( Collection<String> ) any, userEmail );
                 times = 0;
             }
         };
 
-        tested.impersonate( Lists.newArrayList(), userEmail, apiName );
+        tested.impersonate( Lists.newArrayList(), userEmail, "sheets" );
     }
 
     private void noMappingVerifications()

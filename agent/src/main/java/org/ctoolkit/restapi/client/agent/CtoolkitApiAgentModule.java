@@ -20,6 +20,7 @@ package org.ctoolkit.restapi.client.agent;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.ctoolkit.api.agent.model.ExportBatch;
 import org.ctoolkit.api.agent.model.ExportItem;
@@ -39,6 +40,7 @@ import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.BeanMapperConfig;
+import org.ctoolkit.restapi.client.adapter.ClientApi;
 import org.ctoolkit.restapi.client.agent.adaptee.CustomizedCtoolkitAgent;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportBatchAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonExportItemAdaptee;
@@ -77,7 +79,13 @@ public class CtoolkitApiAgentModule
         Multibinder<BeanMapperConfig> multibinder = Multibinder.newSetBinder( binder(), BeanMapperConfig.class );
         multibinder.addBinding().to( ResourcesMapper.class ).in( Singleton.class );
 
+        // ClientApi config
         bind( CustomizedCtoolkitAgent.class ).toProvider( AgentProvider.class );
+
+        MapBinder<String, ClientApi> mapBinder;
+        mapBinder = MapBinder.newMapBinder( binder(), String.class, ClientApi.class );
+        mapBinder.addBinding( API_PREFIX ).to( AgentProvider.class );
+        // ClientApi config end
 
         // ImportBatch
         bind( new TypeLiteral<GetExecutorAdaptee<ImportBatch>>()

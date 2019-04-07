@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Provider;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
@@ -36,16 +35,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * The manager that helps to provide an underlying API client instance either with default or specific configuration.
- * A standard use case is to provide default client configuration.
- * Once {@link #init(Collection, String)} has been called, a newly built client instance
- * with stated configuration will be valid as long as the thread is alive.
- *
- * @param <C> the concrete type of API client to be managed
- */
 public abstract class ClientApiProvider<C>
-        implements Provider<C>
+        implements ClientApi<C>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ClientApiProvider.class );
 
@@ -57,7 +48,6 @@ public abstract class ClientApiProvider<C>
     {
         String api = checkNotNull( api(), "API name cannot be null" );
         this.factory = checkNotNull( factory, "API factory cannot be null" );
-        this.factory.put( api, this );
 
         AtomicReference<C> defaultClient = new AtomicReference<>();
         this.threadLocal = ThreadLocal.withInitial( defaultClient::get );
@@ -87,15 +77,8 @@ public abstract class ClientApiProvider<C>
         return scopes;
     }
 
-    /**
-     * Initialize a client API instance with specified parameters and sets
-     * that instance in to thread local to be consumed in current thread.
-     *
-     * @param scopes    the scopes for use with API
-     * @param userEmail the email address of the user to impersonate
-     * @return the just initialized API client instance
-     */
-    C init( @Nonnull Collection<String> scopes, @Nullable String userEmail )
+    @Override
+    public C init( @Nonnull Collection<String> scopes, @Nullable String userEmail )
     {
         return init( scopes, userEmail, true );
     }

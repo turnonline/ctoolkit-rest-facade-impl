@@ -22,9 +22,11 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import org.ctoolkit.restapi.client.adaptee.DeleteExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.InsertExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
+import org.ctoolkit.restapi.client.adapter.ClientApi;
 import org.ctoolkit.restapi.client.drive.adaptee.FileAdaptee;
 
 import javax.inject.Singleton;
@@ -42,7 +44,13 @@ public class GoogleApiDriveModule
     @Override
     protected void configure()
     {
+        // ClientApi config
         bind( Drive.class ).toProvider( DriveProvider.class );
+
+        MapBinder<String, ClientApi> mapBinder;
+        mapBinder = MapBinder.newMapBinder( binder(), String.class, ClientApi.class );
+        mapBinder.addBinding( API_PREFIX ).to( DriveProvider.class );
+        // ClientApi config end
 
         bind( new TypeLiteral<InsertExecutorAdaptee<File>>()
         {

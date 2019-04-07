@@ -24,6 +24,7 @@ import org.ctoolkit.restapi.client.PayloadRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RestFacade;
 import org.ctoolkit.restapi.client.RetrievalRequest;
+import org.ctoolkit.restapi.client.adapter.ClientApi;
 import org.ctoolkit.restapi.client.adapter.GoogleApiProxyFactory;
 import org.ctoolkit.restapi.client.appengine.BackendServiceTestCase;
 import org.ctoolkit.restapi.client.appengine.adapter.model.Foo;
@@ -33,10 +34,12 @@ import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.testng.Assert.assertEquals;
@@ -101,10 +104,23 @@ public class AdapterAppEngineTest
     String readTimeout;
 
     @Inject
+    private Map<String, ClientApi> apis;
+
+    @Inject
+    private Provider<FakeClient> fc;
+
+    @Inject
     private RestFacade resources;
 
     @Inject
     private GoogleApiProxyFactory builder;
+
+    @Test
+    public void clientApiInitialization()
+    {
+        assertThat( apis ).isNotEmpty();
+        assertThat( fc ).isNotNull();
+    }
 
     @Test
     public void facadeEndToEnd() throws IOException

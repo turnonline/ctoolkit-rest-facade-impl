@@ -20,6 +20,8 @@ package org.ctoolkit.restapi.client.pubsub;
 
 import com.google.api.services.pubsub.Pubsub;
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.MapBinder;
+import org.ctoolkit.restapi.client.adapter.ClientApi;
 import org.ctoolkit.restapi.client.pubsub.adaptee.PubSubAdapteesModule;
 
 /**
@@ -36,6 +38,12 @@ public class GoogleApiPubSubModule
     @Override
     protected void configure()
     {
+        // ClientApi config
         bind( Pubsub.class ).toProvider( PubsubProvider.class );
+
+        MapBinder<String, ClientApi> mapBinder;
+        mapBinder = MapBinder.newMapBinder( binder(), String.class, ClientApi.class );
+        mapBinder.addBinding( API_PREFIX ).to( PubsubProvider.class );
+        // ClientApi config end
     }
 }

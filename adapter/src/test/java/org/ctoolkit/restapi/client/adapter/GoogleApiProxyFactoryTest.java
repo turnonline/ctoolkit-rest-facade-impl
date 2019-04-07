@@ -51,6 +51,9 @@ public class GoogleApiProxyFactoryTest
     private Map<String, String> credential = new HashMap<>();
 
     @Injectable
+    private Map<String, ClientApi> apis = new HashMap<>();
+
+    @Injectable
     private AuthKeyProvider keyProvider;
 
     @BeforeMethod

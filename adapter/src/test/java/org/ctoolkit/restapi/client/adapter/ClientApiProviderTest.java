@@ -62,9 +62,6 @@ public class ClientApiProviderTest
         new Verifications()
         {
             {
-                // initialized in constructor
-                factory.put( withEqual( API ), withSameInstance( tested ) );
-
                 Collection<String> scopes;
                 String email;
                 factory.authorize( scopes = withCapture(), email = withCapture(), API );
@@ -92,9 +89,6 @@ public class ClientApiProviderTest
         new Verifications()
         {
             {
-                // initialized in constructor
-                factory.put( withEqual( API ), withSameInstance( tested ) );
-
                 Collection<String> scopes;
                 String email;
                 factory.authorize( scopes = withCapture(), email = withCapture(), API );

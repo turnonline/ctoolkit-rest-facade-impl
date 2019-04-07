@@ -21,6 +21,7 @@ package org.ctoolkit.restapi.client.appengine;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import ma.glasnost.orika.MapperFactory;
@@ -34,7 +35,10 @@ import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.adapter.BeanMapperConfig;
+import org.ctoolkit.restapi.client.adapter.ClientApi;
 import org.ctoolkit.restapi.client.appengine.adapter.BeeGetListAdaptee;
+import org.ctoolkit.restapi.client.appengine.adapter.FakeClient;
+import org.ctoolkit.restapi.client.appengine.adapter.FakeClientProvider;
 import org.ctoolkit.restapi.client.appengine.adapter.FooClientAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.FooDeleteAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.FooGetAdaptee;
@@ -71,6 +75,11 @@ public class TestModule
         install( new CtoolkitRestFacadeDefaultOrikaModule() );
 
         bind( AuthKeyProvider.class ).to( MyAuthKeyProvider.class ).in( Singleton.class );
+        bind( FakeClient.class ).toProvider( FakeClientProvider.class );
+
+        MapBinder<String, ClientApi> mapBinder;
+        mapBinder = MapBinder.newMapBinder( binder(), String.class, ClientApi.class );
+        mapBinder.addBinding( "fake-client" ).to( FakeClientProvider.class );
 
         // Foo adaptee mapping per type
         bind( new TypeLiteral<NewExecutorAdaptee<RemoteFoo>>()
@@ -131,7 +140,7 @@ public class TestModule
         credential.setFileNameJson( "/org/ctoolkit/restapi/private-key.json" );
         credential.setApiKey( "AIzaSz" );
         credential.setEndpointUrl( "http://localhost:8990/_ah/api/" );
-        credential.setCredentialOn( true );
+        credential.setCredentialOn( false );
         credential.setNumberOfRetries( 3 );
         credential.setRequestReadTimeout( 15000 );
         credential.load( "/credential.properties" );
