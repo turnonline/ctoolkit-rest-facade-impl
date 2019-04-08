@@ -435,7 +435,7 @@ public abstract class GoogleApiProxyFactory
             throws GeneralSecurityException, IOException
     {
         GoogleCredential googleCredential;
-        checkNotNull( scopes, "Scopes is mandatory" );
+        Collection<String> checkedScopes = checkNotNull( scopes, "Scopes is mandatory" );
 
         if ( isJsonConfiguration( checkNotNull( prefix, "API short name is mandatory" ) ) )
         {
@@ -445,7 +445,7 @@ public abstract class GoogleApiProxyFactory
             googleCredential = new ConfiguredByJsonGoogleCredential( json, prefix )
                     .setTransport( getHttpTransport() )
                     .setJsonFactory( getJsonFactory() )
-                    .setServiceAccountScopes( scopes )
+                    .setServiceAccountScopes( checkedScopes )
                     .setServiceAccountUser( userAccount )
                     .build();
         }
@@ -464,7 +464,7 @@ public abstract class GoogleApiProxyFactory
                     .setTransport( getHttpTransport() )
                     .setJsonFactory( getJsonFactory() )
                     .setServiceAccountId( serviceAccountEmail )
-                    .setServiceAccountScopes( scopes )
+                    .setServiceAccountScopes( checkedScopes )
                     .setServiceAccountPrivateKeyFromP12File( new File( resource.getPath() ) )
                     .setServiceAccountUser( userAccount )
                     .build();
@@ -522,12 +522,6 @@ public abstract class GoogleApiProxyFactory
             }
         }
         return stream;
-    }
-
-    public InputStream getServiceAccountPrivateKeyP12Stream( String prefix )
-    {
-        String fileName = getFileName( prefix );
-        return GoogleApiProxyFactory.class.getResourceAsStream( fileName );
     }
 
     public HttpRequestInitializer newRequestConfig( @Nullable String prefix,
@@ -655,7 +649,7 @@ public abstract class GoogleApiProxyFactory
     private class ConfiguredByJsonGoogleCredential
             extends ConfiguredGoogleCredential
     {
-        public ConfiguredByJsonGoogleCredential( InputStream jsonStream, String prefix ) throws IOException
+        ConfiguredByJsonGoogleCredential( InputStream jsonStream, String prefix ) throws IOException
         {
             super( prefix );
             JsonObjectParser parser = new JsonObjectParser( GoogleApiProxyFactory.this.getJsonFactory() );
@@ -678,6 +672,17 @@ public abstract class GoogleApiProxyFactory
             setServiceAccountId( clientEmail );
             setServiceAccountPrivateKey( privateKey );
             setServiceAccountPrivateKeyId( privateKeyId );
+
+            String tokenUri = ( String ) fileContents.get( "token_uri" );
+            if ( tokenUri != null )
+            {
+                setTokenServerEncodedUrl( tokenUri );
+            }
+            String projectId = ( String ) fileContents.get( "project_id" );
+            if ( projectId != null )
+            {
+                setServiceAccountProjectId( projectId );
+            }
         }
     }
 }

@@ -21,6 +21,7 @@ package org.ctoolkit.restapi.client.appengine;
 import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
+import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import org.ctoolkit.restapi.client.Credential;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
@@ -64,6 +65,11 @@ class GoogleApiProxyFactoryAppEngine
         }
         else
         {
+            if ( !Strings.isNullOrEmpty( userAccount ) )
+            {
+                String msg = "User account impersonate is not supported by AppIdentityCredential '" + userAccount + "'";
+                throw new IllegalArgumentException( msg );
+            }
             return new ConfiguredAppIdentityCredential( scopes, prefix );
         }
     }

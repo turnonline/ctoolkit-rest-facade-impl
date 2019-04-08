@@ -55,8 +55,6 @@ import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMigrationItemAdaptee
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonMigrationJobAdaptee;
 import org.ctoolkit.restapi.client.agent.adaptee.GenericJsonPropertyMetaDataAdaptee;
 import org.ctoolkit.restapi.client.agent.model.ResourcesMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 
@@ -69,8 +67,6 @@ public class CtoolkitApiAgentModule
         extends AbstractModule
 {
     public static final String API_PREFIX = "ctoolkit-agent";
-
-    private static final Logger logger = LoggerFactory.getLogger( CtoolkitApiAgentModule.class );
 
     @Override
     protected void configure()
