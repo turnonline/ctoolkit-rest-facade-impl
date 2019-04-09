@@ -22,13 +22,13 @@
     <parent>
         <groupId>org.ctoolkit.restapi</groupId>
         <artifactId>ctoolkit-rest-facade-impl</artifactId>
-        <version>0.32-SNAPSHOT</version>
+        <version>0.32</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ctoolkit-rest-facade-appengine</artifactId>
-    <version>0.32-SNAPSHOT</version>
+    <version>0.32</version>
     <packaging>jar</packaging>
     <name>CtoolkiT REST Facade API for AppEngine</name>
     <description>
