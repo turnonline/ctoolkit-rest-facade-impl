@@ -18,10 +18,16 @@
 
 package org.ctoolkit.restapi.client.appengine;
 
+import com.google.api.client.auth.oauth2.TokenResponse;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
-import com.google.common.base.Strings;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.util.Strings;
+import com.google.appengine.api.appidentity.AppIdentityService;
+import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
 import org.ctoolkit.restapi.client.Credential;
 import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
@@ -35,6 +41,8 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.Map;
+
+import static com.google.api.client.util.Preconditions.checkNotNull;
 
 /**
  * The AppEngine specific factory to build credential instance.
@@ -59,9 +67,10 @@ class GoogleApiProxyFactoryAppEngine
                                              @Nonnull String prefix )
             throws GeneralSecurityException, IOException
     {
+        Collection<String> checkedScopes = Preconditions.checkNotNull( scopes, "Scopes is mandatory" );
         if ( super.isCredentialOn( prefix ) )
         {
-            return super.authorize( scopes, userAccount, prefix );
+            return super.authorize( checkedScopes, userAccount, prefix );
         }
         else
         {
@@ -70,7 +79,7 @@ class GoogleApiProxyFactoryAppEngine
                 String msg = "User account impersonate is not supported by AppIdentityCredential '" + userAccount + "'";
                 throw new IllegalArgumentException( msg );
             }
-            return new ConfiguredAppIdentityCredential( scopes, prefix );
+            return new CredentialWrapper( checkedScopes, getHttpTransport(), getJsonFactory(), userAccount, prefix );
         }
     }
 
@@ -80,16 +89,50 @@ class GoogleApiProxyFactoryAppEngine
         super.setKeyProvider( keyProvider );
     }
 
-    private class ConfiguredAppIdentityCredential
-            extends AppIdentityCredential
+    private class CredentialWrapper
+            extends GoogleCredential
     {
+        private final AppIdentityCredential appIdentity;
+
+        private final boolean scopesRequired;
+
+        private final String userAccount;
+
+        private final String prefix;
+
         private final int numberOfRetries;
 
         private final int readTimeout;
 
-        ConfiguredAppIdentityCredential( Collection<String> scopes, String prefix )
+        /**
+         * Constructs the wrapper using the default AppIdentityService.
+         */
+        CredentialWrapper( @Nonnull Collection<String> scopes,
+                           @Nonnull HttpTransport transport,
+                           @Nonnull JsonFactory jsonFactory,
+                           @Nullable String userAccount,
+                           @Nonnull String prefix )
         {
-            super( scopes );
+            this( new AppIdentityCredential( scopes ), transport, jsonFactory, userAccount, prefix );
+        }
+
+        private CredentialWrapper( AppIdentityCredential appIdentity,
+                                   HttpTransport transport,
+                                   JsonFactory jsonFactory,
+                                   String userAccount,
+                                   String prefix )
+        {
+            super( new GoogleCredential.Builder()
+                    .setRequestInitializer( appIdentity )
+                    .setTransport( checkNotNull( transport ) )
+                    .setJsonFactory( checkNotNull( jsonFactory ) )
+                    .setServiceAccountUser( userAccount ) );
+
+            Collection<String> scopes = appIdentity.getScopes();
+            this.scopesRequired = ( scopes == null || scopes.isEmpty() );
+            this.appIdentity = appIdentity;
+            this.userAccount = userAccount;
+            this.prefix = checkNotNull( prefix );
             this.numberOfRetries = getNumberOfRetries( prefix );
             this.readTimeout = getReadTimeout( prefix );
         }
@@ -101,7 +144,7 @@ class GoogleApiProxyFactoryAppEngine
             // the authorization header set by facade client has a preference, see Request#authBy(String)
             if ( authorization == null )
             {
-                super.intercept( request );
+                appIdentity.intercept( request );
             }
             eventBus.post( new BeforeRequestEvent( request ) );
         }
@@ -109,8 +152,39 @@ class GoogleApiProxyFactoryAppEngine
         @Override
         public void initialize( HttpRequest request ) throws IOException
         {
-            super.initialize( request );
+            appIdentity.initialize( request );
             configureHttpRequest( request, numberOfRetries, readTimeout );
+        }
+
+        public boolean createScopedRequired()
+        {
+            return scopesRequired;
+        }
+
+        public GoogleCredential createScoped( Collection<String> scopes )
+        {
+            return new CredentialWrapper(
+                    new AppIdentityCredential.Builder( scopes )
+                            .setAppIdentityService( appIdentity.getAppIdentityService() )
+                            .build(),
+                    getTransport(),
+                    getJsonFactory(),
+                    userAccount,
+                    prefix );
+        }
+
+        @Override
+        protected TokenResponse executeRefreshToken()
+        {
+            AppIdentityService.GetAccessTokenResult tokenResult = appIdentity.getAppIdentityService()
+                    .getAccessToken( appIdentity.getScopes() );
+
+            TokenResponse response = new TokenResponse();
+            response.setAccessToken( tokenResult.getAccessToken() );
+
+            long expiresInSeconds = ( tokenResult.getExpirationTime().getTime() - System.currentTimeMillis() ) / 1000;
+            response.setExpiresInSeconds( expiresInSeconds );
+            return response;
         }
     }
 }
