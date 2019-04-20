@@ -22,6 +22,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.common.base.Strings;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
@@ -62,7 +63,7 @@ public class GoogleApiFirebaseModule
 
     @Provides
     @Singleton
-    IdentityHandler provideIdentityHandler( IdentityApiInit init )
+    FirebaseAuth provideIdentityHandler( IdentityApiInit init )
             throws IOException
     {
         logger.info( "credential.firebase.credentialOn: " + init.credentialOn );
@@ -133,7 +134,7 @@ public class GoogleApiFirebaseModule
 
         FirebaseApp.initializeApp( options );
 
-        return new IdentityHandler();
+        return FirebaseAuth.getInstance();
     }
 
     static class IdentityApiInit

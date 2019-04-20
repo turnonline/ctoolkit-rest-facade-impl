@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -48,8 +49,12 @@ public final class IdentityHandler
 
     private static final Logger logger = LoggerFactory.getLogger( IdentityHandler.class );
 
-    IdentityHandler()
+    private final FirebaseAuth firebase;
+
+    @Inject
+    IdentityHandler( FirebaseAuth firebase )
     {
+        this.firebase = firebase;
     }
 
     /**
@@ -62,20 +67,17 @@ public final class IdentityHandler
      */
     public FirebaseToken resolveVerifyToken( @Nonnull HttpServletRequest request )
     {
-        checkNotNull( request );
-
-        String token = getToken( request );
+        String token = getToken( checkNotNull( request ) );
         FirebaseToken decodedToken = null;
 
         if ( !Strings.isNullOrEmpty( token ) )
         {
             try
             {
-                decodedToken = FirebaseAuth.getInstance().verifyIdTokenAsync( token ).get();
+                decodedToken = firebase.verifyIdTokenAsync( token ).get();
             }
             catch ( InterruptedException | ExecutionException e )
             {
-                decodedToken = null;
                 logger.error( "Token verification has failed.", e );
             }
         }
@@ -92,8 +94,6 @@ public final class IdentityHandler
      */
     public final String getToken( @Nonnull HttpServletRequest request )
     {
-        checkNotNull( request );
-
         String token = request.getHeader( FTOKEN );
         if ( !Strings.isNullOrEmpty( token ) )
         {
@@ -126,9 +126,6 @@ public final class IdentityHandler
      */
     public void delete( @Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response )
     {
-        checkNotNull( request );
-        checkNotNull( response );
-
         Cookie[] cookies = request.getCookies();
 
         if ( cookies == null )
