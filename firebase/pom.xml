@@ -22,13 +22,13 @@
     <parent>
         <groupId>org.ctoolkit.restapi</groupId>
         <artifactId>ctoolkit-rest-facade-impl</artifactId>
-        <version>0.33</version>
+        <version>0.34-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ctoolkit-client-firebase</artifactId>
-    <version>0.33</version>
+    <version>0.34-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Google API CtoolkiT Client - Google Firebase Auth</name>
     <description>Google API CtoolkiT Client Implementation of Google Firebase Auth</description>
