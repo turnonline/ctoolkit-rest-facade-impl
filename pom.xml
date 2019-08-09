@@ -184,9 +184,9 @@
         <ctoolkit-rest-facade-api.version>0.27</ctoolkit-rest-facade-api.version>
         <google-api-services-analytics.version>v3-rev161-1.25.0</google-api-services-analytics.version>
         <google-api-services-drive.version>v3-rev156-1.25.0</google-api-services-drive.version>
-        <firebase-admin.version>6.8.1</firebase-admin.version>
+        <firebase-admin.version>6.9.0</firebase-admin.version>
         <google-api-services-sheets.version>v4-rev569-1.25.0</google-api-services-sheets.version>
-        <google-maps-services.version>0.2.11</google-maps-services.version>
+        <google-maps-services.version>0.9.4</google-maps-services.version>
         <google-api-services-pubsub.version>v1-rev418-1.25.0</google-api-services-pubsub.version>
         <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
         <jmockit.version>1.44</jmockit.version>
