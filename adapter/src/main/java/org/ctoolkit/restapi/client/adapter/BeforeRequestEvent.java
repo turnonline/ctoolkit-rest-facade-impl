@@ -22,6 +22,45 @@ import com.google.api.client.http.HttpRequest;
 
 /**
  * The event called right before call to the remote REST endpoint.
+ * <p>
+ * <strong>Example how to subscribe to this event</strong>
+ * <pre>
+ * {@code
+ * import com.google.common.eventbus.EventBus;
+ * import com.google.common.eventbus.Subscribe;
+ * import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
+ *
+ * import javax.inject.Inject;
+ * import javax.inject.Provider;
+ * import javax.inject.Singleton;
+ * import javax.servlet.http.HttpServletRequest;
+ *
+ * @Singleton
+ * class MySubscriber
+ * {
+ *     // Provider to provide current http servlet request
+ *     private final Provider<HttpServletRequest> provider;
+ *
+ *     @Inject
+ *     public MySubscriber( EventBus eventBus, Provider<HttpServletRequest> provider )
+ *     {
+ *         eventBus.register( this );
+ *         this.provider = provider;
+ *     }
+ *
+ *     @Subscribe
+ *     public void onBeforeRequestEvent( BeforeRequestEvent event )
+ *     {
+ *         com.google.api.client.http.HttpRequest clientRequest = event.getRequest();
+ *         javax.servlet.http.HttpServletRequest originRequest = provider.get();
+ *
+ *         // forward some headers from origin HTTP request or do something else in order to populate client request
+ *     }
+ * }
+ * }
+ * Then include in to injection graph in Guice AbstractModule
+ * bind( MySubscriber.class ).asEagerSingleton();
+ * </pre>
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
