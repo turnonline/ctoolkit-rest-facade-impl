@@ -84,7 +84,7 @@ public class ClientApiProviderTest
         MockedClientApiProvider.FakeClient client = tested.get();
 
         assertThat( client ).isNotNull();
-        assertThat( client.getCredential() ).isSameAs( credential );
+        assertThat( client.getCredential() ).isSameInstanceAs( credential );
 
         new Verifications()
         {

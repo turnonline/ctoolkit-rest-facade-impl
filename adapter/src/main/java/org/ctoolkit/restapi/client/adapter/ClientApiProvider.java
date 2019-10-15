@@ -78,9 +78,9 @@ public abstract class ClientApiProvider<C>
     }
 
     @Override
-    public C init( @Nonnull Collection<String> scopes, @Nullable String userEmail )
+    public C init( @Nullable Collection<String> scopes, @Nullable String userEmail )
     {
-        return init( scopes, userEmail, true );
+        return init( scopes == null ? getScopes( api() ) : scopes, userEmail, true );
     }
 
     private C init( @Nonnull Collection<String> scopes, @Nullable String userEmail, boolean updateLocal )

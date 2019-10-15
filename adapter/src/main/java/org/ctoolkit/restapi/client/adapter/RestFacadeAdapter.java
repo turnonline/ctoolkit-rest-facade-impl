@@ -63,6 +63,7 @@ import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
 import org.ctoolkit.restapi.client.provider.LocalListResourceProvider;
 import org.ctoolkit.restapi.client.provider.LocalResourceProvider;
+import org.ctoolkit.restapi.client.provider.TokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -753,14 +754,25 @@ public class RestFacadeAdapter
     }
 
     @Override
+    public void impersonate( @Nonnull String userEmail, @Nonnull String api )
+    {
+        ClientApi provider = apis.get( api );
+        if ( provider == null )
+        {
+            throw new IllegalArgumentException( impersonateClientApiMissingErrorMessage( api ) );
+        }
+
+        String emailError = "User email cannot be null";
+        provider.init( null, checkNotNull( userEmail, emailError ) );
+    }
+
+    @Override
     public void impersonate( @Nonnull Collection<String> scopes, @Nonnull String userEmail, @Nonnull String api )
     {
         ClientApi provider = apis.get( api );
         if ( provider == null )
         {
-            throw new IllegalArgumentException( "No API client found for '"
-                    + api
-                    + "'. Make sure API is installed in module, for example: install( new GoogleApiDriveModule() );" );
+            throw new IllegalArgumentException( impersonateClientApiMissingErrorMessage( api ) );
         }
 
         String scopesError = "Scopes cannot be null";
@@ -768,6 +780,12 @@ public class RestFacadeAdapter
         provider.init( checkNotNull( scopes, scopesError ), checkNotNull( userEmail, emailError ) );
     }
 
+    private String impersonateClientApiMissingErrorMessage( String api )
+    {
+        return "No API client found for '"
+                + api
+                + "'. Make sure API is installed in module, for example: install( new GoogleApiDriveModule() );";
+    }
 
     @SuppressWarnings( "unchecked" )
     <T> PayloadRequest<T> internalDelete( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
@@ -1049,5 +1067,23 @@ public class RestFacadeAdapter
             adaptee = ( A ) binding.getProvider().get();
         }
         return adaptee;
+    }
+
+    TokenProvider<Object> getTokenProvider( @Nonnull Class type )
+    {
+        TokenProvider<Object> provider;
+        ParameterizedType pt = Types.newParameterizedType( TokenProvider.class, type );
+        Binding<?> binding = injector.getExistingBinding( Key.get( TypeLiteral.get( pt ) ) );
+
+        if ( binding != null )
+        {
+            //noinspection unchecked
+            provider = ( TokenProvider ) binding.getProvider().get();
+        }
+        else
+        {
+            provider = null;
+        }
+        return provider;
     }
 }

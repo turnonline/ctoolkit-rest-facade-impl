@@ -23,6 +23,7 @@ import org.ctoolkit.restapi.client.ListRetrievalRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
+import org.ctoolkit.restapi.client.provider.TokenProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -64,8 +65,6 @@ class ListRequest<T>
 
     private GoogleRequestHeaders filler;
 
-    private String token;
-
     ListRequest( @Nonnull Class<T> resource,
                  @Nonnull RestFacadeAdapter adapter,
                  @Nonnull ListExecutorAdaptee adaptee,
@@ -76,7 +75,7 @@ class ListRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeaders( remoteRequest );
+        this.filler = new GoogleRequestHeaders( adapter, remoteRequest );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -134,10 +133,7 @@ class ListRequest<T>
         }
 
         filler.acceptLanguage( locale );
-        if ( token != null )
-        {
-            filler.authorization( token );
-        }
+        filler.setAuthorizationIf();
 
         return adapter.callbackExecuteList( adaptee, remoteRequest, resource, params, locale, start, length,
                 orderBy, ascending );
@@ -189,22 +185,25 @@ class ListRequest<T>
     }
 
     @Override
-    public Request<List<T>> onBehalf( @Nonnull String email, @Nullable String identityId )
+    public Request<List<T>> onBehalfOf( @Nonnull Object of )
     {
-        addHeader( Request.ON_BEHALF_OF_EMAIL, email );
-        if ( identityId != null )
-        {
-            addHeader( Request.ON_BEHALF_OF_USER_ID, identityId );
-        }
+        filler.setOnBehalfOf( of );
         return this;
     }
 
     @Override
-    public AuthRequest<List<T>> authBy( @Nonnull String authorization )
+    public AuthRequest<List<T>> authBy( @Nonnull String token )
     {
-        checkNotNull( authorization );
+        checkNotNull( token, "Authorization token expected to be not null" );
 
-        this.token = authorization;
+        filler.setTokenCreator( ( FinalTokenProvider ) () -> token );
+        return new AuthRequestImpl<>( this, filler );
+    }
+
+    @Override
+    public AuthRequest<List<T>> authBy( @Nonnull TokenProvider<Object> provider )
+    {
+        filler.setTokenCreator( checkNotNull( provider, "Token provider can't be null" ) );
         return new AuthRequestImpl<>( this, filler );
     }
 

@@ -39,15 +39,22 @@ import java.net.URL;
  * The Google Firebase Admin based identity module.
  * The following properties are allowed to be configured via dependency injection:
  * <ul>
- * <li>credential.firebase.credentialOn</li>
+ * <li>credential.firebase.on</li>
  * <li>credential.firebase.fileName</li>
  * <li>credential.firebase.projectId</li>
  * <li>credential.firebase.databaseName</li>
+ * <li>credential.firebase.serviceAccountEmail</li>
  * </ul>
  * If credentialOn is true (by default is false) these properties become mandatory
  * and will be used to authenticate calls. If databaseName value is missing the projectId will be used.
+ * <p>
+ * In order to create a custom token the service Identity and Access Management (IAM) API
+ * must be enabled and service account ID "Service Account Token Creator" role
+ * must have the 'iam.serviceAccounts.signBlob' permission for the custom token creation to work.
+ * </p>
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ * @see <a href="https://firebase.google.com/docs/admin/setup">Add Firebase to your app</a>
  */
 public class GoogleApiFirebaseModule
         extends AbstractModule
@@ -56,20 +63,16 @@ public class GoogleApiFirebaseModule
 
     private static final Logger logger = LoggerFactory.getLogger( GoogleApiFirebaseModule.class );
 
-    @Override
-    protected void configure()
-    {
-    }
-
     @Provides
     @Singleton
     FirebaseAuth provideIdentityHandler( IdentityApiInit init )
             throws IOException
     {
-        logger.info( "credential.firebase.credentialOn: " + init.credentialOn );
+        logger.info( "credential.firebase.on: " + init.credentialOn );
         logger.info( "credential.firebase.fileName:" + init.fileName );
         logger.info( "credential.firebase.projectId: " + init.projectId );
         logger.info( "credential.firebase.databaseName: " + init.databaseName );
+        logger.info( "credential.firebase.serviceAccountEmail: " + init.serviceAccount );
 
         FirebaseOptions options;
         String databaseName = init.databaseName;
@@ -86,23 +89,21 @@ public class GoogleApiFirebaseModule
             throw new IllegalArgumentException( msg );
         }
 
-        if ( Strings.isNullOrEmpty( projectId ) )
-        {
-            String msg = "The property 'credential.firebase.projectId' is mandatory.";
-            throw new IllegalArgumentException( msg );
-        }
-
         String databaseUrl = "https://" + databaseName + ".firebaseio.com";
         logger.info( "The final Firebase database URL: " + databaseUrl );
 
         if ( !init.credentialOn )
         {
-
-            options = new FirebaseOptions.Builder()
+            FirebaseOptions.Builder builder = new FirebaseOptions.Builder()
                     .setCredentials( GoogleCredentials.getApplicationDefault() )
-                    .setDatabaseUrl( databaseUrl )
-                    .setProjectId( projectId )
-                    .build();
+                    .setDatabaseUrl( databaseUrl );
+
+            if ( !Strings.isNullOrEmpty( init.serviceAccount ) )
+            {
+                builder.setServiceAccountId( init.serviceAccount );
+            }
+
+            options = builder.build();
 
             logger.info( "Firebase-admin built with application default credentials." );
         }
@@ -123,11 +124,16 @@ public class GoogleApiFirebaseModule
             }
             FileInputStream serviceAccount = new FileInputStream( url.getPath() );
 
-            options = new FirebaseOptions.Builder()
+            FirebaseOptions.Builder builder = new FirebaseOptions.Builder()
                     .setCredentials( GoogleCredentials.fromStream( serviceAccount ) )
-                    .setDatabaseUrl( databaseUrl )
-                    .setProjectId( projectId )
-                    .build();
+                    .setDatabaseUrl( databaseUrl );
+
+            if ( !Strings.isNullOrEmpty( init.serviceAccount ) )
+            {
+                builder.setServiceAccountId( init.serviceAccount );
+            }
+
+            options = builder.build();
 
             logger.info( "Firebase-admin built with credentials from file." );
         }
@@ -140,7 +146,7 @@ public class GoogleApiFirebaseModule
     static class IdentityApiInit
     {
         @Inject( optional = true )
-        @Named( "credential.firebase.credentialOn" )
+        @Named( "credential.firebase.on" )
         boolean credentialOn = false;
 
         @Inject( optional = true )
@@ -154,5 +160,9 @@ public class GoogleApiFirebaseModule
         @Inject( optional = true )
         @Named( "credential.firebase.databaseName" )
         String databaseName;
+
+        @Inject( optional = true )
+        @Named( "credential.firebase.serviceAccountEmail" )
+        String serviceAccount;
     }
 }

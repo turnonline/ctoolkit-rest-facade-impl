@@ -201,7 +201,6 @@ public abstract class GoogleApiProxyFactory
         {
             return Collections.emptyList();
         }
-        @SuppressWarnings( "UnstableApiUsage" )
         List<String> list = Splitter.on( "," ).trimResults().omitEmptyStrings().splitToList( values );
         return Collections.unmodifiableList( list );
     }
@@ -341,7 +340,7 @@ public abstract class GoogleApiProxyFactory
         {
             value = checkNotNull( defaultValue, "Default value is expected" );
         }
-        return Integer.valueOf( value );
+        return Integer.parseInt( value );
     }
 
     /**
@@ -385,7 +384,7 @@ public abstract class GoogleApiProxyFactory
             return false;
         }
 
-        return Boolean.valueOf( value );
+        return Boolean.parseBoolean( value );
     }
 
     private String getStringValue( String prefix, String property )

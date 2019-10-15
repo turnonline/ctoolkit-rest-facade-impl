@@ -26,6 +26,7 @@ import org.ctoolkit.restapi.client.Identifier;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
 import org.ctoolkit.restapi.client.adaptee.DownloadExecutorAdaptee;
+import org.ctoolkit.restapi.client.provider.TokenProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,8 +66,6 @@ class DownloadRequestImpl
 
     private GoogleRequestHeaders filler;
 
-    private String token;
-
     /**
      * Constructor.
      *
@@ -96,7 +95,7 @@ class DownloadRequestImpl
         this.output = checkNotNull( output );
         this.interceptor = checkNotNull( interceptor );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeaders();
+        this.filler = new GoogleRequestHeaders( adapter );
         this.filler.contentType( type );
     }
 
@@ -106,6 +105,11 @@ class DownloadRequestImpl
         return finish( null, withLocale );
     }
 
+    /**
+     * <strong>Note:</strong> if {@link RequestCredential#getApiKey()} has a non empty value, it will override
+     * any value configured either by {@link #authBy(String)} or {@link #authBy(TokenProvider)}.
+     * See {@link GoogleRequestHeaders#fillInCredential(Map)}
+     */
     @Override
     public Map<String, Object> finish( @Nonnull RequestCredential credential )
     {
@@ -114,6 +118,11 @@ class DownloadRequestImpl
         return finish();
     }
 
+    /**
+     * <strong>Note:</strong> if property 'credential.xxx.apiKey' has a non empty value, it will override
+     * any value configured either by {@link #authBy(String)} or {@link #authBy(TokenProvider)}.
+     * See {@link GoogleRequestHeaders#fillInCredential(Map)}
+     */
     @Override
     public Map<String, Object> finish( @Nullable Map<String, Object> parameters )
     {
@@ -126,6 +135,11 @@ class DownloadRequestImpl
         return finish( null, locale );
     }
 
+    /**
+     * <strong>Note:</strong> if property 'credential.xxx.apiKey' has a non empty value, it will override
+     * any value configured either by {@link #authBy(String)} or {@link #authBy(TokenProvider)}.
+     * See {@link GoogleRequestHeaders#fillInCredential(Map)}
+     */
     @Override
     public Map<String, Object> finish( @Nullable Map<String, Object> parameters, @Nullable Locale locale )
     {
@@ -135,11 +149,8 @@ class DownloadRequestImpl
         }
 
         filler.acceptLanguage( locale );
+        filler.setAuthorizationIf();
         filler.fillInCredential( params );
-        if ( token != null )
-        {
-            filler.authorization( token );
-        }
 
         HttpHeaders headers = filler.getHeaders();
 
@@ -193,22 +204,25 @@ class DownloadRequestImpl
     }
 
     @Override
-    public Request<Map<String, Object>> onBehalf( @Nonnull String email, @Nullable String identityId )
+    public Request<Map<String, Object>> onBehalfOf( @Nonnull Object of )
     {
-        addHeader( Request.ON_BEHALF_OF_EMAIL, email );
-        if ( identityId != null )
-        {
-            addHeader( Request.ON_BEHALF_OF_USER_ID, identityId );
-        }
+        filler.setOnBehalfOf( of );
         return this;
     }
 
     @Override
-    public AuthRequest<Map<String, Object>> authBy( @Nonnull String authorization )
+    public AuthRequest<Map<String, Object>> authBy( @Nonnull String token )
     {
-        checkNotNull( authorization );
+        checkNotNull( token, "Authorization token expected to be not null" );
 
-        this.token = authorization;
+        filler.setTokenCreator( ( FinalTokenProvider ) () -> token );
+        return new AuthRequestImpl<>( this, filler );
+    }
+
+    @Override
+    public AuthRequest<Map<String, Object>> authBy( @Nonnull TokenProvider<Object> provider )
+    {
+        filler.setTokenCreator( checkNotNull( provider, "Token provider can't be null" ) );
         return new AuthRequestImpl<>( this, filler );
     }
 }

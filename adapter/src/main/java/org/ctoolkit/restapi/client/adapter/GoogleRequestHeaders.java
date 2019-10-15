@@ -21,7 +21,9 @@ package org.ctoolkit.restapi.client.adapter;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.http.HttpHeaders;
 import com.google.common.base.Strings;
+import org.ctoolkit.restapi.client.AuthRequest;
 import org.ctoolkit.restapi.client.RequestCredential;
+import org.ctoolkit.restapi.client.provider.TokenProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,14 +35,22 @@ import java.util.Map;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class GoogleRequestHeaders
+class GoogleRequestHeaders
 {
     private final HttpHeaders headers;
 
-    private AuthScheme authScheme;
+    private final RestFacadeAdapter adapter;
 
-    public GoogleRequestHeaders( Object remoteRequest )
+    private AuthRequest.AuthScheme authScheme;
+
+    private TokenProvider<Object> provider;
+
+    private Object onBehalfOf;
+
+    GoogleRequestHeaders( RestFacadeAdapter adapter, Object remoteRequest )
     {
+        this.adapter = adapter;
+
         if ( remoteRequest instanceof AbstractGoogleClientRequest )
         {
             this.headers = ( ( AbstractGoogleClientRequest ) remoteRequest ).getRequestHeaders();
@@ -51,8 +61,9 @@ public class GoogleRequestHeaders
         }
     }
 
-    public GoogleRequestHeaders()
+    GoogleRequestHeaders( RestFacadeAdapter adapter )
     {
+        this.adapter = adapter;
         this.headers = new HttpHeaders();
     }
 
@@ -61,7 +72,7 @@ public class GoogleRequestHeaders
      *
      * @param locale the optional locale to be set, {@code null} value will be ignored
      */
-    public void acceptLanguage( @Nullable Locale locale )
+    void acceptLanguage( @Nullable Locale locale )
     {
         if ( locale != null )
         {
@@ -75,7 +86,7 @@ public class GoogleRequestHeaders
      *
      * @param type the optional content type to be set, {@code null} value will be ignored
      */
-    public void contentType( @Nullable String type )
+    void contentType( @Nullable String type )
     {
         if ( type != null )
         {
@@ -88,37 +99,61 @@ public class GoogleRequestHeaders
      *
      * @param authScheme the the authentication scheme to be set
      */
-    public void setAuthScheme( AuthScheme authScheme )
+    void setAuthScheme( AuthRequest.AuthScheme authScheme )
     {
         this.authScheme = authScheme;
     }
 
-    /**
-     * Sets the {@code "Authorization"} header to this request.
-     *
-     * @param token the authorization token to be set, {@code null} value will be ignored
-     */
-    public void authorization( @Nullable String token )
+    void setOnBehalfOf( Object onBehalfOf )
     {
-        boolean hasAuthScheme = false;
-        if ( !Strings.isNullOrEmpty( token ) )
-        {
-            for ( AuthScheme scheme : AuthScheme.values() )
-            {
-                if ( token.startsWith( scheme.value ) )
-                {
-                    headers.setAuthorization( token );
-                    hasAuthScheme = true;
-                    break;
-                }
-            }
+        this.onBehalfOf = onBehalfOf;
+    }
 
-            if ( !hasAuthScheme )
+    /**
+     * Sets the 'Authorization' header if there is an explicit configuration to this request,
+     * otherwise the underlying authorization mechanism will be used.
+     */
+    void setAuthorizationIf()
+    {
+        if ( provider == null && onBehalfOf != null )
+        {
+            // Impl of TokenProvider is required, search for one. Expected to be possible to inject.
+            provider = adapter.getTokenProvider( onBehalfOf.getClass() );
+            if ( provider == null )
             {
-                String finalToken = authScheme == null ? token : authScheme.value + " " + token;
-                headers.setAuthorization( finalToken );
+                String msg = "Missing binding between TokenProvider and on behalf of user: "
+                        + TokenProvider.class.getSimpleName()
+                        + "<"
+                        + onBehalfOf.getClass().getName()
+                        + ">";
+
+                throw new IllegalArgumentException( msg );
             }
         }
+
+        if ( provider != null )
+        {
+            String token = provider.token( authScheme, onBehalfOf );
+            if ( token != null )
+            {
+                headers.setAuthorization( token );
+            }
+
+            Map<String, String> headers = provider.headers( onBehalfOf );
+            if ( headers != null )
+            {
+                this.headers.putAll( headers );
+            }
+        }
+    }
+
+    /**
+     * Sets the custom implementation that provides a token for 'Authorization' header.
+     * Additional optional headers provided by {@link TokenProvider#headers(Object)}.
+     */
+    void setTokenCreator( @Nullable TokenProvider<Object> provider )
+    {
+        this.provider = provider;
     }
 
     /**
@@ -127,41 +162,25 @@ public class GoogleRequestHeaders
      * @param header the name of the header
      * @param value  the header value
      */
-    public void addHeader( @Nonnull String header, @Nonnull String value )
+    void addHeader( @Nonnull String header, @Nonnull String value )
     {
         headers.put( header, value );
     }
 
-    public void fillInCredential( @Nullable Map<String, Object> params )
+    void fillInCredential( @Nullable Map<String, Object> params )
     {
-        //noinspection MismatchedQueryAndUpdateOfCollection
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( params, false );
 
-        authorization( credential.getApiKey() );
+        String apiKey = credential.getApiKey();
+        if ( !Strings.isNullOrEmpty( apiKey ) )
+        {
+            provider = ( FinalTokenProvider ) () -> apiKey;
+        }
     }
 
-    public HttpHeaders getHeaders()
+    HttpHeaders getHeaders()
     {
         return headers;
-    }
-
-    public enum AuthScheme
-    {
-        BEARER( "Bearer" ),
-
-        OAUTH( "OAuth" );
-
-        private String value;
-
-        AuthScheme( String value )
-        {
-            this.value = value;
-        }
-
-        public String getValue()
-        {
-            return value;
-        }
     }
 }

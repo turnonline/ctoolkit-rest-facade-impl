@@ -92,7 +92,7 @@ public class AdapterAppEngineTest
     String endpointUrl;
 
     @Inject
-    @Named( "credential.default.credentialOn" )
+    @Named( "credential.default.on" )
     String credentialOn;
 
     @Inject

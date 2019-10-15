@@ -19,7 +19,9 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.http.HttpHeaders;
+import mockit.Injectable;
 import mockit.Tested;
+import org.ctoolkit.restapi.client.AuthRequest;
 import org.testng.annotations.Test;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -33,12 +35,15 @@ public class GoogleRequestHeadersTest
 {
     private static final String fakeToken = "y23.789abc";
 
-    private static final String bearerToken = GoogleRequestHeaders.AuthScheme.BEARER.getValue() + " " + fakeToken;
+    private static final String bearerToken = AuthRequest.AuthScheme.BEARER.getValue() + " " + fakeToken;
 
-    private static final String oauthToken = GoogleRequestHeaders.AuthScheme.OAUTH.getValue() + " " + fakeToken;
+    private static final String oauthToken = AuthRequest.AuthScheme.OAUTH.getValue() + " " + fakeToken;
 
     @Tested( fullyInitialized = true )
     private GoogleRequestHeaders tested;
+
+    @Injectable
+    private RestFacadeAdapter adapter;
 
     @Test
     public void authorizationNone()
@@ -50,7 +55,8 @@ public class GoogleRequestHeadersTest
     @Test
     public void authorizationNoAuthScheme()
     {
-        tested.authorization( fakeToken );
+        tested.setTokenCreator( ( FinalTokenProvider ) () -> fakeToken );
+        tested.setAuthorizationIf();
         final HttpHeaders httpHeaders = tested.getHeaders();
 
         assertThat( httpHeaders.getAuthorization() ).isEqualTo( fakeToken );
@@ -59,8 +65,9 @@ public class GoogleRequestHeadersTest
     @Test
     public void authorizationBearer()
     {
-        tested.setAuthScheme( GoogleRequestHeaders.AuthScheme.BEARER );
-        tested.authorization( fakeToken );
+        tested.setAuthScheme( AuthRequest.AuthScheme.BEARER );
+        tested.setTokenCreator( ( FinalTokenProvider ) () -> fakeToken );
+        tested.setAuthorizationIf();
         final HttpHeaders httpHeaders = tested.getHeaders();
 
         assertThat( httpHeaders.getAuthorization() ).isEqualTo( bearerToken );
@@ -69,8 +76,9 @@ public class GoogleRequestHeadersTest
     @Test
     public void authorizationOauth()
     {
-        tested.setAuthScheme( GoogleRequestHeaders.AuthScheme.OAUTH );
-        tested.authorization( fakeToken );
+        tested.setAuthScheme( AuthRequest.AuthScheme.OAUTH );
+        tested.setTokenCreator( ( FinalTokenProvider ) () -> fakeToken );
+        tested.setAuthorizationIf();
         final HttpHeaders httpHeaders = tested.getHeaders();
 
         assertThat( httpHeaders.getAuthorization() ).isEqualTo( oauthToken );
@@ -79,7 +87,8 @@ public class GoogleRequestHeadersTest
     @Test
     public void authorizationAlreadyWithBearer()
     {
-        tested.authorization( bearerToken );
+        tested.setTokenCreator( ( FinalTokenProvider ) () -> bearerToken );
+        tested.setAuthorizationIf();
         final HttpHeaders httpHeaders = tested.getHeaders();
 
         assertThat( httpHeaders.getAuthorization() ).isEqualTo( bearerToken );
@@ -88,7 +97,8 @@ public class GoogleRequestHeadersTest
     @Test
     public void authorizationAlreadyWithOauth()
     {
-        tested.authorization( oauthToken );
+        tested.setTokenCreator( ( FinalTokenProvider ) () -> oauthToken );
+        tested.setAuthorizationIf();
         final HttpHeaders httpHeaders = tested.getHeaders();
 
         assertThat( httpHeaders.getAuthorization() ).isEqualTo( oauthToken );

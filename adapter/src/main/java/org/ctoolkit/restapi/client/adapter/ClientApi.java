@@ -18,7 +18,6 @@
 
 package org.ctoolkit.restapi.client.adapter;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Provider;
 import java.util.Collection;
@@ -42,5 +41,5 @@ public interface ClientApi<C>
      * @param userEmail the email address of the user to impersonate
      * @return the just initialized API client instance
      */
-    C init( @Nonnull Collection<String> scopes, @Nullable String userEmail );
+    C init( @Nullable Collection<String> scopes, @Nullable String userEmail );
 }

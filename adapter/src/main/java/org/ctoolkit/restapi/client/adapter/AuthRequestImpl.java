@@ -21,6 +21,7 @@ package org.ctoolkit.restapi.client.adapter;
 import org.ctoolkit.restapi.client.AuthRequest;
 import org.ctoolkit.restapi.client.Request;
 import org.ctoolkit.restapi.client.RequestCredential;
+import org.ctoolkit.restapi.client.provider.TokenProvider;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -52,14 +53,21 @@ class AuthRequestImpl<T>
     @Override
     public Request<T> bearer()
     {
-        filler.setAuthScheme( GoogleRequestHeaders.AuthScheme.BEARER );
+        filler.setAuthScheme( AuthScheme.BEARER );
         return this;
     }
 
     @Override
     public Request<T> oauth()
     {
-        filler.setAuthScheme( GoogleRequestHeaders.AuthScheme.OAUTH );
+        filler.setAuthScheme( AuthScheme.OAUTH );
+        return this;
+    }
+
+    @Override
+    public Request<T> onBehalfOf( @Nonnull Object of )
+    {
+        filler.setOnBehalfOf( of );
         return this;
     }
 
@@ -124,19 +132,14 @@ class AuthRequestImpl<T>
     }
 
     @Override
-    public Request<T> onBehalf( @Nonnull String email, @Nullable String identityId )
-    {
-        addHeader( Request.ON_BEHALF_OF_EMAIL, email );
-        if ( identityId != null )
-        {
-            addHeader( Request.ON_BEHALF_OF_USER_ID, identityId );
-        }
-        return this;
-    }
-
-    @Override
     public AuthRequest<T> authBy( @Nonnull String token )
     {
         return request.authBy( token );
+    }
+
+    @Override
+    public AuthRequest<T> authBy( @Nonnull TokenProvider<Object> provider )
+    {
+        return request.authBy( provider );
     }
 }
