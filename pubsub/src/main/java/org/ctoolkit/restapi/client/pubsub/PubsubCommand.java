@@ -71,6 +71,11 @@ public class PubsubCommand
     public static final String ACCOUNT_EMAIL = "AccountEmail";
 
     /**
+     * The account audience unique identification.
+     */
+    public static final String ACCOUNT_AUDIENCE = "AccountAudience";
+
+    /**
      * The account unique Long type identification.
      */
     public static final String ACCOUNT_UNIQUE_ID = "AccountUnique_ID";
@@ -254,6 +259,16 @@ public class PubsubCommand
     public String getAccountEmail()
     {
         return attributes.get( ACCOUNT_EMAIL );
+    }
+
+    /**
+     * Returns the account audience unique identification.
+     *
+     * @return the account audience
+     */
+    public String getAccountAudience()
+    {
+        return attributes.get( ACCOUNT_AUDIENCE );
     }
 
     /**

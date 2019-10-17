@@ -12,6 +12,7 @@ import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCEPT_LANGUAGE;
+import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCOUNT_AUDIENCE;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCOUNT_EMAIL;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCOUNT_SIGN_UP;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCOUNT_UNIQUE_ID;
@@ -30,6 +31,8 @@ public class PubsubCommandTest
     private static final Long PRODUCT_ID = 13572468L;
 
     private static final Long ACCOUNT_ID = 246813579L;
+
+    private static final String ACCOUNT_AUD = "ctoolkit-1ab";
 
     @Test
     public void validate_NothingValidate()
@@ -151,6 +154,15 @@ public class PubsubCommandTest
         tested.validate( ACCOUNT_EMAIL );
 
         assertThat( tested.getAccountEmail() ).isEqualTo( "my.account@turnonline.biz" );
+    }
+
+    @Test
+    public void getAccountAudience()
+    {
+        PubsubCommand tested = command( false );
+        tested.validate( ACCOUNT_AUDIENCE );
+
+        assertThat( tested.getAccountAudience() ).isEqualTo( ACCOUNT_AUD );
     }
 
     @Test
@@ -353,6 +365,7 @@ public class PubsubCommandTest
                 .addMessage( "{}", ENTITY_ID, String.valueOf( PRODUCT_ID ) )
                 .addAttribute( DATA_TYPE, "Product" )
                 .addAttribute( ACCOUNT_EMAIL, "my.account@turnonline.biz" )
+                .addAttribute( ACCOUNT_AUDIENCE, ACCOUNT_AUD )
                 .addAttribute( ACCOUNT_UNIQUE_ID, String.valueOf( ACCOUNT_ID ) )
                 .addAttribute( ENTITY_DELETION, String.valueOf( deletion ) );
 
