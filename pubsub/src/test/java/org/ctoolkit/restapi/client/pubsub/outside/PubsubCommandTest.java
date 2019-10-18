@@ -14,6 +14,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCEPT_LANGUAGE;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCOUNT_AUDIENCE;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCOUNT_EMAIL;
+import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCOUNT_IDENTITY_ID;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCOUNT_SIGN_UP;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.ACCOUNT_UNIQUE_ID;
 import static org.ctoolkit.restapi.client.pubsub.PubsubCommand.DATA_TYPE;
@@ -33,6 +34,8 @@ public class PubsubCommandTest
     private static final Long ACCOUNT_ID = 246813579L;
 
     private static final String ACCOUNT_AUD = "ctoolkit-1ab";
+
+    private static final String ACCOUNT_USER_ID = "6hnhfh8kW98";
 
     @Test
     public void validate_NothingValidate()
@@ -114,7 +117,7 @@ public class PubsubCommandTest
     public void getEntityId_StringType()
     {
         PubsubCommand tested = command( false );
-        tested.validate( ENTITY_ID );
+        assertThat( tested.validate( ENTITY_ID ) ).isTrue();
 
         assertThat( tested.getEntityId() ).isEqualTo( String.valueOf( PRODUCT_ID ) );
     }
@@ -123,7 +126,7 @@ public class PubsubCommandTest
     public void getEntityId_LongType()
     {
         PubsubCommand tested = command( false );
-        tested.validate( ENTITY_ID );
+        assertThat( tested.validate( ENTITY_ID ) ).isTrue();
 
         assertThat( tested.getEntityLongId() ).isEqualTo( PRODUCT_ID );
     }
@@ -142,7 +145,7 @@ public class PubsubCommandTest
     public void getDataType()
     {
         PubsubCommand tested = command( true );
-        tested.validate( DATA_TYPE );
+        assertThat( tested.validate( DATA_TYPE ) ).isTrue();
 
         assertThat( tested.getDataType() ).isEqualTo( "Product" );
     }
@@ -151,7 +154,7 @@ public class PubsubCommandTest
     public void getAccountEmail()
     {
         PubsubCommand tested = command( true );
-        tested.validate( ACCOUNT_EMAIL );
+        assertThat( tested.validate( ACCOUNT_EMAIL ) ).isTrue();
 
         assertThat( tested.getAccountEmail() ).isEqualTo( "my.account@turnonline.biz" );
     }
@@ -160,16 +163,25 @@ public class PubsubCommandTest
     public void getAccountAudience()
     {
         PubsubCommand tested = command( false );
-        tested.validate( ACCOUNT_AUDIENCE );
+        assertThat( tested.validate( ACCOUNT_AUDIENCE ) ).isTrue();
 
         assertThat( tested.getAccountAudience() ).isEqualTo( ACCOUNT_AUD );
+    }
+
+    @Test
+    public void getAccountIdentityId()
+    {
+        PubsubCommand tested = command( false );
+        assertThat( tested.validate( ACCOUNT_IDENTITY_ID ) ).isTrue();
+
+        assertThat( tested.getAccountIdentityId() ).isEqualTo( ACCOUNT_USER_ID );
     }
 
     @Test
     public void getAccountId()
     {
         PubsubCommand tested = command( true );
-        tested.validate( ACCOUNT_UNIQUE_ID );
+        assertThat( tested.validate( ACCOUNT_UNIQUE_ID ) ).isTrue();
 
         assertThat( tested.getAccountId() ).isEqualTo( ACCOUNT_ID );
     }
@@ -245,7 +257,7 @@ public class PubsubCommandTest
         long id2 = 246L;
         long id3 = 357L;
         PubsubCommand tested = command( false, id1, id2, id3 );
-        tested.validate( ENCODED_UNIQUE_KEY );
+        assertThat( tested.validate( ENCODED_UNIQUE_KEY ) ).isTrue();
 
         List<String> uniqueKey = tested.getUniqueKey();
         assertThat( uniqueKey ).hasSize( 3 );
@@ -260,7 +272,7 @@ public class PubsubCommandTest
         long id1 = 246L;
         long id2 = 357L;
         PubsubCommand tested = command( false, id1, id2 );
-        tested.validate( ENCODED_UNIQUE_KEY );
+        assertThat( tested.validate( ENCODED_UNIQUE_KEY ) ).isTrue();
 
         assertThat( tested.idFromKey( 0 ) ).isEqualTo( String.valueOf( id1 ) );
         assertThat( tested.idFromKey( 1 ) ).isEqualTo( String.valueOf( id2 ) );
@@ -287,7 +299,7 @@ public class PubsubCommandTest
         long id1 = 246L;
         long id2 = 357L;
         PubsubCommand tested = command( false, id1, id2 );
-        tested.validate( ENCODED_UNIQUE_KEY );
+        assertThat( tested.validate( ENCODED_UNIQUE_KEY ) ).isTrue();
 
         assertThat( tested.idFromKeyLong( 0 ) ).isEqualTo( id1 );
         assertThat( tested.idFromKeyLong( 1 ) ).isEqualTo( id2 );
@@ -299,7 +311,7 @@ public class PubsubCommandTest
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "/456bn/5678" );
         PubsubCommand tested = new PubsubCommand( attributes, null );
-        tested.validate( ENCODED_UNIQUE_KEY );
+        assertThat( tested.validate( ENCODED_UNIQUE_KEY ) ).isTrue();
 
         assertThat( tested.idFromKey( 0 ) ).isEqualTo( "456bn" );
         assertThat( tested.idFromKeyLong( 1 ) ).isEqualTo( 5678L );
@@ -311,7 +323,7 @@ public class PubsubCommandTest
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "5678987" );
         PubsubCommand tested = new PubsubCommand( attributes, null );
-        tested.validate( ENCODED_UNIQUE_KEY );
+        assertThat( tested.validate( ENCODED_UNIQUE_KEY ) ).isTrue();
 
         assertThat( tested.idFromKeyLong( 0 ) ).isEqualTo( 5678987L );
     }
@@ -322,7 +334,7 @@ public class PubsubCommandTest
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "/5678987" );
         PubsubCommand tested = new PubsubCommand( attributes, null );
-        tested.validate( ENCODED_UNIQUE_KEY );
+        assertThat( tested.validate( ENCODED_UNIQUE_KEY ) ).isTrue();
 
         assertThat( tested.idFromKeyLong( 0 ) ).isEqualTo( 5678987L );
     }
@@ -333,7 +345,7 @@ public class PubsubCommandTest
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123ab/456bn" );
         PubsubCommand tested = new PubsubCommand( attributes, null );
-        tested.validate( ENCODED_UNIQUE_KEY );
+        assertThat( tested.validate( ENCODED_UNIQUE_KEY ) ).isTrue();
 
         tested.idFromKeyLong( 0 );
     }
@@ -366,6 +378,7 @@ public class PubsubCommandTest
                 .addAttribute( DATA_TYPE, "Product" )
                 .addAttribute( ACCOUNT_EMAIL, "my.account@turnonline.biz" )
                 .addAttribute( ACCOUNT_AUDIENCE, ACCOUNT_AUD )
+                .addAttribute( ACCOUNT_IDENTITY_ID, ACCOUNT_USER_ID )
                 .addAttribute( ACCOUNT_UNIQUE_ID, String.valueOf( ACCOUNT_ID ) )
                 .addAttribute( ENTITY_DELETION, String.valueOf( deletion ) );
 

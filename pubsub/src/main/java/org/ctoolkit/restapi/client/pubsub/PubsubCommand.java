@@ -76,6 +76,11 @@ public class PubsubCommand
     public static final String ACCOUNT_AUDIENCE = "AccountAudience";
 
     /**
+     * The user account unique identification within login provider system.
+     */
+    public static final String ACCOUNT_IDENTITY_ID = "AccountIdentity_ID";
+
+    /**
      * The account unique Long type identification.
      */
     public static final String ACCOUNT_UNIQUE_ID = "AccountUnique_ID";
@@ -269,6 +274,16 @@ public class PubsubCommand
     public String getAccountAudience()
     {
         return attributes.get( ACCOUNT_AUDIENCE );
+    }
+
+    /**
+     * Returns the user account unique identification within login provider system.
+     *
+     * @return the user account identity ID
+     */
+    public String getAccountIdentityId()
+    {
+        return attributes.get( ACCOUNT_IDENTITY_ID );
     }
 
     /**
