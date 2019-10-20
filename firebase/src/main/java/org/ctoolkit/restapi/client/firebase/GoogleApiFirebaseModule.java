@@ -19,6 +19,7 @@
 package org.ctoolkit.restapi.client.firebase;
 
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.ServiceOptions;
 import com.google.common.base.Strings;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -77,6 +78,12 @@ public class GoogleApiFirebaseModule
         FirebaseOptions options;
         String databaseName = init.databaseName;
         String projectId = init.projectId;
+
+        if ( Strings.isNullOrEmpty( projectId ) )
+        {
+            // GCP project ID where this service is running
+            projectId = ServiceOptions.getDefaultProjectId();
+        }
 
         if ( Strings.isNullOrEmpty( databaseName ) && projectId != null )
         {
