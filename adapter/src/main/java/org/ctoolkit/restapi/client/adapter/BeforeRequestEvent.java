@@ -25,7 +25,6 @@ import com.google.api.client.http.HttpRequest;
  * <p>
  * <strong>Example how to subscribe to this event</strong>
  * <pre>
- * {@code
  * import com.google.common.eventbus.EventBus;
  * import com.google.common.eventbus.Subscribe;
  * import org.ctoolkit.restapi.client.adapter.BeforeRequestEvent;
@@ -35,20 +34,20 @@ import com.google.api.client.http.HttpRequest;
  * import javax.inject.Singleton;
  * import javax.servlet.http.HttpServletRequest;
  *
- * @Singleton
+ * &#64;Singleton
  * class MySubscriber
  * {
  *     // Provider to provide current http servlet request
- *     private final Provider<HttpServletRequest> provider;
+ *     private final Provider&#60;HttpServletRequest&#62; provider;
  *
- *     @Inject
- *     public MySubscriber( EventBus eventBus, Provider<HttpServletRequest> provider )
+ *     &#64;Inject
+ *     public MySubscriber( EventBus eventBus, Provider&#60;HttpServletRequest&#62; provider )
  *     {
  *         eventBus.register( this );
  *         this.provider = provider;
  *     }
  *
- *     @Subscribe
+ *     &#64;Subscribe
  *     public void onBeforeRequestEvent( BeforeRequestEvent event )
  *     {
  *         com.google.api.client.http.HttpRequest clientRequest = event.getRequest();
@@ -56,7 +55,6 @@ import com.google.api.client.http.HttpRequest;
  *
  *         // forward some headers from origin HTTP request or do something else in order to populate client request
  *     }
- * }
  * }
  * Then include in to injection graph in Guice AbstractModule
  * bind( MySubscriber.class ).asEagerSingleton();
