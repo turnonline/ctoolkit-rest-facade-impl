@@ -1,11 +1,18 @@
 package org.ctoolkit.restapi.client.pubsub.outside;
 
+import com.google.api.client.util.Charsets;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.pubsub.model.PubsubMessage;
+import com.google.common.io.CharStreams;
+import org.ctoolkit.restapi.client.pubsub.InvoicingConfig;
+import org.ctoolkit.restapi.client.pubsub.InvoicingConfigBillingAddress;
 import org.ctoolkit.restapi.client.pubsub.PubsubCommand;
 import org.ctoolkit.restapi.client.pubsub.TopicMessage;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,21 +47,21 @@ public class PubsubCommandTest
     @Test
     public void validate_NothingValidate()
     {
-        PubsubCommand tested = new PubsubCommand( null, null );
+        PubsubCommand tested = new PubsubCommand( null, null, null, null );
         assertThat( tested.validate() ).isTrue();
     }
 
     @Test
     public void validate_NullOrEmpty()
     {
-        PubsubCommand tested = new PubsubCommand( null, null );
+        PubsubCommand tested = new PubsubCommand( null, null, null, null );
         assertThat( tested.validate( "", null ) ).isFalse();
     }
 
     @Test
     public void validate_NoAttributesDefined()
     {
-        PubsubCommand tested = new PubsubCommand( null, null );
+        PubsubCommand tested = new PubsubCommand( null, null, null, null );
         assertThat( tested.validate( DATA_TYPE ) ).isFalse();
     }
 
@@ -82,7 +89,7 @@ public class PubsubCommandTest
     @Test
     public void deletion_Missing()
     {
-        PubsubCommand tested = new PubsubCommand( new HashMap<>(), null );
+        PubsubCommand tested = new PubsubCommand( new HashMap<>(), null, null, null );
         assertThat( tested.isDelete() ).isFalse();
     }
 
@@ -92,7 +99,7 @@ public class PubsubCommandTest
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ACCOUNT_SIGN_UP, String.valueOf( true ) );
 
-        PubsubCommand tested = new PubsubCommand( attributes, null );
+        PubsubCommand tested = new PubsubCommand( attributes, null, null, null );
         assertThat( tested.isAccountSignUp() ).isTrue();
     }
 
@@ -102,14 +109,14 @@ public class PubsubCommandTest
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ACCOUNT_SIGN_UP, String.valueOf( false ) );
 
-        PubsubCommand tested = new PubsubCommand( attributes, null );
+        PubsubCommand tested = new PubsubCommand( attributes, null, null, null );
         assertThat( tested.isAccountSignUp() ).isFalse();
     }
 
     @Test
     public void accountSignUp_Missing()
     {
-        PubsubCommand tested = new PubsubCommand( new HashMap<>(), null );
+        PubsubCommand tested = new PubsubCommand( new HashMap<>(), null, null, null );
         assertThat( tested.isAccountSignUp() ).isFalse();
     }
 
@@ -136,7 +143,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
-        PubsubCommand tested = new PubsubCommand( attributes, null );
+        PubsubCommand tested = new PubsubCommand( attributes, null, null, null );
 
         assertThat( tested.getEntityLongId() ).isNull();
     }
@@ -191,7 +198,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
-        PubsubCommand tested = new PubsubCommand( attributes, null );
+        PubsubCommand tested = new PubsubCommand( attributes, null, null, null );
 
         assertThat( tested.getAccountId() ).isNull();
     }
@@ -201,7 +208,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
-        PubsubCommand tested = new PubsubCommand( attributes, "2019-03-25T16:01:31.992Z" );
+        PubsubCommand tested = new PubsubCommand( attributes, "2019-03-25T16:01:31.992Z", null, null );
 
         Date publishTime = tested.getPublishDate();
         assertThat( publishTime ).isEqualTo( new Date( 1553529691992L ) );
@@ -212,7 +219,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
-        PubsubCommand tested = new PubsubCommand( attributes, null );
+        PubsubCommand tested = new PubsubCommand( attributes, null, null, null );
 
         Date publishTime = tested.getPublishDate();
         assertThat( publishTime ).isNull();
@@ -224,7 +231,7 @@ public class PubsubCommandTest
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
         String input = "2019-03-25T16:01:31.992Z";
-        PubsubCommand tested = new PubsubCommand( attributes, input );
+        PubsubCommand tested = new PubsubCommand( attributes, input, null, null );
 
         DateTime publishTime = tested.getPublishDateTime();
         assertThat( publishTime.toStringRfc3339() ).isEqualTo( input );
@@ -235,7 +242,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123/456" );
-        PubsubCommand tested = new PubsubCommand( attributes, null );
+        PubsubCommand tested = new PubsubCommand( attributes, null, null, null );
 
         DateTime publishTime = tested.getPublishDateTime();
         assertThat( publishTime ).isNull();
@@ -283,7 +290,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "/5678987/4680/1358/" );
-        PubsubCommand tested = new PubsubCommand( attributes, null );
+        PubsubCommand tested = new PubsubCommand( attributes, null, null, null );
 
         List<String> uniqueKey = tested.getUniqueKey();
         assertThat( uniqueKey ).hasSize( 3 );
@@ -310,7 +317,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "/456bn/5678" );
-        PubsubCommand tested = new PubsubCommand( attributes, null );
+        PubsubCommand tested = new PubsubCommand( attributes, null, null, null );
         assertThat( tested.validate( ENCODED_UNIQUE_KEY ) ).isTrue();
 
         assertThat( tested.idFromKey( 0 ) ).isEqualTo( "456bn" );
@@ -322,7 +329,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "5678987" );
-        PubsubCommand tested = new PubsubCommand( attributes, null );
+        PubsubCommand tested = new PubsubCommand( attributes, null, null, null );
         assertThat( tested.validate( ENCODED_UNIQUE_KEY ) ).isTrue();
 
         assertThat( tested.idFromKeyLong( 0 ) ).isEqualTo( 5678987L );
@@ -333,7 +340,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "/5678987" );
-        PubsubCommand tested = new PubsubCommand( attributes, null );
+        PubsubCommand tested = new PubsubCommand( attributes, null, null, null );
         assertThat( tested.validate( ENCODED_UNIQUE_KEY ) ).isTrue();
 
         assertThat( tested.idFromKeyLong( 0 ) ).isEqualTo( 5678987L );
@@ -344,7 +351,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ENCODED_UNIQUE_KEY, "123ab/456bn" );
-        PubsubCommand tested = new PubsubCommand( attributes, null );
+        PubsubCommand tested = new PubsubCommand( attributes, null, null, null );
         assertThat( tested.validate( ENCODED_UNIQUE_KEY ) ).isTrue();
 
         tested.idFromKeyLong( 0 );
@@ -355,7 +362,7 @@ public class PubsubCommandTest
     {
         HashMap<String, String> attributes = new HashMap<>();
         attributes.put( ACCEPT_LANGUAGE, "sk_SK" );
-        PubsubCommand tested = new PubsubCommand( attributes, null );
+        PubsubCommand tested = new PubsubCommand( attributes, null, null, null );
 
         String locale = tested.getAcceptLanguage();
         assertThat( locale ).isEqualTo( "sk_SK" );
@@ -364,10 +371,36 @@ public class PubsubCommandTest
     @Test
     public void getAcceptLanguage_Null()
     {
-        PubsubCommand tested = new PubsubCommand( new HashMap<>(), null );
+        PubsubCommand tested = new PubsubCommand( new HashMap<>(), null, null, null );
 
         String locale = tested.getAcceptLanguage();
         assertThat( locale ).isNull();
+    }
+
+    @Test
+    public void fromString() throws IOException
+    {
+        InputStream stream = InvoicingConfig.class.getResourceAsStream( "invoicing.base64" );
+        String result = CharStreams.toString( new InputStreamReader( stream, Charsets.UTF_8 ) );
+
+        PubsubCommand tested = new PubsubCommand( new HashMap<>(), null, null, null );
+        InvoicingConfig invoicing = tested.fromString( result, InvoicingConfig.class );
+
+        assertThat( invoicing ).isNotNull();
+        assertThat( invoicing.getId() ).isEqualTo( 13579246810291L );
+        assertThat( invoicing.getCurrency() ).isEqualTo( "EUR" );
+        assertThat( invoicing.getNumberOfDays() ).isEqualTo( 30 );
+        assertThat( invoicing.getHasBillingAddress() ).isEqualTo( true );
+
+        InvoicingConfigBillingAddress billingAddress = invoicing.getBillingAddress();
+        assertThat( billingAddress ).isNotNull();
+        assertThat( billingAddress.getBusinessName() ).isEqualTo( "My own business, Ltd" );
+        assertThat( billingAddress.getStreet() ).isEqualTo( "Bajkalská 717/29" );
+        assertThat( billingAddress.getCity() ).isEqualTo( "Bratislava" );
+        assertThat( billingAddress.getCountry() ).isEqualTo( "SK" );
+        assertThat( billingAddress.getPostcode() ).isEqualTo( "82105" );
+        assertThat( billingAddress.getLatitude() ).isEqualTo( 48.1570754D );
+        assertThat( billingAddress.getLongitude() ).isEqualTo( 17.1662531 );
     }
 
     private PubsubCommand command( boolean deletion, long... ids )

@@ -18,16 +18,21 @@
 
 package org.ctoolkit.restapi.client.pubsub;
 
+import com.google.api.client.json.JsonParser;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.Charsets;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.pubsub.model.PubsubMessage;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.net.HttpHeaders;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -44,6 +49,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class PubsubCommand
 {
+    public static final String PUB_SUB_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+
     /**
      * The entity identification, unique only for same data type.
      */
@@ -100,17 +107,26 @@ public class PubsubCommand
 
     private Map<String, String> attributes;
 
+    private String data;
+
+    private String messageId;
+
     private String publishTime;
 
     public PubsubCommand( @Nonnull PubsubMessage message )
     {
-        this( message.getAttributes(), message.getPublishTime() );
+        this( message.getAttributes(), message.getPublishTime(), message.getData(), message.getMessageId() );
     }
 
-    public PubsubCommand( @Nullable Map<String, String> attributes, @Nullable String publishTime )
+    public PubsubCommand( @Nullable Map<String, String> attributes,
+                          @Nullable String publishTime,
+                          @Nullable String data,
+                          @Nullable String messageId )
     {
         this.attributes = attributes == null ? new HashMap<>() : attributes;
         this.publishTime = publishTime;
+        this.data = data;
+        this.messageId = messageId;
     }
 
     /**
@@ -165,6 +181,60 @@ public class PubsubCommand
         }
 
         return true;
+    }
+
+    /**
+     * Returns decoded (Base64) message data.
+     * If this field is empty, the message must contain at least one attribute.
+     *
+     * @return the decoded data
+     * @see #decode(String)
+     */
+    public String getData()
+    {
+        return data == null ? null : decode( data );
+    }
+
+    /**
+     * Decode Base64 based string. If not encoded, value will be returned as been provided.
+     *
+     * @param data optionally encoded string value
+     * @return the decoded data
+     */
+    public String decode( @Nonnull String data )
+    {
+        String decoded;
+        if ( Base64.isBase64( data.getBytes() ) )
+        {
+            decoded = new String( new PubsubMessage().setData( data ).decodeData(), Charsets.UTF_8 );
+        }
+        else
+        {
+            decoded = data;
+        }
+        return decoded;
+    }
+
+    public <T> T fromData( @Nonnull Class<T> destinationClass )
+            throws IOException
+    {
+        return data == null ? null : fromString( data, destinationClass );
+    }
+
+    /**
+     * Parses an encoded string value as a JSON object, array, or value into a new instance of the given
+     * destination class using {@link JsonParser#parse(Class)}.
+     *
+     * @param content          encoded (might be Base64) JSON string value
+     * @param destinationClass destination class that has an accessible default constructor to use to
+     *                         create a new instance
+     * @return the new instance of the parsed destination class
+     */
+    public <T> T fromString( @Nonnull String content, @Nonnull Class<T> destinationClass )
+            throws IOException
+    {
+        String decoded = decode( content );
+        return JacksonFactory.getDefaultInstance().fromString( decoded, destinationClass );
     }
 
     /**
@@ -320,6 +390,18 @@ public class PubsubCommand
     public boolean isDelete()
     {
         return Boolean.parseBoolean( attributes.get( ENTITY_DELETION ) );
+    }
+
+    /**
+     * ID of this message, assigned by the server when the message is published.
+     * Guaranteed to be unique within the topic.
+     *
+     * @return message ID or {@code null} for none
+     * @see PubsubMessage#getMessageId()
+     */
+    public String getMessageId()
+    {
+        return messageId;
     }
 
     /**
