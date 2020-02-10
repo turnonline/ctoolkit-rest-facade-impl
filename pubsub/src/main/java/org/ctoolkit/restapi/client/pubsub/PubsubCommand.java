@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -48,6 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class PubsubCommand
+        implements Serializable
 {
     public static final String PUB_SUB_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
@@ -104,6 +106,8 @@ public class PubsubCommand
     public static final String ACCEPT_LANGUAGE = HttpHeaders.ACCEPT_LANGUAGE;
 
     private static final Logger LOGGER = LoggerFactory.getLogger( PubsubCommand.class );
+
+    private static final long serialVersionUID = 7574123291824968689L;
 
     private Map<String, String> attributes;
 
@@ -201,7 +205,7 @@ public class PubsubCommand
      * @param data optionally encoded string value
      * @return the decoded data
      */
-    public String decode( @Nonnull String data )
+    public static String decode( @Nonnull String data )
     {
         String decoded;
         if ( Base64.isBase64( data.getBytes() ) )
@@ -215,26 +219,36 @@ public class PubsubCommand
         return decoded;
     }
 
-    public <T> T fromData( @Nonnull Class<T> destinationClass )
-            throws IOException
-    {
-        return data == null ? null : fromString( data, destinationClass );
-    }
-
     /**
      * Parses an encoded string value as a JSON object, array, or value into a new instance of the given
      * destination class using {@link JsonParser#parse(Class)}.
      *
-     * @param content          encoded (might be Base64) JSON string value
-     * @param destinationClass destination class that has an accessible default constructor to use to
-     *                         create a new instance
+     * @param content     encoded (might be Base64) JSON string value
+     * @param destination destination class that has an accessible default constructor to use to
+     *                    create a new instance
      * @return the new instance of the parsed destination class
      */
-    public <T> T fromString( @Nonnull String content, @Nonnull Class<T> destinationClass )
+    public static <T> T fromString( @Nonnull String content, @Nonnull Class<T> destination )
             throws IOException
     {
+        checkNotNull( destination, "Destination class to de-serialize JSON to, can't be null" );
         String decoded = decode( content );
-        return JacksonFactory.getDefaultInstance().fromString( decoded, destinationClass );
+        return JacksonFactory.getDefaultInstance().fromString( decoded, destination );
+    }
+
+    /**
+     * Parses JSON object (array, or value) taken from {@link #getData()}, into a new instance of the given
+     * destination class using {@link JsonParser#parse(Class)}.
+     *
+     * @param destination destination class that has an accessible default constructor to use to
+     *                    create a new instance
+     * @param <T>         the type of the class to be JSON data de-serialized to
+     * @return the new instance of the parsed destination class
+     */
+    public <T> T fromData( @Nonnull Class<T> destination )
+            throws IOException
+    {
+        return data == null ? null : fromString( data, destination );
     }
 
     /**
