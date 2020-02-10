@@ -201,7 +201,7 @@ class ListRequest<T>
     }
 
     @Override
-    public AuthRequest<List<T>> authBy( @Nonnull TokenProvider<Object> provider )
+    public AuthRequest<List<T>> authBy( @Nonnull TokenProvider<?> provider )
     {
         filler.setTokenCreator( checkNotNull( provider, "Token provider can't be null" ) );
         return new AuthRequestImpl<>( this, filler );

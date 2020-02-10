@@ -138,7 +138,7 @@ class AuthRequestImpl<T>
     }
 
     @Override
-    public AuthRequest<T> authBy( @Nonnull TokenProvider<Object> provider )
+    public AuthRequest<T> authBy( @Nonnull TokenProvider<?> provider )
     {
         return request.authBy( provider );
     }

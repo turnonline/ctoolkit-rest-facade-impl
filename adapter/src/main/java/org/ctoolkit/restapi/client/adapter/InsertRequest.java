@@ -183,7 +183,7 @@ class InsertRequest<T>
     }
 
     @Override
-    public AuthRequest<T> authBy( @Nonnull TokenProvider<Object> provider )
+    public AuthRequest<T> authBy( @Nonnull TokenProvider<?> provider )
     {
         filler.setTokenCreator( checkNotNull( provider, "Token provider can't be null" ) );
         return new AuthRequestImpl<>( this, filler );

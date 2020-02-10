@@ -220,7 +220,7 @@ class DownloadRequestImpl
     }
 
     @Override
-    public AuthRequest<Map<String, Object>> authBy( @Nonnull TokenProvider<Object> provider )
+    public AuthRequest<Map<String, Object>> authBy( @Nonnull TokenProvider<?> provider )
     {
         filler.setTokenCreator( checkNotNull( provider, "Token provider can't be null" ) );
         return new AuthRequestImpl<>( this, filler );

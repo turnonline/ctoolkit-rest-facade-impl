@@ -53,7 +53,7 @@ class GoogleRequestHeaders
 
         if ( remoteRequest instanceof AbstractGoogleClientRequest )
         {
-            this.headers = ( ( AbstractGoogleClientRequest ) remoteRequest ).getRequestHeaders();
+            this.headers = ( ( AbstractGoogleClientRequest<?> ) remoteRequest ).getRequestHeaders();
         }
         else
         {
@@ -151,9 +151,10 @@ class GoogleRequestHeaders
      * Sets the custom implementation that provides a token for 'Authorization' header.
      * Additional optional headers provided by {@link TokenProvider#headers(Object)}.
      */
-    void setTokenCreator( @Nullable TokenProvider<Object> provider )
+    @SuppressWarnings( "unchecked" )
+    void setTokenCreator( @Nullable TokenProvider<?> provider )
     {
-        this.provider = provider;
+        this.provider = ( TokenProvider<Object> ) provider;
     }
 
     /**
