@@ -383,8 +383,7 @@ public class PubsubCommandTest
         InputStream stream = InvoicingConfig.class.getResourceAsStream( "invoicing.base64" );
         String result = CharStreams.toString( new InputStreamReader( stream, Charsets.UTF_8 ) );
 
-        PubsubCommand tested = new PubsubCommand( new HashMap<>(), null, null, null );
-        InvoicingConfig invoicing = tested.fromString( result, InvoicingConfig.class );
+        InvoicingConfig invoicing = PubsubCommand.fromString( result, InvoicingConfig.class );
 
         assertThat( invoicing ).isNotNull();
         assertThat( invoicing.getId() ).isEqualTo( 13579246810291L );

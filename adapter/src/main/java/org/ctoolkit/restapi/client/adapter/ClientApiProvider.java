@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
@@ -42,16 +43,23 @@ public abstract class ClientApiProvider<C>
 
     private final GoogleApiProxyFactory factory;
 
-    private final ThreadLocal<C> threadLocal;
+    private ThreadLocal<C> threadLocal;
 
     public ClientApiProvider( @Nonnull GoogleApiProxyFactory factory )
     {
-        String api = checkNotNull( api(), "API name cannot be null" );
+        checkNotNull( api(), "API name cannot be null" );
         this.factory = checkNotNull( factory, "API factory cannot be null" );
+    }
 
+    /**
+     * This will be invoked automatically after the object is instantiated
+     */
+    @Inject
+    void init()
+    {
         AtomicReference<C> defaultClient = new AtomicReference<>();
         this.threadLocal = ThreadLocal.withInitial( defaultClient::get );
-        defaultClient.set( init( getScopes( api ), null, false ) );
+        defaultClient.set( init( getScopes( api() ), null, false ) );
     }
 
     @Override

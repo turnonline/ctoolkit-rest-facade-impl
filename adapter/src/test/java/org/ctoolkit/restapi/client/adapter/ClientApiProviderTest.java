@@ -57,6 +57,7 @@ public class ClientApiProviderTest
     @Test
     public void init_Default() throws GeneralSecurityException, IOException
     {
+        tested.init();
         tested.get();
 
         new Verifications()
@@ -78,6 +79,7 @@ public class ClientApiProviderTest
         String scope = "https://www.googleapis.com/auth/fake";
         ArrayList<String> scopes = Lists.newArrayList( SCOPE, scope );
         String userEmail = "specific@turnonline.biz";
+        tested.init();
 
         // test call
         tested.init( scopes, userEmail );
