@@ -19,7 +19,6 @@
 package org.ctoolkit.restapi.client.adapter;
 
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
-import com.google.api.client.http.HttpHeaders;
 import org.ctoolkit.restapi.client.AuthRequest;
 import org.ctoolkit.restapi.client.DownloadRequest;
 import org.ctoolkit.restapi.client.Identifier;
@@ -48,11 +47,11 @@ class DownloadRequestImpl
 {
     private final RestFacadeAdapter adapter;
 
-    private final DownloadExecutorAdaptee adaptee;
+    private final DownloadExecutorAdaptee<?> adaptee;
 
     private final MediaHttpDownloader downloader;
 
-    private final Class resource;
+    private final Class<?> resource;
 
     private final Identifier identifier;
 
@@ -79,9 +78,9 @@ class DownloadRequestImpl
      * @param type        the content type or {@code null} to expect default
      */
     DownloadRequestImpl( @Nonnull RestFacadeAdapter adapter,
-                         @Nonnull DownloadExecutorAdaptee adaptee,
+                         @Nonnull DownloadExecutorAdaptee<?> adaptee,
                          @Nonnull MediaHttpDownloader downloader,
-                         @Nonnull Class resource,
+                         @Nonnull Class<?> resource,
                          @Nonnull Identifier identifier,
                          @Nonnull OutputStream output,
                          @Nonnull DownloadResponseInterceptor interceptor,
@@ -95,7 +94,7 @@ class DownloadRequestImpl
         this.output = checkNotNull( output );
         this.interceptor = checkNotNull( interceptor );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeaders( adapter );
+        this.filler = new GoogleRequestHeaders();
         this.filler.contentType( type );
     }
 
@@ -149,13 +148,10 @@ class DownloadRequestImpl
         }
 
         filler.acceptLanguage( locale );
-        filler.setAuthorizationIf();
         filler.fillInCredential( params );
 
-        HttpHeaders headers = filler.getHeaders();
-
         return adapter.executeDownload( downloader, adaptee, resource, identifier, output, interceptor,
-                headers, params, locale );
+                filler, params, locale );
     }
 
     @Override

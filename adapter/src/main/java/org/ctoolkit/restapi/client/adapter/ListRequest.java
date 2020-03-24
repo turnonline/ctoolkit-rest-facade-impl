@@ -47,7 +47,7 @@ class ListRequest<T>
 
     private final RestFacadeAdapter adapter;
 
-    private final ListExecutorAdaptee adaptee;
+    private final ListExecutorAdaptee<?> adaptee;
 
     private final Object remoteRequest;
 
@@ -67,7 +67,7 @@ class ListRequest<T>
 
     ListRequest( @Nonnull Class<T> resource,
                  @Nonnull RestFacadeAdapter adapter,
-                 @Nonnull ListExecutorAdaptee adaptee,
+                 @Nonnull ListExecutorAdaptee<?> adaptee,
                  @Nonnull Object remoteRequest )
     {
         this.resource = checkNotNull( resource );
@@ -75,7 +75,7 @@ class ListRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeaders( adapter, remoteRequest );
+        this.filler = new GoogleRequestHeaders( remoteRequest );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -133,9 +133,8 @@ class ListRequest<T>
         }
 
         filler.acceptLanguage( locale );
-        filler.setAuthorizationIf();
 
-        return adapter.callbackExecuteList( adaptee, remoteRequest, resource, params, locale, start, length,
+        return adapter.callbackExecuteList( adaptee, remoteRequest, resource, filler, params, locale, start, length,
                 orderBy, ascending );
     }
 

@@ -69,7 +69,7 @@ import static org.testng.Assert.assertNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-@SuppressWarnings( {"unchecked", "ConstantConditions"} )
+@SuppressWarnings( {"unchecked", "ConstantConditions", "rawtypes"} )
 public class RestFacadeAdapterTest
 {
     private static final String API_NAME = "drive";
@@ -132,9 +132,6 @@ public class RestFacadeAdapterTest
     private LocalResourceProvider provider;
 
     @Mocked
-    private OutputStream output;
-
-    @Mocked
     private HttpContent httpContent;
 
     @Mocked
@@ -142,11 +139,15 @@ public class RestFacadeAdapterTest
 
     private RemoteRequest remoteRequest;
 
+    private GoogleRequestHeaders headers;
+
     @BeforeMethod
     public void before()
     {
         remoteRequest = new RemoteRequest( googleClient, "", "", httpContent, ResourceNoMapping.class );
         apis.put( API_NAME, clientApi );
+
+        headers = new GoogleRequestHeaders();
     }
 
     @Test
@@ -414,7 +415,7 @@ public class RestFacadeAdapterTest
         ByteArrayOutputStream content = new ByteArrayOutputStream();
         Identifier id = new Identifier( 1L );
 
-        tested.executeDownload( downloader, downloadAdaptee, ResourceNoMapping.class, id, content, interceptor, null,
+        tested.executeDownload( downloader, downloadAdaptee, ResourceNoMapping.class, id, content, interceptor, headers,
                 null, null );
     }
 
@@ -438,7 +439,7 @@ public class RestFacadeAdapterTest
         ByteArrayOutputStream content = new ByteArrayOutputStream();
         final Identifier id = new Identifier( 1L );
 
-        tested.executeDownload( downloader, downloadAdaptee, ResourceNoMapping.class, id, content, interceptor, null,
+        tested.executeDownload( downloader, downloadAdaptee, ResourceNoMapping.class, id, content, interceptor, headers,
                 null, null );
     }
 
@@ -451,10 +452,9 @@ public class RestFacadeAdapterTest
         final String type = "application/pdf";
         final Locale locale = Locale.GERMANY;
         final URL url = new URL( "https://www.ctoolkit.org/download" );
-        final HttpHeaders headers = new HttpHeaders();
         final Map<String, Object> params = new HashMap<>();
 
-        headers.setContentType( type );
+        headers.getHeaders().setContentType( type );
 
         new Expectations()
         {
@@ -471,7 +471,7 @@ public class RestFacadeAdapterTest
         new Verifications()
         {
             {
-                downloader.download( new GenericUrl( url ), headers, content );
+                downloader.download( new GenericUrl( url ), headers.getHeaders(), content );
                 times = 1;
             }
         };
@@ -490,8 +490,9 @@ public class RestFacadeAdapterTest
             }
         };
 
+        OutputStream output = new ByteArrayOutputStream();
         tested.executeDownload( downloader, downloadAdaptee, ResourceNoMapping.class, identifier, output,
-                interceptor, null, null, null );
+                interceptor, headers, null, null );
 
         new Verifications()
         {
@@ -521,7 +522,7 @@ public class RestFacadeAdapterTest
             }
         };
 
-        tested.callbackExecuteGet( getAdaptee, new Object(), ResourceNoMapping.class, identifier, null, null );
+        tested.callbackExecuteGet( getAdaptee, new Object(), ResourceNoMapping.class, identifier, headers, null, null );
 
         new Verifications()
         {

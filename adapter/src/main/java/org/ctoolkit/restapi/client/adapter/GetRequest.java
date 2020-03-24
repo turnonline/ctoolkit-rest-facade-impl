@@ -49,7 +49,7 @@ class GetRequest<T>
 
     private final RestFacadeAdapter adapter;
 
-    private final GetExecutorAdaptee adaptee;
+    private final GetExecutorAdaptee<?> adaptee;
 
     private final Object remoteRequest;
 
@@ -62,7 +62,7 @@ class GetRequest<T>
     GetRequest( @Nonnull Class<T> resource,
                 @Nonnull Identifier identifier,
                 @Nonnull RestFacadeAdapter adapter,
-                @Nonnull GetExecutorAdaptee adaptee,
+                @Nonnull GetExecutorAdaptee<?> adaptee,
                 @Nonnull Object remoteRequest )
     {
         this.resource = checkNotNull( resource );
@@ -71,7 +71,7 @@ class GetRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeaders( adapter, remoteRequest );
+        this.filler = new GoogleRequestHeaders( remoteRequest );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -116,9 +116,8 @@ class GetRequest<T>
         }
 
         filler.acceptLanguage( locale );
-        filler.setAuthorizationIf();
 
-        return adapter.callbackExecuteGet( adaptee, remoteRequest, resource, identifier, params, locale );
+        return adapter.callbackExecuteGet( adaptee, remoteRequest, resource, identifier, filler, params, locale );
     }
 
     @Override

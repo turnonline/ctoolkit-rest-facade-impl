@@ -48,7 +48,7 @@ class UpdateRequest<T>
 
     private final RestFacadeAdapter adapter;
 
-    private final UpdateExecutorAdaptee adaptee;
+    private final UpdateExecutorAdaptee<?> adaptee;
 
     private final Object remoteRequest;
 
@@ -61,7 +61,7 @@ class UpdateRequest<T>
     UpdateRequest( @Nonnull Class<T> resource,
                    @Nonnull Object identifier,
                    @Nonnull RestFacadeAdapter adapter,
-                   @Nonnull UpdateExecutorAdaptee adaptee,
+                   @Nonnull UpdateExecutorAdaptee<?> adaptee,
                    @Nonnull Object remoteRequest )
     {
         this.resource = checkNotNull( resource );
@@ -70,7 +70,7 @@ class UpdateRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeaders( adapter, remoteRequest );
+        this.filler = new GoogleRequestHeaders( remoteRequest );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -115,9 +115,8 @@ class UpdateRequest<T>
         }
 
         filler.acceptLanguage( locale );
-        filler.setAuthorizationIf();
 
-        return adapter.callbackExecuteUpdate( adaptee, remoteRequest, resource, identifier, params, locale );
+        return adapter.callbackExecuteUpdate( adaptee, remoteRequest, resource, identifier, filler, params, locale );
     }
 
     @Override

@@ -55,6 +55,7 @@ import static com.google.common.truth.Truth.assertThat;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
+@SuppressWarnings( "rawtypes" )
 public class AdapterWithSubstituteTest
 {
     @Tested
@@ -105,11 +106,13 @@ public class AdapterWithSubstituteTest
     @Mocked
     private DownloadResponseInterceptor interceptor;
 
+    private GoogleRequestHeaders headers = new GoogleRequestHeaders();
+
     @Test
     public void callbackNewInstance()
     {
         Object response = tested.callbackNewInstance( newAdaptee, new Object(), NewResource.class,
-                null, null );
+                headers, null, null );
 
         assertThat( response ).isInstanceOf( NewResource.class );
     }
@@ -130,7 +133,7 @@ public class AdapterWithSubstituteTest
         };
 
         Object response = tested.callbackNewInstance( newAdaptee, new Object(), RemoteResource.class,
-                null, null );
+                headers, null, null );
 
         assertThat( response ).isInstanceOf( RemoteResource.class );
     }
@@ -140,7 +143,7 @@ public class AdapterWithSubstituteTest
     {
         Identifier identifier = new Identifier( 1L );
         Object response = tested.callbackExecuteGet( getAdaptee, new Object(), GetResource.class, identifier,
-                null, null );
+                headers, null, null );
 
         assertThat( response ).isInstanceOf( GetResource.class );
     }
@@ -164,7 +167,7 @@ public class AdapterWithSubstituteTest
         };
 
         Object response = tested.callbackExecuteGet( getAdaptee, new Object(), RemoteResource.class, identifier,
-                null, null );
+                headers, null, null );
 
         assertThat( response ).isInstanceOf( RemoteResource.class );
     }
@@ -183,7 +186,7 @@ public class AdapterWithSubstituteTest
         };
 
         List<GetResource> response = tested.callbackExecuteList( listAdaptee, new Object(), GetResource.class,
-                null, null, 1, 10, null, false );
+                headers, null, null, 1, 10, null, false );
 
         assertThat( response ).hasSize( 1 );
         assertThat( response.get( 0 ) ).isInstanceOf( GetResource.class );
@@ -208,7 +211,7 @@ public class AdapterWithSubstituteTest
         };
 
         List<RemoteResource> response = tested.callbackExecuteList( listAdaptee, new Object(), RemoteResource.class,
-                null, null, 1, 10, null, false );
+                headers, null, null, 1, 10, null, false );
 
         assertThat( response ).hasSize( 1 );
         assertThat( response.get( 0 ) ).isInstanceOf( RemoteResource.class );
@@ -218,7 +221,7 @@ public class AdapterWithSubstituteTest
     public void callbackExecuteInsert()
     {
         Object response = tested.callbackExecuteInsert( insertAdaptee, new Object(), InsertResource.class,
-                null, null, null );
+                null, headers, null, null );
 
         assertThat( response ).isInstanceOf( InsertResource.class );
     }
@@ -239,7 +242,7 @@ public class AdapterWithSubstituteTest
         };
 
         Object response = tested.callbackExecuteInsert( insertAdaptee, new Object(), RemoteResource.class,
-                null, null, null );
+                null, headers, null, null );
 
         assertThat( response ).isInstanceOf( RemoteResource.class );
     }
@@ -249,7 +252,7 @@ public class AdapterWithSubstituteTest
     {
         Identifier identifier = new Identifier( 1L );
         Object response = tested.callbackExecuteUpdate( updateAdaptee, new Object(), UpdateResource.class,
-                identifier, null, null );
+                identifier, headers, null, null );
 
         assertThat( response ).isInstanceOf( UpdateResource.class );
     }
@@ -272,7 +275,7 @@ public class AdapterWithSubstituteTest
         };
 
         Object response = tested.callbackExecuteUpdate( updateAdaptee, new Object(), RemoteResource.class,
-                identifier, null, null );
+                identifier, headers, null, null );
 
         assertThat( response ).isInstanceOf( RemoteResource.class );
     }
@@ -282,7 +285,7 @@ public class AdapterWithSubstituteTest
     {
         Identifier identifier = new Identifier( 1L );
         Object response = tested.callbackExecuteDelete( deleteAdaptee, new Object(), identifier,
-                DeleteResource.class, null, null );
+                headers, DeleteResource.class, null, null );
 
         assertThat( response ).isInstanceOf( DeleteResource.class );
     }
@@ -304,7 +307,7 @@ public class AdapterWithSubstituteTest
         };
 
         Object response = tested.callbackExecuteDelete( deleteAdaptee, new Object(), identifier,
-                RemoteResource.class, null, null );
+                headers, RemoteResource.class, null, null );
 
         assertThat( response ).isInstanceOf( RemoteResource.class );
     }
@@ -316,13 +319,13 @@ public class AdapterWithSubstituteTest
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         tested.executeDownload( downloader, downloadAdaptee, DownloadResource.class,
-                identifier, output, interceptor, null, null, null );
+                identifier, output, interceptor, headers, null, null );
 
         new Verifications()
         {
             {
                 substitute.download( DownloadResource.class, identifier, output,
-                        null, null, null );
+                        headers.getHeaders(), null, null );
 
                 //noinspection ConstantConditions
                 downloader.download( ( GenericUrl ) any, null, ( OutputStream ) any );
@@ -350,7 +353,7 @@ public class AdapterWithSubstituteTest
         };
 
         tested.executeDownload( downloader, downloadAdaptee, DownloadResource.class,
-                identifier, output, interceptor, null, null, null );
+                identifier, output, interceptor, headers, null, null );
 
         new Verifications()
         {

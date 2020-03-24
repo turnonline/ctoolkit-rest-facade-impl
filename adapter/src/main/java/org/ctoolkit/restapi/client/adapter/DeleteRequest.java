@@ -48,7 +48,7 @@ class DeleteRequest<T>
 
     private final RestFacadeAdapter adapter;
 
-    private final DeleteExecutorAdaptee adaptee;
+    private final DeleteExecutorAdaptee<?> adaptee;
 
     private final Object remoteRequest;
 
@@ -60,7 +60,7 @@ class DeleteRequest<T>
 
     DeleteRequest( @Nonnull Object identifier,
                    @Nonnull RestFacadeAdapter adapter,
-                   @Nonnull DeleteExecutorAdaptee adaptee,
+                   @Nonnull DeleteExecutorAdaptee<?> adaptee,
                    @Nonnull Object remoteRequest )
     {
         this( null, identifier, adapter, adaptee, remoteRequest );
@@ -69,7 +69,7 @@ class DeleteRequest<T>
     private DeleteRequest( @Nullable Class<T> resource,
                            @Nonnull Object identifier,
                            @Nonnull RestFacadeAdapter adapter,
-                           @Nonnull DeleteExecutorAdaptee adaptee,
+                           @Nonnull DeleteExecutorAdaptee<?> adaptee,
                            @Nonnull Object remoteRequest )
     {
         this.resource = resource;
@@ -78,7 +78,7 @@ class DeleteRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeaders( adapter, remoteRequest );
+        this.filler = new GoogleRequestHeaders( remoteRequest );
     }
 
     @Override
@@ -116,9 +116,8 @@ class DeleteRequest<T>
         }
 
         filler.acceptLanguage( locale );
-        filler.setAuthorizationIf();
 
-        return adapter.callbackExecuteDelete( adaptee, remoteRequest, identifier, resource, params, locale );
+        return adapter.callbackExecuteDelete( adaptee, remoteRequest, identifier, filler, resource, params, locale );
     }
 
     @Override

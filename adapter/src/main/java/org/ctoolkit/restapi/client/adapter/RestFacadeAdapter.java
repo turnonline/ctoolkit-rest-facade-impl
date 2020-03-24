@@ -109,10 +109,12 @@ public class RestFacadeAdapter
 
     private final GoogleApiProxyFactory apiFactory;
 
+    @SuppressWarnings( "rawtypes" )
     private final Map<String, ClientApi> apis;
 
     private Substitute substitute;
 
+    @SuppressWarnings( "rawtypes" )
     @Inject
     RestFacadeAdapter( MapperFacade mapper,
                        MapperFactory factory,
@@ -152,24 +154,25 @@ public class RestFacadeAdapter
      * @param identifier  the unique identifier of content to download
      * @param output      the output stream where desired content will be downloaded to.
      * @param interceptor the response interceptor
-     * @param headers     the HTTP request headers
+     * @param grh         the HTTP request headers
      * @param params      the optional resource params
      * @param locale      the language the client has configured to prefer in results if applicable
      * @return the download's response headers.
      */
     Map<String, Object> executeDownload( @Nonnull MediaHttpDownloader downloader,
-                                         @Nonnull DownloadExecutorAdaptee adaptee,
-                                         @Nonnull Class resource,
+                                         @Nonnull DownloadExecutorAdaptee<?> adaptee,
+                                         @Nonnull Class<?> resource,
                                          @Nonnull Identifier identifier,
                                          @Nonnull OutputStream output,
                                          @Nonnull DownloadResponseInterceptor interceptor,
-                                         @Nullable HttpHeaders headers,
+                                         @Nonnull GoogleRequestHeaders grh,
                                          @Nullable Map<String, Object> params,
                                          @Nullable Locale locale )
     {
         //noinspection MismatchedQueryAndUpdateOfCollection
         RequestCredential credential = new RequestCredential();
         credential.fillInFrom( params, false );
+        HttpHeaders headers = grh.getHeaders();
         String type = headers == null ? null : headers.getContentType();
 
         URL path = requireNonNull( adaptee ).prepareDownloadUrl( identifier.root(), type, params, locale );
@@ -201,6 +204,7 @@ public class RestFacadeAdapter
 
             if ( remote )
             {
+                grh.setAuthorizationIf( this::getTokenProvider );
                 requireNonNull( downloader ).download( new GenericUrl( path ), headers, output );
             }
         }
@@ -221,13 +225,13 @@ public class RestFacadeAdapter
      * @param type       the content type or {@code null} to expect default
      * @return the configured download request
      */
-    DownloadRequest prepareDownloadRequest( @Nonnull Class resource,
+    DownloadRequest prepareDownloadRequest( @Nonnull Class<?> resource,
                                             @Nonnull Identifier identifier,
                                             @Nonnull OutputStream output,
                                             @Nullable String type )
     {
         DownloadResponseInterceptor interceptor = new DownloadResponseInterceptor();
-        DownloadExecutorAdaptee adaptee = adaptee( DownloadExecutorAdaptee.class, checkNotNull( resource ) );
+        DownloadExecutorAdaptee<?> adaptee = adaptee( DownloadExecutorAdaptee.class, checkNotNull( resource ) );
         String apiPrefix = adaptee.getApiPrefix();
         MediaHttpDownloader downloader;
 
@@ -258,7 +262,7 @@ public class RestFacadeAdapter
     @Override
     public <T> PayloadRequest<T> newInstance( @Nonnull Class<T> resource )
     {
-        NewExecutorAdaptee adaptee = adaptee( NewExecutorAdaptee.class, checkNotNull( resource ) );
+        NewExecutorAdaptee<?> adaptee = adaptee( NewExecutorAdaptee.class, checkNotNull( resource ) );
         Object remoteRequest;
         try
         {
@@ -284,9 +288,10 @@ public class RestFacadeAdapter
         return new OutputStreamDownloadMediaRequestProvider( this, checkNotNull( resource ) );
     }
 
-    <R> R callbackNewInstance( @Nonnull NewExecutorAdaptee adaptee,
+    <R> R callbackNewInstance( @Nonnull NewExecutorAdaptee<?> adaptee,
                                @Nonnull Object remoteRequest,
                                @Nonnull Class<R> responseType,
+                               @Nonnull GoogleRequestHeaders headers,
                                @Nullable Map<String, Object> parameters,
                                @Nullable Locale locale )
     {
@@ -316,6 +321,7 @@ public class RestFacadeAdapter
 
             if ( remote )
             {
+                headers.setAuthorizationIf( this::getTokenProvider );
                 remoteInstance = adaptee.executeNew( remoteRequest, parameters, locale );
             }
         }
@@ -344,7 +350,7 @@ public class RestFacadeAdapter
 
     <T> RetrievalRequest<T> internalGet( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
-        GetExecutorAdaptee adaptee = adaptee( GetExecutorAdaptee.class, checkNotNull( resource ) );
+        GetExecutorAdaptee<?> adaptee = adaptee( GetExecutorAdaptee.class, checkNotNull( resource ) );
         Object remoteRequest;
         try
         {
@@ -359,10 +365,11 @@ public class RestFacadeAdapter
         return new GetRequest<>( resource, identifier.root(), this, adaptee, remoteRequest );
     }
 
-    <R> R callbackExecuteGet( @Nonnull GetExecutorAdaptee adaptee,
+    <R> R callbackExecuteGet( @Nonnull GetExecutorAdaptee<?> adaptee,
                               @Nonnull Object remoteRequest,
                               @Nonnull Class<R> responseType,
                               @Nonnull Identifier identifier,
+                              @Nonnull GoogleRequestHeaders headers,
                               @Nullable Map<String, Object> parameters,
                               @Nullable Locale locale )
     {
@@ -403,20 +410,13 @@ public class RestFacadeAdapter
 
                 if ( remote )
                 {
+                    headers.setAuthorizationIf( this::getTokenProvider );
                     remoteObject = adaptee.executeGet( remoteRequest, parameters, locale );
                 }
             }
             catch ( IOException e )
             {
-                RuntimeException exception = prepareRetrievalException( e, responseType, identifier );
-                if ( exception == null )
-                {
-                    return null;
-                }
-                else
-                {
-                    throw exception;
-                }
+                throw prepareRetrievalException( e, responseType, identifier );
             }
 
             checkNotNull( remoteObject, "Callback must not return null" );
@@ -449,7 +449,7 @@ public class RestFacadeAdapter
     @Override
     public <T> ListRequest<T> list( @Nonnull Class<T> resource, @Nullable Identifier parent )
     {
-        ListExecutorAdaptee adaptee = adaptee( ListExecutorAdaptee.class, checkNotNull( resource ) );
+        ListExecutorAdaptee<?> adaptee = adaptee( ListExecutorAdaptee.class, checkNotNull( resource ) );
         Object remoteRequest;
         try
         {
@@ -463,9 +463,10 @@ public class RestFacadeAdapter
         return new ListRequest<>( resource, this, adaptee, remoteRequest );
     }
 
-    <R> List<R> callbackExecuteList( @Nonnull ListExecutorAdaptee adaptee,
+    <R> List<R> callbackExecuteList( @Nonnull ListExecutorAdaptee<?> adaptee,
                                      @Nonnull Object remoteRequest,
                                      @Nonnull Class<R> responseType,
+                                     @Nonnull GoogleRequestHeaders headers,
                                      @Nullable Map<String, Object> criteria,
                                      @Nullable Locale locale,
                                      int start,
@@ -511,21 +512,14 @@ public class RestFacadeAdapter
 
                 if ( remote )
                 {
+                    headers.setAuthorizationIf( this::getTokenProvider );
                     //noinspection unchecked
-                    remoteList = adaptee.executeList( remoteRequest, criteria, locale, start, length, orderBy, ascending );
+                    remoteList = ( List<R> ) adaptee.executeList( remoteRequest, criteria, locale, start, length, orderBy, ascending );
                 }
             }
             catch ( IOException e )
             {
-                RuntimeException exception = prepareRetrievalException( e, responseType, null );
-                if ( exception == null )
-                {
-                    remoteList = null;
-                }
-                else
-                {
-                    throw exception;
-                }
+                throw prepareRetrievalException( e, responseType, null );
             }
             if ( remoteList == null || remoteList.isEmpty() )
             {
@@ -597,10 +591,11 @@ public class RestFacadeAdapter
         return new InsertRequest<>( resourceClass, parentKey, this, adaptee, remoteRequest );
     }
 
-    <R> R callbackExecuteInsert( @Nonnull InsertExecutorAdaptee adaptee,
+    <R> R callbackExecuteInsert( @Nonnull InsertExecutorAdaptee<?> adaptee,
                                  @Nonnull Object remoteRequest,
                                  @Nonnull Class<R> responseType,
                                  @Nullable Identifier parentKey,
+                                 @Nonnull GoogleRequestHeaders headers,
                                  @Nullable Map<String, Object> parameters,
                                  @Nullable Locale locale )
     {
@@ -626,6 +621,7 @@ public class RestFacadeAdapter
 
             if ( remote )
             {
+                headers.setAuthorizationIf( this::getTokenProvider );
                 source = adaptee.executeInsert( remoteRequest, parameters, locale );
             }
         }
@@ -690,10 +686,11 @@ public class RestFacadeAdapter
         return new UpdateRequest<>( resourceClass, identifier, this, adaptee, remoteRequest );
     }
 
-    <R> R callbackExecuteUpdate( @Nonnull UpdateExecutorAdaptee adaptee,
+    <R> R callbackExecuteUpdate( @Nonnull UpdateExecutorAdaptee<?> adaptee,
                                  @Nonnull Object remoteRequest,
                                  @Nonnull Class<R> responseType,
                                  @Nonnull Object identifier,
+                                 @Nonnull GoogleRequestHeaders headers,
                                  @Nullable Map<String, Object> parameters,
                                  @Nullable Locale locale )
     {
@@ -715,6 +712,7 @@ public class RestFacadeAdapter
 
             if ( remote )
             {
+                headers.setAuthorizationIf( this::getTokenProvider );
                 source = adaptee.executeUpdate( remoteRequest, parameters, locale );
             }
         }
@@ -756,7 +754,7 @@ public class RestFacadeAdapter
     @Override
     public void impersonate( @Nonnull String userEmail, @Nonnull String api )
     {
-        ClientApi provider = apis.get( api );
+        ClientApi<?> provider = apis.get( api );
         if ( provider == null )
         {
             throw new IllegalArgumentException( impersonateClientApiMissingErrorMessage( api ) );
@@ -769,7 +767,7 @@ public class RestFacadeAdapter
     @Override
     public void impersonate( @Nonnull Collection<String> scopes, @Nonnull String userEmail, @Nonnull String api )
     {
-        ClientApi provider = apis.get( api );
+        ClientApi<?> provider = apis.get( api );
         if ( provider == null )
         {
             throw new IllegalArgumentException( impersonateClientApiMissingErrorMessage( api ) );
@@ -790,7 +788,7 @@ public class RestFacadeAdapter
     @SuppressWarnings( "unchecked" )
     <T> PayloadRequest<T> internalDelete( @Nonnull Class<T> resource, @Nonnull Identifier identifier )
     {
-        DeleteExecutorAdaptee adaptee = adaptee( DeleteExecutorAdaptee.class, checkNotNull( resource ) );
+        DeleteExecutorAdaptee<?> adaptee = adaptee( DeleteExecutorAdaptee.class, checkNotNull( resource ) );
         Object remoteRequest;
         try
         {
@@ -803,12 +801,14 @@ public class RestFacadeAdapter
         }
 
         // by default response type is not being provided (resulting in null), client can configure if expected
+        //noinspection rawtypes
         return new DeleteRequest( identifier, this, adaptee, remoteRequest );
     }
 
-    <R> R callbackExecuteDelete( @Nonnull DeleteExecutorAdaptee adaptee,
+    <R> R callbackExecuteDelete( @Nonnull DeleteExecutorAdaptee<?> adaptee,
                                  @Nonnull Object remoteRequest,
                                  @Nonnull Object identifier,
+                                 @Nonnull GoogleRequestHeaders headers,
                                  @Nullable Class<R> responseType,
                                  @Nullable Map<String, Object> parameters,
                                  @Nullable Locale locale )
@@ -835,6 +835,7 @@ public class RestFacadeAdapter
 
             if ( remote )
             {
+                headers.setAuthorizationIf( this::getTokenProvider );
                 response = adaptee.executeDelete( remoteRequest, parameters, locale );
             }
         }
@@ -955,9 +956,8 @@ public class RestFacadeAdapter
         return toBeThrown;
     }
 
-    private Class<?> evaluateRemoteResource( Class resource )
+    private Class<?> evaluateRemoteResource( Class<?> resource )
     {
-        @SuppressWarnings( "unchecked" )
         Set<Type<?>> types = factory.lookupMappedClasses( TypeFactory.valueOf( resource ) );
         Iterator<Type<?>> iterator = types.iterator();
 
@@ -1069,7 +1069,7 @@ public class RestFacadeAdapter
         return adaptee;
     }
 
-    TokenProvider<Object> getTokenProvider( @Nonnull Class type )
+    TokenProvider<Object> getTokenProvider( @Nonnull Class<?> type )
     {
         TokenProvider<Object> provider;
         ParameterizedType pt = Types.newParameterizedType( TokenProvider.class, type );
@@ -1078,7 +1078,7 @@ public class RestFacadeAdapter
         if ( binding != null )
         {
             //noinspection unchecked
-            provider = ( TokenProvider ) binding.getProvider().get();
+            provider = ( TokenProvider<Object> ) binding.getProvider().get();
         }
         else
         {

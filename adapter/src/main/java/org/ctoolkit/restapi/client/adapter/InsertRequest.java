@@ -47,7 +47,7 @@ class InsertRequest<T>
 
     private final RestFacadeAdapter adapter;
 
-    private final InsertExecutorAdaptee adaptee;
+    private final InsertExecutorAdaptee<?> adaptee;
 
     private final Object remoteRequest;
 
@@ -62,7 +62,7 @@ class InsertRequest<T>
     InsertRequest( @Nonnull Class<T> resource,
                    @Nullable Identifier parentKey,
                    @Nonnull RestFacadeAdapter adapter,
-                   @Nonnull InsertExecutorAdaptee adaptee,
+                   @Nonnull InsertExecutorAdaptee<?> adaptee,
                    @Nonnull Object remoteRequest )
     {
         this.resource = checkNotNull( resource );
@@ -71,7 +71,7 @@ class InsertRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = checkNotNull( remoteRequest );
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeaders( adapter, remoteRequest );
+        this.filler = new GoogleRequestHeaders( remoteRequest );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -116,9 +116,8 @@ class InsertRequest<T>
         }
 
         filler.acceptLanguage( locale );
-        filler.setAuthorizationIf();
 
-        return adapter.callbackExecuteInsert( adaptee, remoteRequest, resource, parentKey, params, locale );
+        return adapter.callbackExecuteInsert( adaptee, remoteRequest, resource, parentKey, filler, params, locale );
     }
 
     @Override

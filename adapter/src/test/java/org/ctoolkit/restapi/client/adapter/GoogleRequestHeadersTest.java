@@ -56,7 +56,7 @@ public class GoogleRequestHeadersTest
     public void authorizationNoAuthScheme()
     {
         tested.setTokenCreator( ( FinalTokenProvider ) () -> fakeToken );
-        tested.setAuthorizationIf();
+        tested.setAuthorizationIf( c -> null );
         final HttpHeaders httpHeaders = tested.getHeaders();
 
         assertThat( httpHeaders.getAuthorization() ).isEqualTo( fakeToken );
@@ -67,7 +67,7 @@ public class GoogleRequestHeadersTest
     {
         tested.setAuthScheme( AuthRequest.AuthScheme.BEARER );
         tested.setTokenCreator( ( FinalTokenProvider ) () -> fakeToken );
-        tested.setAuthorizationIf();
+        tested.setAuthorizationIf( c -> null );
         final HttpHeaders httpHeaders = tested.getHeaders();
 
         assertThat( httpHeaders.getAuthorization() ).isEqualTo( bearerToken );
@@ -78,7 +78,7 @@ public class GoogleRequestHeadersTest
     {
         tested.setAuthScheme( AuthRequest.AuthScheme.OAUTH );
         tested.setTokenCreator( ( FinalTokenProvider ) () -> fakeToken );
-        tested.setAuthorizationIf();
+        tested.setAuthorizationIf( c -> null );
         final HttpHeaders httpHeaders = tested.getHeaders();
 
         assertThat( httpHeaders.getAuthorization() ).isEqualTo( oauthToken );
@@ -88,7 +88,7 @@ public class GoogleRequestHeadersTest
     public void authorizationAlreadyWithBearer()
     {
         tested.setTokenCreator( ( FinalTokenProvider ) () -> bearerToken );
-        tested.setAuthorizationIf();
+        tested.setAuthorizationIf( c -> null );
         final HttpHeaders httpHeaders = tested.getHeaders();
 
         assertThat( httpHeaders.getAuthorization() ).isEqualTo( bearerToken );
@@ -98,7 +98,7 @@ public class GoogleRequestHeadersTest
     public void authorizationAlreadyWithOauth()
     {
         tested.setTokenCreator( ( FinalTokenProvider ) () -> oauthToken );
-        tested.setAuthorizationIf();
+        tested.setAuthorizationIf( c -> null );
         final HttpHeaders httpHeaders = tested.getHeaders();
 
         assertThat( httpHeaders.getAuthorization() ).isEqualTo( oauthToken );

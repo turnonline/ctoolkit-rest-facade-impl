@@ -29,6 +29,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * The class with convenient methods to populate {@link HttpHeaders} with values.
@@ -39,18 +40,14 @@ class GoogleRequestHeaders
 {
     private final HttpHeaders headers;
 
-    private final RestFacadeAdapter adapter;
-
     private AuthRequest.AuthScheme authScheme;
 
     private TokenProvider<Object> provider;
 
     private Object onBehalfOf;
 
-    GoogleRequestHeaders( RestFacadeAdapter adapter, Object remoteRequest )
+    GoogleRequestHeaders( Object remoteRequest )
     {
-        this.adapter = adapter;
-
         if ( remoteRequest instanceof AbstractGoogleClientRequest )
         {
             this.headers = ( ( AbstractGoogleClientRequest<?> ) remoteRequest ).getRequestHeaders();
@@ -61,9 +58,8 @@ class GoogleRequestHeaders
         }
     }
 
-    GoogleRequestHeaders( RestFacadeAdapter adapter )
+    GoogleRequestHeaders()
     {
-        this.adapter = adapter;
         this.headers = new HttpHeaders();
     }
 
@@ -113,12 +109,12 @@ class GoogleRequestHeaders
      * Sets the 'Authorization' header if there is an explicit configuration to this request,
      * otherwise the underlying authorization mechanism will be used.
      */
-    void setAuthorizationIf()
+    void setAuthorizationIf( Function<Class<?>, TokenProvider<Object>> function )
     {
         if ( provider == null && onBehalfOf != null )
         {
             // Impl of TokenProvider is required, search for one. Expected to be possible to inject.
-            provider = adapter.getTokenProvider( onBehalfOf.getClass() );
+            provider = function.apply( onBehalfOf.getClass() );
             if ( provider == null )
             {
                 String msg = "Missing binding between TokenProvider and on behalf of user: "

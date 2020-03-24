@@ -38,7 +38,7 @@ class OutputStreamDownloadRequest
 {
     private final RestFacadeAdapter adapter;
 
-    private final Class resource;
+    private final Class<?> resource;
 
     private final OutputStream output;
 
@@ -52,7 +52,7 @@ class OutputStreamDownloadRequest
      * @param output   the output stream where desired content will be downloaded to.
      */
     OutputStreamDownloadRequest( @Nonnull RestFacadeAdapter adapter,
-                                 @Nonnull Class resource,
+                                 @Nonnull Class<?> resource,
                                  @Nonnull OutputStream output )
     {
         this.adapter = checkNotNull( adapter );

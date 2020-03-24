@@ -52,7 +52,7 @@ public interface Substitute
      * Same input parameters except Adaptee that is not provided here.
      *
      * @throws ProceedWithRemoteCall if it is preferred to continue with remote call for concrete use cases
-     * @see RestFacadeAdapter#callbackNewInstance(NewExecutorAdaptee, Object, Class, Map, Locale)
+     * @see RestFacadeAdapter#callbackNewInstance(NewExecutorAdaptee, Object, Class, GoogleRequestHeaders, Map, Locale)
      */
     <R> R newInstance( @Nonnull Object remoteRequest,
                        @Nonnull Class<R> responseType,
@@ -64,9 +64,9 @@ public interface Substitute
      *
      * @throws ProceedWithRemoteCall if it is preferred to continue with remote call for concrete use cases
      * @see RestFacadeAdapter#executeDownload(MediaHttpDownloader, DownloadExecutorAdaptee, Class, Identifier,
-     * OutputStream, DownloadResponseInterceptor, HttpHeaders, Map, Locale)
+     * OutputStream, DownloadResponseInterceptor, GoogleRequestHeaders, Map, Locale)
      */
-    void download( @Nonnull Class resource,
+    void download( @Nonnull Class<?> resource,
                    @Nonnull Identifier identifier,
                    @Nonnull OutputStream output,
                    @Nullable HttpHeaders headers,
@@ -77,7 +77,8 @@ public interface Substitute
      * Same input parameters except Adaptee that is not provided here.
      *
      * @throws ProceedWithRemoteCall if it is preferred to continue with remote call for concrete use cases
-     * @see RestFacadeAdapter#callbackExecuteGet(GetExecutorAdaptee, Object, Class, Identifier, Map, Locale)
+     * @see RestFacadeAdapter#callbackExecuteGet(GetExecutorAdaptee, Object, Class, Identifier,
+     * GoogleRequestHeaders, Map, Locale)
      */
     <R> R get( @Nonnull Object remoteRequest,
                @Nonnull Class<R> responseType,
@@ -89,8 +90,8 @@ public interface Substitute
      * Same input parameters except Adaptee that is not provided here.
      *
      * @throws ProceedWithRemoteCall if it is preferred to continue with remote call for concrete use cases
-     * @see RestFacadeAdapter#callbackExecuteList(ListExecutorAdaptee, Object, Class, Map, Locale, int, int,
-     * String, Boolean)
+     * @see RestFacadeAdapter#callbackExecuteList(ListExecutorAdaptee, Object, Class,
+     * GoogleRequestHeaders, Map, Locale, int, int, String, Boolean)
      */
     <R> List<R> list( @Nonnull Object remoteRequest,
                       @Nonnull Class<R> responseType,
@@ -105,7 +106,8 @@ public interface Substitute
      * Same input parameters except Adaptee that is not provided here.
      *
      * @throws ProceedWithRemoteCall if it is preferred to continue with remote call for concrete use cases
-     * @see RestFacadeAdapter#callbackExecuteInsert(InsertExecutorAdaptee, Object, Class, Identifier, Map, Locale)
+     * @see RestFacadeAdapter#callbackExecuteInsert(InsertExecutorAdaptee, Object, Class, Identifier,
+     * GoogleRequestHeaders, Map, Locale)
      */
     <R> R insert( @Nonnull Object remoteRequest,
                   @Nonnull Class<R> responseType,
@@ -117,7 +119,8 @@ public interface Substitute
      * Same input parameters except Adaptee that is not provided here.
      *
      * @throws ProceedWithRemoteCall if it is preferred to continue with remote call for concrete use cases
-     * @see RestFacadeAdapter#callbackExecuteUpdate(UpdateExecutorAdaptee, Object, Class, Object, Map, Locale)
+     * @see RestFacadeAdapter#callbackExecuteUpdate(UpdateExecutorAdaptee, Object, Class, Object,
+     * GoogleRequestHeaders, Map, Locale)
      */
     <R> R update( @Nonnull Object remoteRequest,
                   @Nonnull Class<R> responseType,
@@ -129,7 +132,8 @@ public interface Substitute
      * Same input parameters except Adaptee that is not provided here.
      *
      * @throws ProceedWithRemoteCall if it is preferred to continue with remote call for concrete use cases
-     * @see RestFacadeAdapter#callbackExecuteDelete(DeleteExecutorAdaptee, Object, Object, Class, Map, Locale)
+     * @see RestFacadeAdapter#callbackExecuteDelete(DeleteExecutorAdaptee, Object, Object,
+     * GoogleRequestHeaders, Class, Map, Locale)
      */
     <R> R delete( @Nonnull Object remoteRequest,
                   @Nonnull Object identifier,

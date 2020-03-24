@@ -36,9 +36,9 @@ class OutputStreamDownloadMediaRequestProvider
 {
     private final RestFacadeAdapter adapter;
 
-    private final Class resource;
+    private final Class<?> resource;
 
-    OutputStreamDownloadMediaRequestProvider( @Nonnull RestFacadeAdapter adapter, @Nonnull Class resource )
+    OutputStreamDownloadMediaRequestProvider( @Nonnull RestFacadeAdapter adapter, @Nonnull Class<?> resource )
     {
         this.adapter = checkNotNull( adapter );
         this.resource = checkNotNull( resource );

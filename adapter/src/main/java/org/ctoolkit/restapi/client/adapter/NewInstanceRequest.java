@@ -47,7 +47,7 @@ class NewInstanceRequest<T>
 
     private final RestFacadeAdapter adapter;
 
-    private final NewExecutorAdaptee adaptee;
+    private final NewExecutorAdaptee<?> adaptee;
 
     private final Object remoteRequest;
 
@@ -59,7 +59,7 @@ class NewInstanceRequest<T>
 
     NewInstanceRequest( @Nonnull Class<T> resource,
                         @Nonnull RestFacadeAdapter adapter,
-                        @Nonnull NewExecutorAdaptee adaptee,
+                        @Nonnull NewExecutorAdaptee<?> adaptee,
                         @Nullable Object remoteRequest )
     {
         this.resource = checkNotNull( resource );
@@ -67,9 +67,10 @@ class NewInstanceRequest<T>
         this.adaptee = checkNotNull( adaptee );
         this.remoteRequest = remoteRequest;
         this.params = new HashMap<>();
-        this.filler = new GoogleRequestHeaders( adapter, remoteRequest );
+        this.filler = new GoogleRequestHeaders( remoteRequest );
     }
 
+    @SuppressWarnings( "unchecked" )
     @Override
     public <U> U underlying( Class<U> type )
     {
@@ -123,9 +124,8 @@ class NewInstanceRequest<T>
         }
 
         filler.acceptLanguage( locale );
-        filler.setAuthorizationIf();
 
-        return adapter.callbackNewInstance( adaptee, remoteRequest, resource, params, locale );
+        return adapter.callbackNewInstance( adaptee, remoteRequest, resource, filler, params, locale );
     }
 
     @Override
