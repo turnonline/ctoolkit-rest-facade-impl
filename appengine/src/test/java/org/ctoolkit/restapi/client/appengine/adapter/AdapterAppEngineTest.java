@@ -198,7 +198,7 @@ public class AdapterAppEngineTest
 
         List<String> scopes = builder.getScopes( null );
         assertThat( scopes )
-                .containsAllOf( "https://www.googleapis.com/auth/drive",
+                .containsAtLeast( "https://www.googleapis.com/auth/drive",
                         "https://www.googleapis.com/auth/drive.metadata" );
 
         boolean disableGZipContent = builder.isDisableGZipContent( null );
@@ -248,7 +248,7 @@ public class AdapterAppEngineTest
 
         List<String> scopes = builder.getScopes( prefix );
         assertThat( scopes )
-                .containsAllOf( "https://www.googleapis.com/auth/drive",
+                .containsAtLeast( "https://www.googleapis.com/auth/drive",
                         "https://www.googleapis.com/auth/drive.metadata" );
 
         boolean disableGZipContent = builder.isDisableGZipContent( prefix );
@@ -297,7 +297,7 @@ public class AdapterAppEngineTest
 
         List<String> scopes = builder.getScopes( prefix );
         assertThat( scopes )
-                .containsAllOf( "https://www.googleapis.com/auth/drive",
+                .containsAtLeast( "https://www.googleapis.com/auth/drive",
                         "https://www.googleapis.com/auth/drive.metadata" );
 
         boolean disableGZipContent = builder.isDisableGZipContent( prefix );

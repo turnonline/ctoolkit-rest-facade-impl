@@ -96,7 +96,7 @@ public class ClientApiProviderTest
                 factory.authorize( scopes = withCapture(), email = withCapture(), API );
                 assertThat( email ).isEqualTo( userEmail );
                 assertThat( scopes ).hasSize( 2 );
-                assertThat( scopes ).containsAllOf( SCOPE, scope );
+                assertThat( scopes ).containsAtLeast( SCOPE, scope );
             }
         };
     }
