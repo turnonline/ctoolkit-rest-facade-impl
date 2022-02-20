@@ -107,15 +107,15 @@ public class PubsubCommand
 
     private static final Logger LOGGER = LoggerFactory.getLogger( PubsubCommand.class );
 
-    private static final long serialVersionUID = 7574123291824968689L;
+    private static final long serialVersionUID = 2023063093067483562L;
 
-    private Map<String, String> attributes;
+    private final Map<String, String> attributes;
 
-    private String data;
+    private final String data;
 
-    private String messageId;
+    private final String messageId;
 
-    private String publishTime;
+    private final String publishTime;
 
     public PubsubCommand( @Nonnull PubsubMessage message )
     {

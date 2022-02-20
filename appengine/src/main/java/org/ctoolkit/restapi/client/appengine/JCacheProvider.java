@@ -18,37 +18,29 @@
 
 package org.ctoolkit.restapi.client.appengine;
 
-import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
-import net.sf.jsr107cache.Cache;
-import net.sf.jsr107cache.CacheException;
-import net.sf.jsr107cache.CacheFactory;
-import net.sf.jsr107cache.CacheManager;
-
+import javax.cache.Cache;
+import javax.cache.CacheException;
+import javax.cache.CacheFactory;
+import javax.cache.CacheManager;
 import javax.inject.Provider;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 
 /**
- * The optional JCache provider to provide cache instance with own dedicated namespace: ${@link #CACHE_NAMESPACE}.
+ * The optional JCache provider to provide cache instance.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class JCacheProvider
         implements Provider<Cache>
 {
-    public static final String CACHE_NAMESPACE = "REST_API_CLIENT_FACADE";
-
     @Override
     public Cache get()
     {
-        Map<String, String> properties = new HashMap<>();
-        properties.put( GCacheFactory.NAMESPACE, CACHE_NAMESPACE );
-
         CacheFactory factory;
         try
         {
             factory = CacheManager.getInstance().getCacheFactory();
-            return factory.createCache( properties );
+            return factory.createCache( Collections.emptyMap() );
         }
         catch ( CacheException e )
         {
