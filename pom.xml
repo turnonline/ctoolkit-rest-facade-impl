@@ -20,8 +20,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>org.ctoolkit.maven</groupId>
-        <artifactId>ctoolkit-public</artifactId>
+        <groupId>biz.turnonline.ecosystem</groupId>
+        <artifactId>connecsys-private-parent</artifactId>
         <version>2</version>
     </parent>
 
@@ -59,6 +59,7 @@
     <modules>
         <module>adapter</module>
         <module>appengine</module>
+        <module>appengine-lite</module>
         <module>analytics</module>
         <module>drive</module>
         <module>firebase</module>
@@ -199,6 +200,7 @@
     </dependencyManagement>
 
     <properties>
+        <jdk.version>11</jdk.version>
         <appengine.version>1.9.95</appengine.version>
         <ctoolkit-rest-facade-api.version>0.29</ctoolkit-rest-facade-api.version>
         <google-api-services-analytics.version>v3-rev169-1.25.0</google-api-services-analytics.version>

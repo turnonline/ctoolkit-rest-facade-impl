@@ -1,4 +1,4 @@
-package org.ctoolkit.restapi.client.adapter;
+package org.ctoolkit.restapi.client.appengine.orika;
 
 import com.google.api.client.util.DateTime;
 import ma.glasnost.orika.MappingContext;

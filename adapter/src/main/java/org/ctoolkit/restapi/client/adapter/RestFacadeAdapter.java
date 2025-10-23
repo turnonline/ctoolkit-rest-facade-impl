@@ -30,10 +30,6 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Types;
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.metadata.Type;
-import ma.glasnost.orika.metadata.TypeFactory;
 import org.ctoolkit.restapi.client.ClientErrorException;
 import org.ctoolkit.restapi.client.DeleteIdentification;
 import org.ctoolkit.restapi.client.DownloadMediaProvider;
@@ -80,11 +76,9 @@ import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Objects.requireNonNull;
@@ -94,7 +88,6 @@ import static java.util.Objects.requireNonNull;
  * and then delegates the execution to one of the binded adaptee.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
- * @see MapperFactory
  */
 public class RestFacadeAdapter
         implements RestFacade
@@ -102,8 +95,6 @@ public class RestFacadeAdapter
     private static final Logger logger = LoggerFactory.getLogger( RestFacadeAdapter.class );
 
     private final MapperFacade mapper;
-
-    private final MapperFactory factory;
 
     private final Injector injector;
 
@@ -117,13 +108,11 @@ public class RestFacadeAdapter
     @SuppressWarnings( "rawtypes" )
     @Inject
     RestFacadeAdapter( MapperFacade mapper,
-                       MapperFactory factory,
                        Injector injector,
                        GoogleApiProxyFactory apiFactory,
                        Map<String, ClientApi> apis )
     {
         this.mapper = mapper;
-        this.factory = factory;
         this.injector = injector;
         this.apiFactory = apiFactory;
         this.apis = apis;
@@ -239,6 +228,8 @@ public class RestFacadeAdapter
         {
             HttpRequestInitializer requestConfig = apiFactory.newRequestConfig( apiPrefix, interceptor );
             downloader = new MediaHttpDownloader( apiFactory.getHttpTransport(), requestConfig );
+            // Enable direct download to avoid reliance on Content-Length parsing (e.g., for chunked/unknown lengths)
+            downloader.setDirectDownloadEnabled( true );
         }
         catch ( GeneralSecurityException e )
         {
@@ -958,22 +949,8 @@ public class RestFacadeAdapter
 
     private Class<?> evaluateRemoteResource( Class<?> resource )
     {
-        Set<Type<?>> types = factory.lookupMappedClasses( TypeFactory.valueOf( resource ) );
-        Iterator<Type<?>> iterator = types.iterator();
-
-        Class<?> remoteResource;
-
-        if ( iterator.hasNext() )
-        {
-            remoteResource = iterator.next().getRawType();
-        }
-        else
-        {
-            // there is no mapping, use directly the given resource type
-            remoteResource = resource;
-        }
-
-        return remoteResource;
+        Class<?> remoteResource = mapper.getMappedClassOrSelf( resource );
+        return remoteResource == null ? resource : remoteResource;
     }
 
     private <A> A adaptee( Class<A> adapteeType, Class<?> resource )

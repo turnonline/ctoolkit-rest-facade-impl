@@ -22,8 +22,6 @@ import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.http.GenericUrl;
 import com.google.common.collect.Lists;
 import com.google.inject.Injector;
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
 import mockit.Expectations;
 import mockit.Injectable;
 import mockit.Mocked;
@@ -63,9 +61,6 @@ public class AdapterWithSubstituteTest
 
     @Injectable
     private MapperFacade mapper;
-
-    @Injectable
-    private MapperFactory factory;
 
     @Injectable
     private Injector injector;

@@ -25,9 +25,6 @@ import com.google.api.client.http.HttpContent;
 import com.google.api.client.http.HttpHeaders;
 import com.google.common.collect.Lists;
 import com.google.inject.Injector;
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingContext;
 import mockit.Expectations;
 import mockit.Injectable;
 import mockit.Mocked;
@@ -79,9 +76,6 @@ public class RestFacadeAdapterTest
 
     @Injectable
     private MapperFacade mapper;
-
-    @Injectable
-    private MapperFactory factory;
 
     @Injectable
     private Injector injector;
@@ -689,19 +683,7 @@ public class RestFacadeAdapterTest
                 mapper.map( any, ( Class ) any );
                 times = 0;
 
-                mapper.map( any, ( Class ) any, ( MappingContext ) any );
-                times = 0;
-
-                mapper.map( any, any );
-                times = 0;
-
-                mapper.map( any, any, ( MappingContext ) any );
-                times = 0;
-
                 mapper.mapAsList( ( List ) any, ( Class ) any );
-                times = 0;
-
-                mapper.mapAsList( ( List ) any, ( Class ) any, ( MappingContext ) any );
                 times = 0;
             }
         };

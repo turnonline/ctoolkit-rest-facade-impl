@@ -21,12 +21,12 @@ package org.ctoolkit.restapi.client.appengine;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
-import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
-import org.ctoolkit.restapi.client.adapter.BeanMapperConfig;
-import org.ctoolkit.restapi.client.adapter.DateTimeToDateConverter;
+import org.ctoolkit.restapi.client.adapter.MapperFacade;
+import org.ctoolkit.restapi.client.appengine.orika.BeanMapperConfig;
+import org.ctoolkit.restapi.client.appengine.orika.DateTimeToDateConverter;
 
 import javax.inject.Singleton;
 import java.util.Set;
@@ -72,7 +72,7 @@ public class CtoolkitRestFacadeDefaultOrikaModule
             next.config( factory );
         }
 
-        return factory.getMapperFacade();
+        return new OrikaMapperFacadeAdapter( factory.getMapperFacade(), factory );
     }
 
     @Override

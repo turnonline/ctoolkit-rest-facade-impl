@@ -34,7 +34,6 @@ import org.ctoolkit.restapi.client.adaptee.ListExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.NewExecutorAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UnderlyingClientAdaptee;
 import org.ctoolkit.restapi.client.adaptee.UpdateExecutorAdaptee;
-import org.ctoolkit.restapi.client.adapter.BeanMapperConfig;
 import org.ctoolkit.restapi.client.adapter.ClientApi;
 import org.ctoolkit.restapi.client.appengine.adapter.BeeGetListAdaptee;
 import org.ctoolkit.restapi.client.appengine.adapter.FakeClient;
@@ -53,6 +52,7 @@ import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteBee;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteFoo;
 import org.ctoolkit.restapi.client.appengine.adapter.model.RemoteOnly;
 import org.ctoolkit.restapi.client.appengine.adapter.model.UnderlyingClient;
+import org.ctoolkit.restapi.client.appengine.orika.BeanMapperConfig;
 import org.ctoolkit.restapi.client.provider.AuthKeyProvider;
 
 import javax.annotation.Nullable;
