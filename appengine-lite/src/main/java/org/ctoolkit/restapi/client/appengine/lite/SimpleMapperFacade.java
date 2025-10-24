@@ -19,7 +19,7 @@ import java.util.List;
  * no mapping is required. Projects needing real mapping can bind their own MapperFacade
  * implementation via Guice.
  */
-class SimpleMapperFacade
+public class SimpleMapperFacade
         implements MapperFacade
 {
     @Override
